@@ -1,0 +1,321 @@
+
+.file-btn {
+  width: 250px;
+  
+  height: 150px;
+  font-size: 18px;
+  font-weight: 500
+  ;
+
+  display: flex;
+
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  color: #612aa9;
+  background-color: #fff;
+  border: 1.5px dashed #5C2D9A;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.file-btn:hover {
+  color: #5C2D9A;
+  background-color: #fff;
+}
+
+.file-btn span {
+  width: 50px;
+  height: 50px;
+  font-size: 30px;
+  color: #5C2D9A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 25px;
+  background-color: #f3ecff;
+}
+
+.btn-submit {
+  background-color: #5C2D9A;
+  
+}
+
+.product-btn {  text-align: center;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+justify-items: center;}
+
+.inputPic {
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+  position: absolute;
+  top: 125px;
+  opacity: 0;
+  cursor: pointer;
+
+}
+
+.selectedImg {
+  width: 250px;
+  height: 200px;
+  border-radius: 5%;
+  position: relative;
+
+}
+
+.imgsel {
+  position: relative;
+}
+
+/* .x{
+  position: absolute;
+  right: 7px;
+  top: 5px;
+  /* height: 5%;
+  wi */
+/* }  */
+.x {
+  color: white;
+  background-color: #5C2D9A;
+  position: absolute;
+  left: 200px;
+  top: 5px;
+
+}
+
+.card-img-top{
+  overflow: hidden;
+  object-fit: cover;
+  border-radius: 5% 5% ;
+  width:20rem !important;
+  height:500px !important;
+  border-radius: 5% 5% ;
+  max-width:20rem !important;
+  max-height:500px !important;
+}
+
+/* -------------------------- */
+.scroll-container {
+  /* max-height: unset !important; */
+  max-height: 100vh;
+  /* max-height: 1222px;  */
+  /* max-height: 100vh;  */
+  /* height: 100vh !important; */
+  width: 100%;
+  overflow-x: auto;
+ 
+}
+.card-container{
+  max-height: unset !important;
+  height: 1000px;
+  
+}
+.scroll-content {
+  max-width: unset !important;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 items per row */
+  gap: 12px; /* Space between items */
+  scroll-snap-type: x mandatory;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  max-height: unset !important;
+  overflow: auto; /* Enables scrolling */
+
+  
+}
+.card {
+  /* height: 650px !important; */
+}
+
+.card-text {
+  
+  color: #5C2D9A;
+  text-align: center;
+}
+.cardItem {
+  max-width: unset !important;
+  width: 350px !important;  /* Fixed width */
+  background:#E7E9EB;
+  height: 600px !important; 
+  color: white;
+  padding: 16px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  scroll-snap-align: start;
+  flex: 0 0 300px; /* FIXED width, no shrinking or expanding */
+
+}
+
+.scroll-container {
+  overflow: auto; /* Enables scrolling */
+}
+
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb { 
+  background-color: #ffffff; /* Scrollbar thumb color */
+  border-radius: 0; /* Makes it rectangular */
+  border: 2px solid #ffffff; /* Optional border */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  height: 8px;
+  width: 20px;
+    border-radius: 0px;
+  background-color: #5C2D9A; /* Scrollbar thumb color */
+}
+.graybg-scrollbar::-webkit-scrollbar {
+   background-color: #F8F9FA; /* Scrollbar thumb color */
+
+}
+/* Custom scrollbar (optional) */
+::-webkit-scrollbar {
+  height: 8px;
+  width: 80px;
+    border-radius: 0px;
+  background-color:  #ffffff;/* Scrollbar thumb color */
+
+  
+}
+::-webkit-scrollbar-thumb {
+  height: 8px;
+  width: 80px;
+    border-radius: 0px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  height: 8px;
+  width: 80px;
+    border-radius: 0px;
+}
+
+
+::-webkit-scrollbar {
+  width: 20px; /* Vertical scrollbar width */
+  height: 12px; /* Horizontal scrollbar height */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #A68AEC; /* Scrollbar thumb color */
+  background-color: #5C2D9A; /* Scrollbar thumb color */
+  border-radius: 0; /* Makes it rectangular */
+  border: 2px solid #ffffff; /* Optional border */
+}
+.thumb-round::-webkit-scrollbar-thumb {
+  border-radius: 20% !important;
+  width: 10px;
+
+}
+.thumb-round::-webkit-scrollbar {
+  width: 17px; /* Vertical scrollbar width */
+  height: 12px; /* Horizontal scrollbar height */
+}
+::-webkit-scrollbar-track {
+}
+/* 
+.search{
+  width: 1000px;
+ margin-right: 10%;
+} */
+.dt{
+  font-family: "PT Sans", sans-serif;
+}
+.text{
+  font-family: 'Kanit', sans-serif;
+}
+
+.logo{
+  width: 40px;
+  height: 40px;
+  /* margin: 10px; */
+}
+.rewearlogo{
+  width: 120px;
+}
+
+.VioletCred{
+  color: #8356C0;
+}
+.category-hover {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-hover:hover {
+  font-weight: bold;
+  text-decoration: underline;
+  color: #8356C0;
+}
+.category-title-hover {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-title-hover:hover {
+  font-weight: bold;
+  text-decoration: underline;
+  color: black;
+}
+.count-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  min-width: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background-color: transparent;
+  color: black;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.count-pill:hover {
+  background-color: #8356C0;
+  color: white;
+}
+
+.statusbg-1 {
+  background-color: #0e01ff48; /* light green */
+}
+
+.statusbg-0 {
+  background-color: #018dffc0; /* light red */
+}
+
+.statusbg-2 {
+  background-color: #b80c0966; /* light yellow */
+}
+
+.statusbg-4 {
+  background-color: #20c660; /* light blue */
+}
+
+.statuscl-0 {
+  color: #018dffc0; /* light red */
+}
+.statuscl-1 {
+  color: #5C2D9A; /* light green */
+}
+
+.statuscl-2 {
+  color: #B80C09; /* light yellow */
+}
+
+.statuscl-4 {
+  color: #20c660; /* light blue */
+}
