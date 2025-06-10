@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import Logout from "./Logout";
-import Cookies from "universal-cookie";
 import axios from "axios";
-// import { useCookies, } from 'react-cookie';
 import Button from "@mui/material/Button";
 import { useLocation } from "react-router-dom";
 
@@ -27,19 +25,12 @@ const Navbar = ({
   const [userNav, setUserNav] = useState(null);
 const location = useLocation();
 
-  const cookies = new Cookies();
   // const [openModalLog, setOpenModalLog] = useState(false);
   // const [openModalReg, setOpenModalReg] = useState(false);
-  // const [cookies,setCookie,removeCookies] = useCookies(['userToken']);
   useEffect(() => {
-    console.log(
-      "token from universal cookies ==>",
-      JSON.stringify(cookies.get("userToken"))
-    );
-    if (cookies.get("userToken")) {
       console.log("theres token in navbar");
       axios
-        .get("http://localhost:10000/api/users/logged", {
+        .get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", {
           withCredentials: true,
         })
         .then((res) => {
@@ -51,14 +42,16 @@ const location = useLocation();
         .catch((error) => {
           localStorage.removeItem("token");
           console.log(error);
+          setUserNav(null);
         });
-    } else {
-      console.log("no token in navbar");
-      setUserNav({});
-    }
+    // } else {
+    //   console.log("no token in navbar");
+    //   setUserNav({});
+    // }
     // setSort( {category:"" ,gender: "", search: "" })
     // },[JSON.stringify(token)])
-  }, [cookies.get("userToken")]);
+  }, [
+    location.pathname]);
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-body-tertiary ">
@@ -215,7 +208,7 @@ const location = useLocation();
                 </div>
               </div>
             </>
-          ) : !cookies.get("userToken") ? (
+          ) : (
             //   <div className="collapse navbar-collapse " id="navbarNavAltMarkup">
             <div className="d-flex gap-4 justify-content-end col-3 pe-5">
               <div className="d-flex align-items-center gap-2 ">
@@ -246,15 +239,7 @@ const location = useLocation();
                 </Link>
               </div>
             </div>
-          ) : (
-            //   </div>
-            <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
-              <div className="d-flex gap-4 ms-5 mt-2">
-                <div className="d-flex align-items-center gap-2 "></div>
-                <div className="d-flex align-items-center gap-2"></div>
-              </div>
-            </div>
-          )}
+          ) }
         </div>
       </nav>
     </>

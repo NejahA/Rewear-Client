@@ -24,7 +24,7 @@ const ModalReg = ({ open, setOpenModalLog, setOpenModalReg }) => {
         e.preventDefault();
         try {
             const response = await axios.post(
-                "http://localhost:10000/api/register",
+                ""+import.meta.env.VITE_LOCAL_URL+"/api/register",
                 user,
                 { withCredentials: true }
             );

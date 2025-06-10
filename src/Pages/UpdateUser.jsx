@@ -3,7 +3,6 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 // import Logout from "../Components/Logout";
 import { useNavigate, useParams } from "react-router-dom";
-import Cookies from "universal-cookie";
 
 const UpdateUser = () => {
   const [user, setUser] = useState({
@@ -23,17 +22,13 @@ const UpdateUser = () => {
   const [adresCheck, setAdressCheck] = useState(true)
   // const nav = useNavigate();
   const navigate = useNavigate();
-  const cookies = new Cookies();
   // const token = localStorage.getItem('token')
   const { id } = useParams();
   // console.log("this is id : ",id);
 
   useEffect(() => {
-    if (!cookies.get("userToken")) {
-      navigate("/");
-    } else {
       axios
-        .get("http://localhost:10000/api/users/logged", {
+        .get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", {
           withCredentials: true,
         })
         .then((res) => {
@@ -44,8 +39,7 @@ const UpdateUser = () => {
         .catch((err) => console.log(err));
       console.log();
       // }
-    }
-  }, [cookies.get("userToken")]);
+  }, []);
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setSelectedFiles(e.target.files);
@@ -107,7 +101,7 @@ const handleToggle = (field) => (event) => {
     //   formData.append("profilePic",JSON.stringify(user.profilePic[0])  );
 
     axios
-      .put("http://localhost:10000/api/users/" + user._id, formData, {
+      .put(""+import.meta.env.VITE_LOCAL_URL+"/api/users/" + user._id, formData, {
         withCredentials: true,
       })
       .then((res) => {

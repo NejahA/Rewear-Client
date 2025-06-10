@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ItemCard from "../Components/ItemCard";
-import Cookies from "universal-cookie";
 import { useRef } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 // import { Spinner } from "flowbite-react"; SyncLoader
@@ -134,15 +133,13 @@ const tagOptions = [
 ];
 const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort }) => {
   // const [items, setItems] = useState([])
-  // const cookies = new Cookies()
   // const [userId, SetUserId] = useState(null)
   // const [page, setPage] = useState(1);
   // const listInnerRef = useRef();
   // const [loading, setLoading] = useState(false);
 
   // useEffect( ()  => {
-  //     if (  cookies.get("userToken"))  {
-  //       axios.get('http://localhost:10000/api/items',{withCredentials:true})
+  //       axios.get(''+import.meta.env.VITE_LOCAL_URL+'/api/items',{withCredentials:true})
   //       .then(  res => {
   //         const allItems = [...res.data]
   //         setItems([...allItems]);
@@ -156,7 +153,6 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort }) => {
   //       setItems([])
   //     }
 
-  // },[JSON.stringify(items),cookies.get("userToken"),sort])
 
   // useEffect(() => {
   //   fetchItems(page);
@@ -178,7 +174,6 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort }) => {
 
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
-  const cookies = new Cookies();
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false); // Track loading state
@@ -187,8 +182,20 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort }) => {
   const pageRef = useRef(0);
   const [openCategory, setOpenCategory] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-
+  const [user,setUser] = useState()
   const [categoryCounts, setCategoryCounts] = useState();
+    const location = useLocation();
+  
+  useEffect(()=>{
+    axios.get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged")
+          .then((res)=>{
+            console.log("user from home axios for state",JSON.stringify(res.data?.id))
+            setUser(res.data)
+          })
+          .catch((err)=> {
+            console.log("error from home user state =>",err)
+          })
+  },[location.pathname])
   useEffect(() => {
     const counts = {};
     items.forEach((item) => {
@@ -202,7 +209,6 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort }) => {
   };
 
   const fetchItems = async (p, force = false) => {
-    // if (  cookies.get("userToken"))
     {
       if (fetchedPagesRef.current.has(p) && !force) {
         console.log("Skipping fetch: page already fetched");
@@ -245,8 +251,8 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort }) => {
         params.delete("tags"); // or leave empty
       }
 
-      const url = `http://localhost:10000/api/items?${params.toString()}`;
-
+      const url = `${import.meta.env.VITE_LOCAL_URL}/api/items?${params.toString()}`;
+      console.log("this is the url",url)
 
       axios
         .get(url, { withCredentials: true })
@@ -303,7 +309,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort }) => {
     // else {
     //   setItems([]);
     // }
-  }, [cookies.get("userToken"), sort.home]);
+  }, [ sort.home]);
 
   useEffect(() => {
     if (items.length === 0) {
@@ -331,7 +337,6 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort }) => {
 
     // setSort({category: "", search: "", gender: ""} )
 
-    //  if (cookies.get("userToken"))
     {
       const timer = setTimeout(() => {
         fetchItems(0, true); // Call fetchItems after delay
@@ -1197,6 +1202,10 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort }) => {
                 <div className="d-flex flex-wrap gap-3" style={{ minHeight: "100vh" }}>
                   {items.map((item) => (
                     <ItemCard
+                      userId = {user?.id}
+                      fName= {user?.fName}
+                      lName= {user?.lName}
+                      profilePic= {user?.profilePic}
                       item={item}
                       setOpenModalLog={setOpenModalLog}
                       setOpenModalReg={setOpenModalReg}

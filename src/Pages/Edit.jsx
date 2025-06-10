@@ -2,7 +2,6 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import Logout from "../Components/Logout";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import Cookies from 'universal-cookie';
 
 // import {
 //   Radio,
@@ -89,18 +88,15 @@ const Edit = () => {
     }, [item]);
   // const nav = useNavigate();
   const navigate = useNavigate();
-  const cookies = new Cookies();
 
   // const token = localStorage.getItem("token");
   const { id } = useParams();
   // console.log("this is id : ",id);
 
   useEffect(() => {
-    if (!cookies.get("userToken")) {
-      navigate("/");
-    } else {
+    
       axios
-        .get("http://localhost:10000/api/items/" + id,{withCredentials:true})
+        .get(""+import.meta.env.VITE_LOCAL_URL+"/api/items/" + id,{withCredentials:true})
         .then( async (res) => { 
           const itemData = res.data;
           const found = sizeMarks.find(mark => mark.label === itemData.size);
@@ -118,13 +114,13 @@ const Edit = () => {
         .catch((err) => console.log(err));
       console.log();
       // }axios
-      // axios.get("http://localhost:10000/api/users/logged", { withCredentials: true })selectedFilesit
+      // axios.get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", { withCredentials: true })selectedFilesit
       // .then((res) => {
       //   console.log("user obj ===>", res.data);
       //   setItem({ ...item, user: res.data.id })
 
       // }).catch((err) => console.log(err));
-    }
+    
   }, []);
   const handleFileChange = (e) => {
     setSelectedFiles(e.target.files);
@@ -188,7 +184,7 @@ const Edit = () => {
     console.log("type of itemPics in formdata:", typeof formData.get("itemPics"));  // should be "string"
 
     axios
-      .put("http://localhost:10000/api/items/" + id, formData,{withCredentials:true})
+      .put(""+import.meta.env.VITE_LOCAL_URL+"/api/items/" + id, formData,{withCredentials:true})
       .then((res) => {
         console.log("update result ===>",JSON.stringify(res.data));
         // console.log(JSON.stringify(formData));

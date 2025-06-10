@@ -2,7 +2,6 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import Logout from "../Components/Logout";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import Cookies from "universal-cookie";
 
 import Box from "@mui/material/Box";
 import { Checkbox, ListItemText, Slider, Typography } from "@mui/material";
@@ -124,18 +123,15 @@ const Edit = () => {
   }, [item]);
   // const nav = useNavigate();
   const navigate = useNavigate();
-  const cookies = new Cookies();
 
   // const token = localStorage.getItem("token");
   const { id } = useParams();
   // console.log("this is id : ",id);
 
   useEffect(() => {
-    if (!cookies.get("userToken")) {
-      navigate("/");
-    } else {
+    
       axios
-        .get("http://localhost:10000/api/items/" + id, {
+        .get(""+import.meta.env.VITE_LOCAL_URL+"/api/items/" + id, {
           withCredentials: true,
         })
         .then(async (res) => {
@@ -151,16 +147,20 @@ const Edit = () => {
           console.log("updated state item ===>", res.data);
         })
 
-        .catch((err) => console.log(err));
+        .catch((err) => {
+      setUserNav(null); // user is NOT logged in
+      navigate('/'); // redirect to homepage
+    });
+
       console.log();
       // }axios
-      // axios.get("http://localhost:10000/api/users/logged", { withCredentials: true })selectedFilesit
+      // axios.get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", { withCredentials: true })selectedFilesit
       // .then((res) => {
       //   console.log("user obj ===>", res.data);
       //   setItem({ ...item, user: res.data.id })
 
       // }).catch((err) => console.log(err));
-    }
+    
   }, []);
   const handleFileChange = (e) => {
     setSelectedFiles(e.target.files);
@@ -234,7 +234,7 @@ const Edit = () => {
     ); // should be "string"
 
     axios
-      .put("http://localhost:10000/api/items/" + id, formData, {
+      .put(""+import.meta.env.VITE_LOCAL_URL+"/api/items/" + id, formData, {
         withCredentials: true,
       })
       .then((res) => {

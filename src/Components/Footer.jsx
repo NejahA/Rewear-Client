@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import Logout from './Logout';
-import Cookies from 'universal-cookie';
 import axios from "axios";
-// import { useCookies, } from 'react-cookie'; 
 const Footer =  (
     { setOpenModalReg, setOpenModalLog ,openLog , openReg, setSort}
 ) => {

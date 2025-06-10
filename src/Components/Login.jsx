@@ -1,9 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useCookies } from 'react-cookie';
-import Cookies from 'universal-cookie';
-
 const Login = (props) => {
     
     const navigate = useNavigate();
@@ -12,8 +9,8 @@ const Login = (props) => {
     const login = async (e) => {
         e.preventDefault()
         
-            // const response = await axios.post('http://localhost:10000/api/login', user, { withCredentials: true })
-              await axios.post('http://localhost:10000/api/login', user, { withCredentials: true })
+            // const response = await axios.post(''+import.meta.env.VITE_LOCAL_URL+'/api/login', user, { withCredentials: true })
+              await axios.post(''+import.meta.env.VITE_LOCAL_URL+'/api/login', user, { withCredentials: true })
               .then(res=>{
                 // sessionStorage.setItem("token", res.data.token);
                 console.log("token from login" ,res.data);

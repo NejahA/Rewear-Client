@@ -119,7 +119,7 @@ const Create = () => {
     // } else
     {
       axios
-        .get("http://localhost:10000/api/users/logged", {
+        .get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", {
           withCredentials: true,
         })
         .then((res) => {
@@ -172,7 +172,7 @@ const found = sizeMarks.find((mark) => mark.value === item.size);
     }
     console.log("item ====>", item);
     axios
-      .post("http://localhost:10000/api/items", formData, {
+      .post(""+import.meta.env.VITE_LOCAL_URL+"/api/items", formData, {
         withCredentials: true,
       })
       .then((res) => {

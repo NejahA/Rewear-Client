@@ -6,7 +6,7 @@ import Chat from "../Components/Chat/Chat";
 import io from "socket.io-client";
 
 const ShowOne = () => {
-  const socket = io.connect("http://localhost:8001");
+  // const socket = io.connect("http://localhost:8001");
   const [item, setItem] = useState({
     title: "",
     category: "",
@@ -31,7 +31,7 @@ const ShowOne = () => {
     //   navigate('/')
     // }
      else {
-      axios.get("http://localhost:10000/api/items/" + id)
+      axios.get(""+import.meta.env.VITE_LOCAL_URL+"/api/items/" + id)
         .then(res => {
           setItem(res.data)
           console.log("data ==>", res.data);
@@ -39,9 +39,9 @@ const ShowOne = () => {
 
           console.log('THIS IS SHOW ONE ITEM ==>', item);
         })
-        .then(axios.get('http://localhost:10000/api/users/' + item.user)
+        .then(axios.get(''+import.meta.env.VITE_LOCAL_URL+'/api/users/' + item.user)
           .then(res => { setOwner(res.data); console.log("THIS IS ITEM OWNER ===> ", owner); }))
-        .then(axios.get('http://localhost:10000/api/users/logged', { withCredentials: true })
+        .then(axios.get(''+import.meta.env.VITE_LOCAL_URL+'/api/users/logged', { withCredentials: true })
           .then((res) => {
             SetLoggedUser(res.data)
             console.log("Logged user ===>", loggedUser);
@@ -54,7 +54,7 @@ const ShowOne = () => {
   }, [id])
 
   const deleteItem = (itemId) => {
-    axios.delete('http://localhost:10000/api/items/' + itemId)
+    axios.delete(''+import.meta.env.VITE_LOCAL_URL+'/api/items/' + itemId)
       .then(response => {
         console.log(response.data)
         navigate("/")
@@ -79,7 +79,14 @@ const ShowOne = () => {
             <img style={{borderRadius:'100%',width:'50px'}} src={loggedUser && loggedUser.profilePic} alt="profilePic" />
             <p>{loggedUser && loggedUser.fName} {loggedUser && loggedUser.lName}</p>
           </div>
-          {showChat?<Chat socket={socket}  ownerid={item.user} room={id} user={loggedUser}  />:<button class="custom-btn btn-1" onClick={()=>{setShowChat(true)}}>Contacter</button>}
+
+          {
+          // showChat?<Chat socket={socket}  ownerid={item.user} room={id} user={loggedUser}
+          //   />
+          //   :
+          //   <button class="custom-btn btn-1" onClick={()=>{setShowChat(true)}}>Contacter
+          //   </button>
+            }
         </div>
         <div className="row p-5 ">
 
