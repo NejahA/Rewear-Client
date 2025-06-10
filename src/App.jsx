@@ -1,0 +1,176 @@
+import "./App.css";
+import {
+  Link,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+import Home from "./Pages/Home";
+import LogReg from "./Pages/LogReg";
+import ShowOne from "./Pages/ShowOne";
+import Edit from "./Pages/Edit";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import Create from "./Pages/Create";
+import Navbar from "./Components/Navbar";
+import { useEffect, useState } from "react";
+import ModalReg from "./Components/RegModal/ModalReg";
+import ModalLog from "./Components/LogModal/ModalLog";
+import {
+  fetchUtils,
+  Admin,
+  Resource,
+  ListGuesser,
+  EditGuesser,
+  ShowGuesser,
+} from "react-admin";
+import AdminDash from "./Pages/AdminDash";
+import simpleRestProvider from "ra-data-simple-rest";
+import { ItemList } from "./admin components/items";
+import itemEdit from "./admin components/itemEdit";
+import adminAuth from "./admin components/adminAuth";
+import ShowUser from "./Pages/ShowUser";
+import UpdateUser from "./Pages/UpdateUser";
+import Footer from "./Components/Footer";
+
+// import Upload from './Pages/Upload';
+import {
+  alpha,
+  createTheme,
+  getContrastRatio,
+  ThemeProvider,
+} from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+
+const violetBase = "#7745B9";
+const violetMain = alpha(violetBase, 0.7);
+
+const theme = createTheme({
+  palette: {
+    violet: {
+      main: violetMain,
+      light: alpha(violetBase, 0.5),
+      dark: alpha(violetBase, 0.9),
+      contrastText:
+        getContrastRatio(violetMain, "#fff") > 4.5 ? "#fff" : "#111",
+    },
+  },
+});
+function App() {
+  const location = useLocation();
+  const hideNavbarOnRoutes = ["/admin/"];
+  const [sort, setSort] = useState({
+    category: "",
+    gender: "",
+    search: "",
+    size: "",
+  });
+  const [userNav, setUserNav] = useState(null);
+  console.log("location path", location.pathname);
+  const [openModalLog, setOpenModalLog] = useState(false);
+  const [openModalReg, setOpenModalReg] = useState(false);
+  const navigate = useNavigate();
+
+  return (
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <div style={{ height: "100vh" }}>
+            {/* <Admin authProvider={adminAuth} loginPage={<><Navbar setOpenModalReg={setOpenModalReg}  setOpenModalLog={setOpenModalLog} /><Home setOpenModalReg={setOpenModalReg} setOpenModalLog={setOpenModalLog} /></> }  dataProvider= {simpleRestProvider(''+import.meta.env.VITE_LOCAL_URL+'/api' )} >
+    <Resource name="items" edit={itemEdit} list={ItemList} />
+  </Admin>; */}
+            <ModalLog
+              open={openModalLog}
+              setOpenModalReg={setOpenModalReg}
+              setOpenModalLog={setOpenModalLog}
+            />
+            <ModalReg
+              open={openModalReg}
+              setOpenModalLog={setOpenModalLog}
+              setOpenModalReg={setOpenModalReg}
+            />
+            {/* <AdminDash  />   */}
+
+            {/* <Navbar /> */}
+            {/* {hideNavbarOnRoutes.filter(element => element.includes("/admin/")) && <Navbar />} */}
+            {!location.pathname.includes("/admin/") && (
+              <Navbar
+                sort={sort}
+                setSort={setSort}
+                userNav={userNav}
+                setUserNav={setUserNav}
+                setOpenModalReg={setOpenModalReg}
+                setSort={setSort}
+                setOpenModalLog={setOpenModalLog}
+              />
+            )}
+
+            <Routes>
+              <Route path="/logreg" element={<LogReg />} />
+              <Route path="/items/new" element={<Create />} />
+              <Route
+                path="/items/edit/:id"
+                element={
+                  <>
+                    <Edit />
+                  </>
+                }
+              />
+              <Route
+                path="/items/:id"
+                element={
+                  <>
+                    <ShowOne />
+                  </>
+                }
+              />
+              <Route
+                path="/user/:id"
+                element={
+                  <>
+                    <ShowUser />
+                  </>
+                }
+              />
+              <Route
+                path="/edituser"
+                element={
+                  <>
+                    <UpdateUser />
+                  </>
+                }
+              />
+              {/* <Route path='/' element={<UpdateUser />  } /> */}
+
+              <Route
+                path="/"
+                element={
+                  <>
+                    <Home
+                      setSort={setSort}
+                      sort={sort}
+                      setOpenModalReg={setOpenModalReg}
+                      setOpenModalLog={setOpenModalLog}
+                    />
+                  </>
+                }
+              />
+              {/* <Route path='/thing/:id' element={<ShowOne />} /> */}
+              {/* <Route path='/thing/edit/:id' element={<Edit />} /> */}
+            </Routes>
+            <Routes>
+              <Route path="/admin/*" element={<AdminDash />} />
+            </Routes>
+            <Footer
+              userNav={userNav}
+              setUserNav={setUserNav}
+              setOpenModalReg={setOpenModalReg}
+              setSort={setSort}
+              setOpenModalLog={setOpenModalLog}
+            />
+          </div>
+        </ThemeProvider>
+  );
+}
+
+export default App;
