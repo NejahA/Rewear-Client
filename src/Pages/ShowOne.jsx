@@ -6,17 +6,15 @@ import Chat from "../Components/Chat/Chat";
 import { io } from "socket.io-client";
 import { Link } from "react-router-dom";
 
-import Cookies from "universal-cookie";
 import { Chip } from "@mui/material";
 import { MoonLoader } from "react-spinners";
 
-const cookies = new Cookies();
 
-const socket = io("http://localhost:8001");
-socket.connect();
+// const socket = io("http://localhost:8001");
+// socket.connect();
 
 const ShowOne = () => {
-  const socket = io("http://localhost:8001");
+  // const socket = io("http://localhost:8001");
   const [item, setItem] = useState({
     title: "",
     category: "",
@@ -46,13 +44,10 @@ const ShowOne = () => {
   //  const token =  localStorage.getItem('token')
 
   useEffect(() => {
-    if (!cookies.get("userToken")) {
-      navigate("/");
-    } else {
       // console.log("token",token)
-      socket.on("connection", () => {
-        console.log("connected", socket.id); // x8WIv7-mJelg7on_ALbx
-      });
+      // socket.on("connection", () => {
+      //   console.log("connected", socket.id); // x8WIv7-mJelg7on_ALbx
+      // });
    
 
         setItem({
@@ -70,7 +65,7 @@ const ShowOne = () => {
           user: {fName:"loading",profilePic:{url:"/logo/load-violet.gif"}}
            })
       axios
-        .get("http://localhost:10000/api/items/" + id, {})
+        .get(""+import.meta.env.VITE_LOCAL_URL+"/api/items/" + id, {})
         .then((res) => {
           const fetchedItem = res.data;
           setItem(fetchedItem);
@@ -85,18 +80,14 @@ const ShowOne = () => {
           console.log("item pics==>", JSON.stringify(item.itemPics));
         })
         .catch((err) => console.log(err));
-    }
     // .catch(err=>console.log(err))
     //   }
     // )
   }, []);
 
   useEffect(() => {
-    if (!cookies.get("userToken")) {
-      navigate("/");
-    } else {
       axios
-        .get("http://localhost:10000/api/users/logged", {
+        .get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", {
           withCredentials: true,
         })
         .then((res) => {
@@ -105,7 +96,6 @@ const ShowOne = () => {
           console.log("Logged user ===>", user);
         })
         .catch((err) => console.log(err));
-    }
     // .catch(err=>console.log(err))
     //   }
     // )
@@ -113,7 +103,7 @@ const ShowOne = () => {
 
   const deleteItem = (itemId) => {
     axios
-      .delete("http://localhost:10000/api/items/" + itemId, {
+      .delete(""+import.meta.env.VITE_LOCAL_URL+"/api/items/" + itemId, {
         withCredentials: true,
       })
       .then((response) => {

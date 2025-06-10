@@ -2,7 +2,7 @@ import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Cookies from 'universal-cookie';
 
-const ItemCard = ({ item,setOpenModalLog ,setOpenModalReg}) => {
+const ItemCard = ({ item,setOpenModalLog ,setOpenModalReg, userId,fName,lName,profilePic}) => {
     const cookies = new Cookies()
 
     // const token = localStorage.getItem('token')
@@ -20,9 +20,14 @@ const ItemCard = ({ item,setOpenModalLog ,setOpenModalReg}) => {
                         <p className="card-text"><span className='text-black'>Gender :</span> <strong>{item.gender}</strong></p>
                         {/* <p className="card-text"><span className='text-black'>Brand :</span> <strong>{item.brand}</strong></p> */}
                         <button onClick={(e)=> { 
-                            if (!cookies.get('userToken'))
+                            if (
+                                fName || lName || userId || profilePic?.url
+                            )
+                            {navigate(`/items/${item._id}`)}
+                            else
                                 {setOpenModalLog(true);setOpenModalReg(false)}
-                            else{navigate(`/items/${item._id}`)}}} className="btn d-block mx-auto product-btn" style={{backgroundColor:'#5C2D9A',color:'white'}}>
+                            
+                            }} className="btn d-block mx-auto product-btn" style={{backgroundColor:'#5C2D9A',color:'white'}}>
                                 Show Product</button>
                     </div>
             </div>}

@@ -2,7 +2,6 @@ import React, { useEffect } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { Link} from 'react-router-dom';
-import Cookies from 'universal-cookie';
 import Button from '@mui/material/Button';
 import { createTheme, alpha, getContrastRatio } from '@mui/material/styles';
 import { ThemeProvider } from 'react-admin';
@@ -25,19 +24,18 @@ const theme = createTheme({
 const Logout = () => {
     const navigate = useNavigate();
     // const token = localStorage.getItem('token')
-    const cookies = new Cookies()
     const logout =  () => {
 
       // async () =>{
         //     try {
-          //         await axios.post('http://localhost:10000/api/logout',{}, {withCredentials:true})
+          //         await axios.post(''+import.meta.env.VITE_LOCAL_URL+'/api/logout',{}, {withCredentials:true})
           //         localStorage.removeItem('token')
           //         navigate('/')
           //     } catch (error) {
             //         console.log('Error', error)
             //     }
             // }
-            axios.post('http://localhost:10000/api/logout', {} ,
+            axios.post(''+import.meta.env.VITE_LOCAL_URL+'/api/logout', {} ,
             {withCredentials:true}
             )
             .then(res => {
@@ -47,7 +45,6 @@ const Logout = () => {
               // localStorage.removeItem('token')
               
               // localStorage.setItem("token", false);
-              // Cookies.remove("userToken");
               console.log("logout 200")
               navigate('/')
             }
@@ -56,7 +53,7 @@ const Logout = () => {
           }
           useEffect(() => {
             
-          }, [cookies.get("userToken")])
+          }, [])
   return (
     // <button className='btn btn-danger' onClick={logout}>Logout</button>
     // <Link className='nav-link text-danger mt-1' ><i class="bi bi-box-arrow-left"></i> Logout</Link>

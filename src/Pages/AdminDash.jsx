@@ -26,13 +26,13 @@ import dataProvider from '../admin components/dataProvider';
 //     options.headers.set('Authorization', `Bearer ${token}`);
 //     return fetchUtils.fetchJson(url, options);
 // }
-// const dataProvider = simpleRestProvider('http://localhost:10000/api' );
+// const dataProvider = simpleRestProvider(''+import.meta.env.VITE_LOCAL_URL+'/api' );
 
 const AdminDash = () => {
   return (
     <div>
         <Admin basename="/admin" loginPage={LoginPage}  authProvider={authProvider}  
-        // dataProvider= {simpleRestProvider('http://localhost:10000/api' )} >
+        // dataProvider= {simpleRestProvider(''+import.meta.env.VITE_LOCAL_URL+'/api' )} >
         dataProvider= {dataProvider} >
     <Resource name="items" edit={itemEdit} list={ItemList} />
     <Resource name="users" list={UserList} />

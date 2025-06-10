@@ -9,11 +9,9 @@ import axios from "axios";
 // import ModalReg from "../Components/RegModal/ModalReg"
 // import Navbar from "../Components/Navbar"
 // import NoteListItem from "../components/NoteListItem"
-import Cookies from "universal-cookie";
 import { MoonLoader } from "react-spinners";
 
 const ShowUser = () => {
-  const cookies = new Cookies();
   const navigate = useNavigate();
   const { id } = useParams();
   // const token = localStorage.getItem('token')
@@ -36,9 +34,7 @@ const ShowUser = () => {
     itemHistory: [],
   });
   useEffect(() => {
-    if (!cookies.get("userToken")) {
       navigate("/");
-    } else {
       setProfile({
         email: "-",
         fName: "-",
@@ -48,7 +44,7 @@ const ShowUser = () => {
         profilePic: null,
       });
       axios
-        .get("http://localhost:10000/api/users/logged", {
+        .get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", {
           withCredentials: true,
         })
         .then((res) => {
@@ -59,7 +55,7 @@ const ShowUser = () => {
         .catch((err) => console.log(err));
 
       axios
-        .get("http://localhost:10000/api/users/" + id, {
+        .get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/" + id, {
           withCredentials: true,
         })
         .then((res) => {
@@ -67,8 +63,7 @@ const ShowUser = () => {
           console.log("one user res ===>", res.data);
         })
         .catch((err) => console.log("err ===>", err));
-    }
-  }, [cookies.get("userToken"), id]);
+  }, [ id]);
   return (
     <div className="container d-flex flex-column gap-5 p-5">
       <div className="d-flex mx-5  gap-3">

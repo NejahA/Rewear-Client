@@ -28,11 +28,11 @@ const Edit = () => {
     //   navigate('/')
     // } else 
     {
-      axios.get("http://localhost:10000/api/items/" + id,{withCredentials:true})
+      axios.get(""+import.meta.env.VITE_LOCAL_URL+"/api/items/" + id,{withCredentials:true})
         .then(res => {
           setItem(res.data)
         })
-        .then(axios.get('http://localhost:10000/api/users/logged',{withCredentials:true})
+        .then(axios.get(''+import.meta.env.VITE_LOCAL_URL+'/api/users/logged',{withCredentials:true})
         .then((res)=> {
           console.log("res ===>",res.data);
           SetUserId(res.data._id)
@@ -84,7 +84,7 @@ const Edit = () => {
       }
   
     axios
-      .put("http://localhost:10000/api/items/"+id, formData,{withCredentials:true})
+      .put(""+import.meta.env.VITE_LOCAL_URL+"/api/items/"+id, formData,{withCredentials:true})
       .then((res) => {
         console.log(res);
         console.log(JSON.stringify(formData));
