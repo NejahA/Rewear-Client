@@ -8,7 +8,9 @@ import { Link } from "react-router-dom";
 
 import { Chip } from "@mui/material";
 import { MoonLoader } from "react-spinners";
-
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
+import Stack from "@mui/material/Stack";
 
 // const socket = io("http://localhost:8001");
 // socket.connect();
@@ -65,7 +67,7 @@ const ShowOne = () => {
           user: {fName:"loading",profilePic:{url:"/logo/load-violet.gif"}}
            })
       axios
-        .get(""+import.meta.env.VITE_LOCAL_URL+"/api/items/" + id, {})
+        .get(""+import.meta.env.VITE_GITHUB_URI+"/api/items/" + id, {})
         .then((res) => {
           const fetchedItem = res.data;
           setItem(fetchedItem);
@@ -87,7 +89,7 @@ const ShowOne = () => {
 
   useEffect(() => {
       axios
-        .get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", {
+        .get(""+import.meta.env.VITE_GITHUB_URI+"/api/users/logged", {
           withCredentials: true,
         })
         .then((res) => {
@@ -103,7 +105,7 @@ const ShowOne = () => {
 
   const deleteItem = (itemId) => {
     axios
-      .delete(""+import.meta.env.VITE_LOCAL_URL+"/api/items/" + itemId, {
+      .delete(""+import.meta.env.VITE_GITHUB_URI+"/api/items/" + itemId, {
         withCredentials: true,
       })
       .then((response) => {
@@ -285,6 +287,11 @@ const ShowOne = () => {
             </div>
             <p className="text">{item.description}</p>
           </div>
+            {
+          item?.adminComment &&
+            <Alert severity="error">
+              {item.adminComment}
+          </Alert>}
         </div>
       </div>
       {loggedUser &&

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./ModalReg.css";
-const ModalReg = ({ open, setOpenModalLog, setOpenModalReg }) => {
+const ModalReg = ({ open, setOpenModalLog, setOpenModalReg,setLogged }) => {
     const navigate = useNavigate();
     const [user, setUser] = useState({
         fName: "",
@@ -24,13 +24,14 @@ const ModalReg = ({ open, setOpenModalLog, setOpenModalReg }) => {
         e.preventDefault();
         try {
             const response = await axios.post(
-                ""+import.meta.env.VITE_LOCAL_URL+"/api/register",
+                ""+import.meta.env.VITE_GITHUB_URI+"/api/register",
                 user,
                 { withCredentials: true }
             );
             console.log("SERVER RESPONSE:", response.data);
             // localStorage.setItem("token", response.data.token);
             setOpenModalReg(false)
+            setLogged(true);
             // !user.password || user.password !== user.confirmPW ? setErrors({...errors, confirm: false}) : setErrors({...errors, confirm: true})
             navigate("/");
         } catch (error) {

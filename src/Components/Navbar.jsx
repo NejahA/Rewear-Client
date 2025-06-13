@@ -4,11 +4,14 @@ import Logout from "./Logout";
 import axios from "axios";
 import Button from "@mui/material/Button";
 import { useLocation } from "react-router-dom";
+import Cookies from "universal-cookie";
 
 import { createTheme, alpha, getContrastRatio } from "@mui/material/styles";
 import { ThemeProvider } from "react-admin";
 // import axios from '../axios'; // Adjust the import path as necessary
 const Navbar = ({
+  logged,
+  setLogged,
   setOpenModalReg,
   setOpenModalLog,
   openLog,
@@ -24,13 +27,15 @@ const Navbar = ({
   // const [sort, setSort]= useState(null)
   const [userNav, setUserNav] = useState(null);
 const location = useLocation();
+  const cookies = new Cookies();
 
   // const [openModalLog, setOpenModalLog] = useState(false);
   // const [openModalReg, setOpenModalReg] = useState(false);
   useEffect(() => {
       console.log("theres token in navbar");
+      console.log("cookies",cookies.get("userToken"));
       axios
-        .get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", {
+        .get(""+import.meta.env.VITE_GITHUB_URI+"/api/users/logged", {
           withCredentials: true,
         })
         .then((res) => {
@@ -50,8 +55,8 @@ const location = useLocation();
     // }
     // setSort( {category:"" ,gender: "", search: "" })
     // },[JSON.stringify(token)])
-  }, [
-    location.pathname]);
+  }, [JSON.stringify(cookies.get("userToken")),
+    location.pathname], logged);
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-body-tertiary ">
@@ -204,7 +209,7 @@ const location = useLocation();
                     {/* Sell Article */}
                   </Link>
 
-                  <Logout />
+                  <Logout setLogged={setLogged} />
                 </div>
               </div>
             </>

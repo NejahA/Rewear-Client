@@ -5,7 +5,7 @@ import {jwtDecode} from "jwt-decode"
 const authProvider = {
     login: async ({ username, password }) => {
 
-        const response = await fetch(""+import.meta.env.VITE_LOCAL_URL+"/api/login", {
+        const response = await fetch("http://localhost:10000/api/login", {
           method: "POST",
           body: JSON.stringify({ email: username, password }),
           headers: { "Content-Type": "application/json" },
@@ -28,7 +28,7 @@ const authProvider = {
         }
 
         
-        axios.post(''+import.meta.env.VITE_LOCAL_URL+'/api/login', { email: username, password }, { withCredentials: true })
+        axios.post('http://localhost:10000/api/login', { email: username, password }, { withCredentials: true })
             .then(async res => {
               const decodedToken = await jwtDecode(res);
               await localStorage.setItem('permissions', decodedToken.isAdmin);
@@ -49,14 +49,14 @@ const authProvider = {
       },
     
       logout: async () => {
-        await fetch(""+import.meta.env.VITE_LOCAL_URL+"/api/logout", {
+        await fetch("http://localhost:10000/api/logout", {
           method: "POST",
           credentials: "include",
         });
         localStorage.clear();
         return Promise.resolve();
 
-        axios.post(''+import.meta.env.VITE_LOCAL_URL+'/api/logout', {  }, { withCredentials: true })
+        axios.post('http://localhost:10000/api/logout', {  }, { withCredentials: true })
             .then(res => {
               return Promise.resolve();
             })
@@ -67,7 +67,7 @@ const authProvider = {
         
       },
       checkAuth: async () => {
-        const response = await fetch(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", {
+        const response = await fetch("http://localhost:10000/api/users/logged", {
           method: "GET",
           credentials: "include",
         });
@@ -82,7 +82,7 @@ const authProvider = {
           return Promise.reject("You do not have admin authorization");
         }
 
-        axios.get(''+import.meta.env.VITE_LOCAL_URL+'/api/users/logged', { withCredentials: true })
+        axios.get('http://localhost:10000/api/users/logged', { withCredentials: true })
             .then(res => {
               return Promise.resolve();
             })
@@ -97,7 +97,7 @@ const authProvider = {
     }
     
       // getIdentity: async () => {
-      //   const response = await fetch(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", {
+      //   const response = await fetch("http://localhost:10000/api/users/logged", {
       //     method: "GET",
       //     credentials: "include",
       //   });

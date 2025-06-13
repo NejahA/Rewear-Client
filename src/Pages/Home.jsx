@@ -139,7 +139,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort }) => {
   // const [loading, setLoading] = useState(false);
 
   // useEffect( ()  => {
-  //       axios.get(''+import.meta.env.VITE_LOCAL_URL+'/api/items',{withCredentials:true})
+  //       axios.get(''+import.meta.env.VITE_GITHUB_URI+'/api/items',{withCredentials:true})
   //       .then(  res => {
   //         const allItems = [...res.data]
   //         setItems([...allItems]);
@@ -187,7 +187,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort }) => {
     const location = useLocation();
   
   useEffect(()=>{
-    axios.get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged")
+    axios.get(""+import.meta.env.VITE_GITHUB_URI+"/api/users/logged")
           .then((res)=>{
             console.log("user from home axios for state",JSON.stringify(res.data?.id))
             setUser(res.data)
@@ -251,7 +251,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort }) => {
         params.delete("tags"); // or leave empty
       }
 
-      const url = `${import.meta.env.VITE_LOCAL_URL}/api/items?${params.toString()}`;
+      const url = `${import.meta.env.VITE_GITHUB_URI}/api/items?${params.toString()}`;
       console.log("this is the url",url)
 
       axios

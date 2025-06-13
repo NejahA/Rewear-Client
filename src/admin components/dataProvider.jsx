@@ -1,6 +1,6 @@
 import { fetchUtils } from "react-admin";
 
-const apiUrl = ""+import.meta.env.VITE_LOCAL_URL+"/api/mod";
+const apiUrl = ""+import.meta.env.VITE_GITHUB_URI+"/api/mod";
 
 const httpClient = (url, options = {}) => {
 

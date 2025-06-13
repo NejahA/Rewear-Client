@@ -10,7 +10,8 @@ export default defineConfig({
   ],
   server: {
     proxy: {
-      '/api': 'https://fantastic-engine-ww965p6rpv4c994-10000.app.github.dev/'
+      // '/api': 'https://fantastic-engine-ww965p6rpv4c994-10000.app.github.dev/'
+      '/api': 'https://rewear-server.onrender.com/'
     }
   },
 })

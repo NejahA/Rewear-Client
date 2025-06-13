@@ -96,7 +96,7 @@ const Edit = () => {
   useEffect(() => {
     
       axios
-        .get(""+import.meta.env.VITE_LOCAL_URL+"/api/items/" + id,{withCredentials:true})
+        .get(""+import.meta.env.VITE_GITHUB_URI+"/api/items/" + id,{withCredentials:true})
         .then( async (res) => { 
           const itemData = res.data;
           const found = sizeMarks.find(mark => mark.label === itemData.size);
@@ -114,7 +114,7 @@ const Edit = () => {
         .catch((err) => console.log(err));
       console.log();
       // }axios
-      // axios.get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", { withCredentials: true })selectedFilesit
+      // axios.get(""+import.meta.env.VITE_GITHUB_URI+"/api/users/logged", { withCredentials: true })selectedFilesit
       // .then((res) => {
       //   console.log("user obj ===>", res.data);
       //   setItem({ ...item, user: res.data.id })
@@ -184,7 +184,7 @@ const Edit = () => {
     console.log("type of itemPics in formdata:", typeof formData.get("itemPics"));  // should be "string"
 
     axios
-      .put(""+import.meta.env.VITE_LOCAL_URL+"/api/items/" + id, formData,{withCredentials:true})
+      .put(""+import.meta.env.VITE_GITHUB_URI+"/api/items/" + id, formData,{withCredentials:true})
       .then((res) => {
         console.log("update result ===>",JSON.stringify(res.data));
         // console.log(JSON.stringify(formData));

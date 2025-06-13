@@ -31,7 +31,7 @@ const ShowOne = () => {
     //   navigate('/')
     // }
      else {
-      axios.get(""+import.meta.env.VITE_LOCAL_URL+"/api/items/" + id)
+      axios.get(""+import.meta.env.VITE_GITHUB_URI+"/api/items/" + id)
         .then(res => {
           setItem(res.data)
           console.log("data ==>", res.data);
@@ -39,9 +39,9 @@ const ShowOne = () => {
 
           console.log('THIS IS SHOW ONE ITEM ==>', item);
         })
-        .then(axios.get(''+import.meta.env.VITE_LOCAL_URL+'/api/users/' + item.user)
+        .then(axios.get(''+import.meta.env.VITE_GITHUB_URI+'/api/users/' + item.user)
           .then(res => { setOwner(res.data); console.log("THIS IS ITEM OWNER ===> ", owner); }))
-        .then(axios.get(''+import.meta.env.VITE_LOCAL_URL+'/api/users/logged', { withCredentials: true })
+        .then(axios.get(''+import.meta.env.VITE_GITHUB_URI+'/api/users/logged', { withCredentials: true })
           .then((res) => {
             SetLoggedUser(res.data)
             console.log("Logged user ===>", loggedUser);
@@ -54,7 +54,7 @@ const ShowOne = () => {
   }, [id])
 
   const deleteItem = (itemId) => {
-    axios.delete(''+import.meta.env.VITE_LOCAL_URL+'/api/items/' + itemId)
+    axios.delete(''+import.meta.env.VITE_GITHUB_URI+'/api/items/' + itemId)
       .then(response => {
         console.log(response.data)
         navigate("/")

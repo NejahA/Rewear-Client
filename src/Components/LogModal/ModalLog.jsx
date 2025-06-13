@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const ModalLog = ({ open ,setOpenModalLog, setOpenModalReg}) => {
+const ModalLog = ({ open ,setOpenModalLog, setOpenModalReg,setLogged}) => {
     const navigate = useNavigate();
     const [user, setUser] = useState({ email: "", password: "" });
     const [errors, setErrors] = useState({ email: "", password: "" });
@@ -12,11 +12,11 @@ const ModalLog = ({ open ,setOpenModalLog, setOpenModalReg}) => {
     const login = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(''+import.meta.env.VITE_LOCAL_URL+'/api/login', user, 
+            const response = await axios.post(''+import.meta.env.VITE_GITHUB_URI+'/api/login', user, 
             { withCredentials: true }
             )
             console.log('SERVER RESPONSE:', response.data)
-            
+            setLogged(true)
             console.log('TOKEN RESPONSE:', response.data.token)
             // localStorage.setItem('token', response.data.token)
 

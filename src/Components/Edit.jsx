@@ -131,7 +131,7 @@ const Edit = () => {
   useEffect(() => {
     
       axios
-        .get(""+import.meta.env.VITE_LOCAL_URL+"/api/items/" + id, {
+        .get(""+import.meta.env.VITE_GITHUB_URI+"/api/items/" + id, {
           withCredentials: true,
         })
         .then(async (res) => {
@@ -154,7 +154,7 @@ const Edit = () => {
 
       console.log();
       // }axios
-      // axios.get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", { withCredentials: true })selectedFilesit
+      // axios.get(""+import.meta.env.VITE_GITHUB_URI+"/api/users/logged", { withCredentials: true })selectedFilesit
       // .then((res) => {
       //   console.log("user obj ===>", res.data);
       //   setItem({ ...item, user: res.data.id })
@@ -234,7 +234,7 @@ const Edit = () => {
     ); // should be "string"
 
     axios
-      .put(""+import.meta.env.VITE_LOCAL_URL+"/api/items/" + id, formData, {
+      .put(""+import.meta.env.VITE_GITHUB_URI+"/api/items/" + id, formData, {
         withCredentials: true,
       })
       .then((res) => {

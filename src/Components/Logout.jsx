@@ -21,28 +21,28 @@ const theme = createTheme({
     },
   },
 });
-const Logout = () => {
+const Logout = ({setLogged}) => {
     const navigate = useNavigate();
     // const token = localStorage.getItem('token')
     const logout =  () => {
 
       // async () =>{
         //     try {
-          //         await axios.post(''+import.meta.env.VITE_LOCAL_URL+'/api/logout',{}, {withCredentials:true})
+          //         await axios.post(''+import.meta.env.VITE_GITHUB_URI+'/api/logout',{}, {withCredentials:true})
           //         localStorage.removeItem('token')
           //         navigate('/')
           //     } catch (error) {
             //         console.log('Error', error)
             //     }
             // }
-            axios.post(''+import.meta.env.VITE_LOCAL_URL+'/api/logout', {} ,
+            axios.post(''+import.meta.env.VITE_GITHUB_URI+'/api/logout', {} ,
             {withCredentials:true}
             )
             .then(res => {
               console.log("user loggedout")
               // localStorage.setItem('token',null)
-
-              // localStorage.removeItem('token')
+              setLogged(false)
+                // localStorage.removeItem('token')
               
               // localStorage.setItem("token", false);
               console.log("logout 200")

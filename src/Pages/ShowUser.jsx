@@ -24,7 +24,7 @@ const ShowUser = () => {
     profilePic: {},
     itemHistory: [],
   });
-  const [logged, setLogged] = useState({
+  const [loggedUser, setloggedUserUser] = useState({
     email: "",
     fName: "",
     lName: "",
@@ -34,7 +34,6 @@ const ShowUser = () => {
     itemHistory: [],
   });
   useEffect(() => {
-      navigate("/");
       setProfile({
         email: "-",
         fName: "-",
@@ -44,18 +43,20 @@ const ShowUser = () => {
         profilePic: null,
       });
       axios
-        .get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", {
+        .get(""+import.meta.env.VITE_GITHUB_URI+"/api/users/loggedUser", {
           withCredentials: true,
         })
         .then((res) => {
-          console.log("logged res ===>", res.data);
-          setLogged(res.data);
+          console.log("loggedUser res ===>", res.data);
+          setloggedUserUser(res.data);
         })
 
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          navigate("/");
+          console.log(err)});
 
       axios
-        .get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/" + id, {
+        .get(""+import.meta.env.VITE_GITHUB_URI+"/api/users/" + id, {
           withCredentials: true,
         })
         .then((res) => {
@@ -82,8 +83,8 @@ const ShowUser = () => {
             <h1>
               {profile && profile.fName} {profile && profile.lName}
             </h1>
-            {/* {logged && logged.id && profile && profile.id && (profile.id == logged.id)? ( */}
-            {(profile?.id == logged?.id)? (
+            {/* {loggedUser && loggedUser.id && profile && profile.id && (profile.id == loggedUser.id)? ( */}
+            {(profile?.id == loggedUser?.id)? (
               <Link to={"/edituser"}>
                 <i className="bi bi-gear VioletCred"></i>
               </Link>

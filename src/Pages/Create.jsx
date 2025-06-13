@@ -119,7 +119,7 @@ const Create = () => {
     // } else
     {
       axios
-        .get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", {
+        .get(""+import.meta.env.VITE_GITHUB_URI+"/api/users/logged", {
           withCredentials: true,
         })
         .then((res) => {
@@ -172,7 +172,7 @@ const found = sizeMarks.find((mark) => mark.value === item.size);
     }
     console.log("item ====>", item);
     axios
-      .post(""+import.meta.env.VITE_LOCAL_URL+"/api/items", formData, {
+      .post(""+import.meta.env.VITE_GITHUB_URI+"/api/items", formData, {
         withCredentials: true,
       })
       .then((res) => {

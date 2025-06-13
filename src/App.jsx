@@ -42,11 +42,11 @@ import {
   ThemeProvider,
 } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-
+import theme from "./Components/theme";
 const violetBase = "#7745B9";
 const violetMain = alpha(violetBase, 0.7);
 
-const theme = createTheme({
+const customTheme = createTheme({
   palette: {
     violet: {
       main: violetMain,
@@ -67,109 +67,121 @@ function App() {
     size: "",
   });
   const [userNav, setUserNav] = useState(null);
+  const [logged, setLogged] = useState(null);
   console.log("location path", location.pathname);
   const [openModalLog, setOpenModalLog] = useState(false);
   const [openModalReg, setOpenModalReg] = useState(false);
   const navigate = useNavigate();
 
   return (
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <div style={{ height: "100vh" }}>
-            {/* <Admin authProvider={adminAuth} loginPage={<><Navbar setOpenModalReg={setOpenModalReg}  setOpenModalLog={setOpenModalLog} /><Home setOpenModalReg={setOpenModalReg} setOpenModalLog={setOpenModalLog} /></> }  dataProvider= {simpleRestProvider(''+import.meta.env.VITE_LOCAL_URL+'/api' )} >
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <div style={{ height: "100vh" }}>
+        {/* <Admin authProvider={adminAuth} loginPage={<><Navbar setOpenModalReg={setOpenModalReg}  setOpenModalLog={setOpenModalLog} /><Home setOpenModalReg={setOpenModalReg} setOpenModalLog={setOpenModalLog} /></> }  dataProvider= {simpleRestProvider(''+import.meta.env.VITE_GITHUB_URI+'/api' )} >
     <Resource name="items" edit={itemEdit} list={ItemList} />
   </Admin>; */}
-            <ModalLog
-              open={openModalLog}
-              setOpenModalReg={setOpenModalReg}
-              setOpenModalLog={setOpenModalLog}
-            />
-            <ModalReg
-              open={openModalReg}
-              setOpenModalLog={setOpenModalLog}
-              setOpenModalReg={setOpenModalReg}
-            />
-            {/* <AdminDash  />   */}
+        <ModalLog
+          open={openModalLog}
+          logged={logged}
+          setLogged={setLogged} setOpenModalReg={setOpenModalReg}
+          setOpenModalLog={setOpenModalLog}
+        />
+        <ModalReg
+          open={openModalReg}
+          logged={logged}
+          setLogged={setLogged} setOpenModalLog={setOpenModalLog}
+          setOpenModalReg={setOpenModalReg}
+        />
+        {/* <AdminDash  />   */}
 
-            {/* <Navbar /> */}
-            {/* {hideNavbarOnRoutes.filter(element => element.includes("/admin/")) && <Navbar />} */}
-            {!location.pathname.includes("/admin/") && (
-              <Navbar
-                sort={sort}
-                setSort={setSort}
-                userNav={userNav}
-                setUserNav={setUserNav}
-                setOpenModalReg={setOpenModalReg}
-                setSort={setSort}
-                setOpenModalLog={setOpenModalLog}
-              />
-            )}
+        {/* <Navbar /> */}
+        {/* {hideNavbarOnRoutes.filter(element => element.includes("/admin/")) && <Navbar />} */}
+        {!location.pathname.includes("/admin/") && (
+          <Navbar
+            logged={logged}
+            setLogged={setLogged}
+            sort={sort}
+            setSort={setSort}
+            userNav={userNav}
+            setUserNav={setUserNav}
+            setOpenModalReg={setOpenModalReg}
+            setOpenModalLog={setOpenModalLog}
+          />
+        )}
 
-            <Routes>
-              <Route path="/logreg" element={<LogReg />} />
-              <Route path="/items/new" element={<Create />} />
-              <Route
-                path="/items/edit/:id"
-                element={
-                  <>
-                    <Edit />
-                  </>
-                }
-              />
-              <Route
-                path="/items/:id"
-                element={
-                  <>
-                    <ShowOne />
-                  </>
-                }
-              />
-              <Route
-                path="/user/:id"
-                element={
-                  <>
-                    <ShowUser />
-                  </>
-                }
-              />
-              <Route
-                path="/edituser"
-                element={
-                  <>
-                    <UpdateUser />
-                  </>
-                }
-              />
-              {/* <Route path='/' element={<UpdateUser />  } /> */}
+        <Routes>
+          <Route path="/logreg" element={<LogReg />} />
+          <Route path="/items/new" element={<Create logged={logged}
+            setLogged={setLogged} />} />
+          <Route
+            path="/items/edit/:id"
+            element={
+              <>
+                <Edit logged={logged}
+                  setLogged={setLogged} />
+              </>
+            }
+          />
+          <Route
+            path="/items/:id"
+            element={
+              <>
+                <ShowOne logged={logged}
+                  setLogged={setLogged} />
+              </>
+            }
+          />
+          <Route
+            path="/user/:id"
+            element={
+              <>
+                <ShowUser logged={logged}
+                  setLogged={setLogged} />
+              </>
+            }
+          />
+          <Route
+            path="/edituser"
+            element={
+              <>
+                <UpdateUser logged={logged}
+                  setLogged={setLogged} />
+              </>
+            }
+          />
+          {/* <Route path='/' element={<UpdateUser />  } /> */}
 
-              <Route
-                path="/"
-                element={
-                  <>
-                    <Home
-                      setSort={setSort}
-                      sort={sort}
-                      setOpenModalReg={setOpenModalReg}
-                      setOpenModalLog={setOpenModalLog}
-                    />
-                  </>
-                }
-              />
-              {/* <Route path='/thing/:id' element={<ShowOne />} /> */}
-              {/* <Route path='/thing/edit/:id' element={<Edit />} /> */}
-            </Routes>
-            <Routes>
-              <Route path="/admin/*" element={<AdminDash />} />
-            </Routes>
-            <Footer
-              userNav={userNav}
-              setUserNav={setUserNav}
-              setOpenModalReg={setOpenModalReg}
-              setSort={setSort}
-              setOpenModalLog={setOpenModalLog}
-            />
-          </div>
-        </ThemeProvider>
+          <Route
+            path="/"
+            element={
+              <>
+                <Home
+                  logged={logged}
+                  setLogged={setLogged}
+                  setSort={setSort}
+                  sort={sort}
+                  setOpenModalReg={setOpenModalReg}
+                  setOpenModalLog={setOpenModalLog}
+                />
+              </>
+            }
+          />
+          {/* <Route path='/thing/:id' element={<ShowOne />} /> */}
+          {/* <Route path='/thing/edit/:id' element={<Edit />} /> */}
+        </Routes>
+        <Routes>
+          <Route path="/admin/*" element={<AdminDash logged={logged}
+            setLogged={setLogged} />} />
+        </Routes>
+        <Footer
+          userNav={userNav}
+          setUserNav={setUserNav}
+          setOpenModalReg={setOpenModalReg}
+          setSort={setSort}
+          setOpenModalLog={setOpenModalLog}
+        />
+      </div>
+    </ThemeProvider>
   );
 }
 
