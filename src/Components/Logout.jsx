@@ -41,7 +41,7 @@ const Logout = ({setLogged}) => {
             .then(res => {
               console.log("user loggedout")
               // localStorage.setItem('token',null)
-              setLogged(false)
+              setLogged (false)
                 // localStorage.removeItem('token')
               
               // localStorage.setItem("token", false);
