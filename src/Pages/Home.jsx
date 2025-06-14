@@ -131,7 +131,7 @@ const tagOptions = [
   "Sporty",
   "Plus Size",
 ];
-const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort }) => {
+const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort , logged}) => {
   // const [items, setItems] = useState([])
   // const [userId, SetUserId] = useState(null)
   // const [page, setPage] = useState(1);
@@ -195,7 +195,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort }) => {
           .catch((err)=> {
             console.log("error from home user state =>",err)
           })
-  },[location.pathname])
+  },[location.pathname,logged])
   useEffect(() => {
     const counts = {};
     items.forEach((item) => {
