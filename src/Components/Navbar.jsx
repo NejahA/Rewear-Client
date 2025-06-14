@@ -45,7 +45,6 @@ const location = useLocation();
           console.log("navbar user  =>", res.data);
         })
         .catch((error) => {
-          localStorage.removeItem("token");
           console.log(error);
           setUserNav(null);
         });
@@ -56,7 +55,7 @@ const location = useLocation();
     // setSort( {category:"" ,gender: "", search: "" })
     // },[JSON.stringify(token)])
   }, [JSON.stringify(cookies.get("userToken")),
-    location.pathname], logged);
+    location.pathname,logged]);
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-body-tertiary ">
