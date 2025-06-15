@@ -58,7 +58,7 @@ const categoryOptions = [
 const footwearCategories = ["Shoes", "Sneakers", "Heels", "Boots", "Sandals"]; // Based on your model
 
 const conditionOptions = ["New with tags", "Like new", "Good", "Acceptable"];
-const adultSizes = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+const adultSizes = ["XXS", "XS", "S", "M", "L", "XL", "XXL"];
 const kidSizes = [
   "0-3M",
   "3-6M",

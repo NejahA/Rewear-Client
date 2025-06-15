@@ -14,6 +14,38 @@ const httpClient = (url, options = {}) => {
 
   return fetchUtils.fetchJson(url, options);
 };
+const convertToFormData = (data, resource) => {
+  const formData = new FormData();
+
+  // Append non-file fields
+  Object.keys(data).forEach((key) => {
+    if (key === "itemPics" || key === "profilePic") return; // skip file fields for now
+    if (data[key] !== undefined && data[key] !== null) {
+      formData.append(key, typeof data[key] === "object" ? JSON.stringify(data[key]) : data[key]);
+    }
+  });
+
+  // Append files
+  if (resource === "items" && Array.isArray(data.itemPics)) {
+    data.itemPics.forEach((pic) => {
+      if (pic.rawFile instanceof File) {
+        formData.append("itemPics", pic.rawFile); // key must match what backend expects
+      }
+    });
+  }
+
+  if (resource === "users" && Array.isArray(data.profilePic) && data.profilePic[0]?.rawFile instanceof File) {
+    formData.append("profilePic", data.profilePic[0].rawFile);
+  }
+
+  return formData;
+};
+
+const isMultipart = (resource, data) =>
+  (resource === "items" && Array.isArray(data.itemPics)) ||
+  (resource === "users" && Array.isArray(data.profilePic));
+
+  
 
 const dataProvider = {
   getList: (resource, params) => {
@@ -38,17 +70,41 @@ const dataProvider = {
       data: json,
     })),
 
-  create: (resource, params) =>
-    httpClient(`${apiUrl}/${resource}`, {
-      method: "POST",
-      body: JSON.stringify(params.data),
-    }).then(({ json }) => ({ data: json })),
+  // create: (resource, params) =>
+  //   httpClient(`${apiUrl}/${resource}`, {
+  //     method: "POST",
+  //     body: JSON.stringify(params.data),
+  //   }).then(({ json }) => ({ data: json })),
 
-  update: (resource, params) =>
-    httpClient(`${apiUrl}/${resource}/${params.id}`, {
+    
+  create: (resource, params) => {
+    const isForm = isMultipart(resource, params.data);
+    const body = isForm ? convertToFormData(params.data, resource) : JSON.stringify(params.data);
+
+    return httpClient(`${apiUrl}/${resource}`, {
+      method: "POST",
+      body,
+      headers: isForm ? undefined : new Headers({ "Content-Type": "application/json" }),
+    }).then(({ json }) => ({ data: json }));
+  },
+
+  
+  update: (resource, params) => {
+    const isForm = isMultipart(resource, params.data);
+    const body = isForm ? convertToFormData(params.data, resource) : JSON.stringify(params.data);
+
+    return httpClient(`${apiUrl}/${resource}/${params.id}`, {
       method: "PUT",
-      body: JSON.stringify(params.data),
-    }).then(({ json }) => ({ data: json })),
+      body,
+      headers: isForm ? undefined : new Headers({ "Content-Type": "application/json" }),
+    }).then(({ json }) => ({ data: json }));
+  },
+
+  // update: (resource, params) =>
+  //   httpClient(`${apiUrl}/${resource}/${params.id}`, {
+  //     method: "PUT",
+  //     body: JSON.stringify(params.data),
+  //   }).then(({ json }) => ({ data: json })),
 
   delete: (resource, params) =>
     httpClient(`${apiUrl}/${resource}/${params.id}`, {

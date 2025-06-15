@@ -1,4 +1,5 @@
 import {
+  ImageInput,
   Edit,
   SimpleForm,
   TextInput,
@@ -86,7 +87,7 @@ const itemEdit = (props) => {
             />
           </Grid>
 
-          <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
+          {/* <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
             <ImageField
               source="itemPics"
               src="url"
@@ -101,6 +102,56 @@ const itemEdit = (props) => {
                 },
               }}
             />
+
+
+
+
+</Grid> */}
+
+
+ <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
+            <ImageInput 
+              source="itemPics" 
+              label="Item Images"
+              accept="image/*"
+              multiple
+              maxSize={5000000} // 5MB limit per file
+              sx={{
+                width: "100%",
+                "& .RaImageInput-dropZone": {
+                  minHeight: "200px",
+                  border: "2px dashed #ccc",
+                  borderRadius: "8px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  gap: "16px",
+                },
+                "& .RaImageInput-preview": {
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "16px",
+                  marginTop: "16px",
+                  justifyContent: "center",
+                }
+              }}
+            >
+              <ImageField 
+                source="src" 
+                title="title"
+                sx={{
+                  width: "200px",
+                  height: "200px",
+                  "& img": {
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                  },
+                }}
+              />
+            </ImageInput>
           </Grid>
         </Grid>
       </SimpleForm>

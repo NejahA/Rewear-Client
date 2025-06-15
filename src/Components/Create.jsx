@@ -21,7 +21,7 @@ const sizeMarks = [
   { value: 3, label: "M" },
   { value: 4, label: "L" },
   { value: 5, label: "XL" },
-  { value: 6, label: "XXL" },
+  { value: 6, label: "XXL" }
   // { value: 7, label: "XXXL" },
 ];
 

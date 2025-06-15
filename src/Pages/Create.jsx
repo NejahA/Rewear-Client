@@ -23,7 +23,7 @@ const sizeMarks = [
   { value: 4, label: "L" },
   { value: 5, label: "XL" },
   { value: 6, label: "XXL" },
-  { value: 7, label: "XXXL" },
+  // { value: 7, label: "XXXL" },
 ];
 
 const genderOptions = ["Male", "Female", "Unisex"];
@@ -563,7 +563,7 @@ const found = sizeMarks.find((mark) => mark.value === item.size);
                     step={1}
                     marks={sizeMarks}
                     min={0}
-                    max={7}
+                    max={6}
                   />
                 </>
               )}

@@ -26,7 +26,7 @@ const sizeMarks = [
   { value: 4, label: 'L' },
   { value: 5, label: 'XL' },
   { value: 6, label: 'XXL' },
-  { value: 7, label: 'XXXL' }
+  // { value: 7, label: 'XXXL' }
 ];
 
 const genderOptions = ["Male", "Female", "Unisex"];
@@ -41,7 +41,7 @@ const categoryOptions = [    'T-Shirts', 'Shirts', 'Sweaters', 'Jeans', 'Trouser
 const footwearCategories = ['Shoes', 'Sneakers', 'Heels',"Boots","Sandals"];  // Based on your model
 
 const conditionOptions = ['New with tags', 'Like new', 'Good', 'Acceptable'];
-const adultSizes = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+const adultSizes = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL'];
 const kidSizes = [
 '0-3M', '3-6M', '6-9M', '9-12M', '12-18M', '18-24M',
 '2Y', '3Y', '4Y', '5Y', '6Y', '7Y', '8Y', '9Y', '10Y', '12Y', '14Y', '16Y'
@@ -605,7 +605,7 @@ const Edit = () => {
                     step={1}
                     marks={sizeMarks}
                     min={0}
-                    max={7}
+                    max={6}
                   />
                 </>
               )}
@@ -617,7 +617,7 @@ const Edit = () => {
             <div className="d-flex justify-content-between align-items-center">
               <label>Condition</label>
               <div className="d-flex gap-4">
-                {/* <RadioGroup
+                <RadioGroup
                   row
                   aria-labelledby="condition-label"
                   name="condition"
@@ -645,7 +645,7 @@ const Edit = () => {
                       label={c}
                     />
                   ))}
-                </RadioGroup> */}
+                </RadioGroup>
               </div>
             </div>
           </div>
@@ -760,7 +760,7 @@ const Edit = () => {
           </div>
 
           <button className="btn-submit w-25 rounded p-2 text-light">
-            Add Article
+            Edit Article
           </button>
         </div>
       </form>

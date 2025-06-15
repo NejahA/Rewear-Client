@@ -11,7 +11,7 @@ import axios from "axios";
 // import NoteListItem from "../components/NoteListItem"
 import { MoonLoader } from "react-spinners";
 
-const ShowUser = () => {
+const ShowUser = ({logged}) => {
   const navigate = useNavigate();
   const { id } = useParams();
   // const token = localStorage.getItem('token')
@@ -24,7 +24,7 @@ const ShowUser = () => {
     profilePic: {},
     itemHistory: [],
   });
-  const [loggedUser, setloggedUserUser] = useState({
+  const [loggedUser, setloggedUser] = useState({
     email: "",
     fName: "",
     lName: "",
@@ -43,12 +43,12 @@ const ShowUser = () => {
         profilePic: null,
       });
       axios
-        .get(""+import.meta.env.VITE_GITHUB_URI+"/api/users/loggedUser", {
+        .get(""+import.meta.env.VITE_GITHUB_URI+"/api/users/logged", {
           withCredentials: true,
         })
         .then((res) => {
-          console.log("loggedUser res ===>", res.data);
-          setloggedUserUser(res.data);
+          console.log("loggedUser res from showUser===>", res.data);
+          setloggedUser(res.data);
         })
 
         .catch((err) => {
@@ -64,7 +64,7 @@ const ShowUser = () => {
           console.log("one user res ===>", res.data);
         })
         .catch((err) => console.log("err ===>", err));
-  }, [ id]);
+  }, [logged, id]);
   return (
     <div className="container d-flex flex-column gap-5 p-5">
       <div className="d-flex mx-5  gap-3">
