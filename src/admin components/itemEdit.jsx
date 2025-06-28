@@ -109,9 +109,9 @@ const itemEdit = (props) => {
 </Grid> */}
 
 
- <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
-            <ImageInput 
-              source="itemPics" 
+          <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
+            <ImageInput
+              source="itemPics"
               label="Item Images"
               accept="image/*"
               multiple
@@ -137,8 +137,29 @@ const itemEdit = (props) => {
                 }
               }}
             >
-              <ImageField 
-                source="src" 
+              {({ record }) =>
+                Array.isArray(record?.itemPics) &&
+                record.itemPics.map((pic, idx) => (
+                  <ImageField
+                    key={idx}
+                    source=""
+                    record={pic.url}
+                    title="title"
+                    sx={{
+                      width: "200px",
+                      height: "200px",
+                      "& img": {
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                      },
+                    }}
+                  />
+                ))
+              }
+              {/* <ImageField
+                source="src"
                 title="title"
                 sx={{
                   width: "200px",
@@ -150,7 +171,7 @@ const itemEdit = (props) => {
                     borderRadius: "8px",
                   },
                 }}
-              />
+              /> */}
             </ImageInput>
           </Grid>
         </Grid>
