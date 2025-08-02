@@ -36,6 +36,7 @@ const customTheme = createTheme({
           borderRadius: "8px",
         },
         image: {
+          
           width: "400px !important",
           height: "auto !important",
           maxWidth: "100% !important",
