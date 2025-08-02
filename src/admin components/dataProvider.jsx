@@ -93,13 +93,26 @@ const dataProvider = {
     const isForm = isMultipart(resource, params.data);
     const body = isForm ? convertToFormData(params.data, resource) : JSON.stringify(params.data);
 
-    return httpClient(`${apiUrl}/${resource}/${params.id}`, {
-      method: "PUT",
-      body,
-      credentials: "include",
-      
-      // headers: isForm ? undefined : new Headers({ "Content-Type": "application/json" }),
-    }).then(({ json }) => ({ data: json }));
+  const options = {
+    method: "PUT",
+    body,
+    credentials: "include", // <-- assure l’envoi des cookies
+  };
+
+  if (!isForm) {
+    options.headers = new Headers({ "Content-Type": "application/json" });
+  }
+
+  return httpClient(`${apiUrl}/${resource}/${params.id}`, options)
+    .then(({ json }) => ({ data: json }));
+
+    // return httpClient(`${apiUrl}/${resource}/${params.id}`, {
+    //   method: "PUT",
+    //   body,
+    //   credentials: "include",
+
+    //   headers: isForm ? undefined : new Headers({ "Content-Type": "application/json" }),
+    // }).then(({ json }) => ({ data: json }));
   },
   
 
