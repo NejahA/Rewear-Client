@@ -47,8 +47,10 @@ const customTheme = createTheme({
   },
 });
 
+
 const itemEdit = (props) => {
-   const record = useRecordContext();
+const record = useRecordContext();
+
 
   return (
     <Edit title="Edit Item" {...props}>
