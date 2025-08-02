@@ -124,7 +124,7 @@ const itemEdit = (props) => {
     </div> */}
 
           
-             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
+             {/* <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
              <ImageInput
                source="itemPics"
                label="Item Images"
@@ -151,6 +151,7 @@ const itemEdit = (props) => {
                    justifyContent: "center",
                  }
                }}
+
              >
 
 
@@ -159,7 +160,7 @@ const itemEdit = (props) => {
             </ImageInput>
             
             
-          </Grid>
+          </Grid> */}
           
       
 
