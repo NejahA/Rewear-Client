@@ -65,18 +65,18 @@ const itemEdit = (props) => {
               ]}
               validate={required()}
             />
-            {/* <TextInput source="title" fullWidth />
+            <TextInput source="title" fullWidth />
             <TextInput source="category" />
             <TextInput source="brand" fullWidth />
             <TextInput source="size" fullWidth />
             <TextInput source="gender" fullWidth />
             <TextInput source="age" fullWidth />
             <TextInput source="previousOwners" fullWidth />
-            <TagInput source="tags" /> */}
+            <TagInput source="tags" />
           </Grid>
 
           <Grid item xs={6}>
-            {/* <UserField />
+            <UserField />
             <TextInput source="user.email" disabled fullWidth />
             <TextInput source="description" multiline rows={3} fullWidth />
             <NumberInput source="price" fullWidth />
@@ -88,7 +88,7 @@ const itemEdit = (props) => {
               multiline 
               rows={5}
               fullWidth
-            /> */}
+            />
           </Grid>
 
 
@@ -123,44 +123,45 @@ const itemEdit = (props) => {
     )}
     </div> */}
 
-          {
-          //   <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
-          //   <ImageInput
-          //     source="itemPics"
-          //     label="Item Images"
-          //     accept="image/*"
-          //     multiple
-          //     maxSize={5000000} // 5MB limit per file
-          //     sx={{
-          //       width: "100%",
-          //       "& .RaImageInput-dropZone": {
-          //         minHeight: "200px",
-          //         border: "2px dashed #ccc",
-          //         borderRadius: "8px",
-          //         display: "flex",
-          //         alignItems: "center",
-          //         justifyContent: "center",
-          //         flexDirection: "column",
-          //         gap: "16px",
-          //       },
-          //       "& .RaImageInput-preview": {
-          //         display: "flex",
-          //         flexWrap: "wrap",
-          //         gap: "16px",
-          //         marginTop: "16px",
-          //         justifyContent: "center",
-          //       }
-          //     }}
-          //   >
+          
+             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
+             <ImageInput
+               source="itemPics"
+               label="Item Images"
+               accept="image/*"
+               multiple
+               maxSize={5000000} // 5MB limit per file
+               sx={{
+                 width: "100%",
+                 "& .RaImageInput-dropZone": {
+                   minHeight: "200px",
+                   border: "2px dashed #ccc",
+                   borderRadius: "8px",
+                   display: "flex",
+                   alignItems: "center",
+                   justifyContent: "center",
+                   flexDirection: "column",
+                   gap: "16px",
+                 },
+                 "& .RaImageInput-preview": {
+                   display: "flex",
+                   flexWrap: "wrap",
+                   gap: "16px",
+                   marginTop: "16px",
+                   justifyContent: "center",
+                 }
+               }}
+             >
 
 
 
               
-          //   </ImageInput>
+            </ImageInput>
             
             
-          // </Grid>
-          }
+          </Grid>
+          
+      
 
         </Grid>
       </SimpleForm>
