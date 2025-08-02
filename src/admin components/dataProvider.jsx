@@ -99,6 +99,7 @@ const dataProvider = {
       headers: isForm ? undefined : new Headers({ "Content-Type": "application/json" }),
     }).then(({ json }) => ({ data: json }));
   },
+  
 
   // update: (resource, params) =>
   //   httpClient(`${apiUrl}/${resource}/${params.id}`, {
