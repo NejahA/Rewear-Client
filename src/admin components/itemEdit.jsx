@@ -65,19 +65,19 @@ const itemEdit = (props) => {
               ]}
               validate={required()}
             />
-            <TextInput source="title" fullWidth />
+            {/* <TextInput source="title" fullWidth />
             <TextInput source="category" />
             <TextInput source="brand" fullWidth />
             <TextInput source="size" fullWidth />
             <TextInput source="gender" fullWidth />
             <TextInput source="age" fullWidth />
             <TextInput source="previousOwners" fullWidth />
-            <TagInput source="tags" />
+            <TagInput source="tags" /> */}
           </Grid>
 
           <Grid item xs={6}>
-            <UserField />
-            {/* <TextInput source="user.email" disabled fullWidth /> */}
+            {/* <UserField />
+            <TextInput source="user.email" disabled fullWidth />
             <TextInput source="description" multiline rows={3} fullWidth />
             <NumberInput source="price" fullWidth />
             <DateInput source="created_at" disabled fullWidth />
@@ -88,7 +88,7 @@ const itemEdit = (props) => {
               multiline 
               rows={5}
               fullWidth
-            />
+            /> */}
           </Grid>
 
 
@@ -123,7 +123,6 @@ const itemEdit = (props) => {
     )}
     </div> */}
 
-<<<<<<< HEAD
           {
           //   <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
           //   <ImageInput
@@ -162,73 +161,7 @@ const itemEdit = (props) => {
             
           // </Grid>
           }
-=======
-          <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
-            <ImageInput
-              source="itemPics"
-              label="Item Images"
-              accept="image/*"
-              multiple
-              maxSize={5000000} // 5MB limit per file
-              sx={{
-                width: "100%",
-                "& .RaImageInput-dropZone": {
-                  minHeight: "200px",
-                  border: "2px dashed #ccc",
-                  borderRadius: "8px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "column",
-                  gap: "16px",
-                },
-                "& .RaImageInput-preview": {
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "16px",
-                  marginTop: "16px",
-                  justifyContent: "center",
-                }
-              }}
-            >
-              {({ record }) =>
-                Array.isArray(record?.itemPics) &&
-                record.itemPics.map((pic, idx) => (
-                  <ImageField
-                    key={idx}
-                    source=""
-                    record={pic.url}
-                    title="title"
-                    sx={{
-                      width: "200px",
-                      height: "200px",
-                      "& img": {
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        borderRadius: "8px",
-                      },
-                    }}
-                  />
-                ))
-              }
-              {/* <ImageField
-                source="src"
-                title="title"
-                sx={{
-                  width: "200px",
-                  height: "200px",
-                  "& img": {
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                  },
-                }}
-              /> */}
-            </ImageInput>
-          </Grid>
->>>>>>> 550405d18a9f50055721266950e79f7ce5924bb1
+
         </Grid>
       </SimpleForm>
     </Edit>
