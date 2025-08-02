@@ -95,7 +95,7 @@ const itemEdit = (props) => {
           </Grid>
 
 
-          {/* <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
+          <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
             <ImageField
               source="itemPics"
               src="url"
@@ -110,9 +110,9 @@ const itemEdit = (props) => {
                 },
               }}
             />
-</Grid> */}
+</Grid>
 
- <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", justifyContent: "center" }}>
+ {/* <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", justifyContent: "center" }}>
       {record?.itemPics.map((pic, index) => 
       (
        <ImageField
@@ -162,7 +162,7 @@ const itemEdit = (props) => {
             </ImageInput>
             
             
-          </Grid>
+          </Grid> */}
           
       
 
