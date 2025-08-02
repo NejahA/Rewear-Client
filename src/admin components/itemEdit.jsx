@@ -79,7 +79,7 @@ const itemEdit = (props) => {
           </Grid>
 
           <Grid item xs={6}>
-            <UserField />
+            {/* <UserField /> */}
             <TextInput source="user.email" disabled fullWidth />
             <TextInput source="description" multiline rows={3} fullWidth />
             <NumberInput source="price" fullWidth />
@@ -112,22 +112,21 @@ const itemEdit = (props) => {
             />
 </Grid> */}
 
- {/* <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", justifyContent: "center" }}>
+ <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", justifyContent: "center" }}>
       {record?.itemPics.map((pic, index) => 
-      "dljsdl"
-      // (
-      //   <ImageField
-      //     key={index}
-      //     source="" // Not needed since we're setting the record directly
-      //     record={{ url: pic.url }}
-      //     title={`Image ${index + 1}`}
-      //   />
-      // )
+      (
+       <ImageField
+         key={index}
+         source="" // Not needed since we're setting the record directly
+         record={{ url: pic.url }}
+         title={`Image ${index + 1}`}
+       />
+       )
     )}
-    </div> */}
+    </div>
 
           
-             {/* <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
+             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
              <ImageInput
                source="itemPics"
                label="Item Images"
@@ -163,7 +162,7 @@ const itemEdit = (props) => {
             </ImageInput>
             
             
-          </Grid> */}
+          </Grid>
           
       
 

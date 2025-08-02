@@ -96,7 +96,7 @@ const dataProvider = {
   const options = {
     method: "PUT",
     body,
-    credentials: "include", // <-- assure l’envoi des cookies
+    credentials: "include",
   };
 
   if (!isForm) {
@@ -115,6 +115,7 @@ const dataProvider = {
     // }).then(({ json }) => ({ data: json }));
   },
   
+
 
   // update: (resource, params) =>
   //   httpClient(`${apiUrl}/${resource}/${params.id}`, {
