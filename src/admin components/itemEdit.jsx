@@ -160,7 +160,7 @@ const itemEdit = (props) => {
             
           // </Grid>
           }
-        {/* </Grid> */}
+        </Grid>
       </SimpleForm>
     </Edit>
   );
