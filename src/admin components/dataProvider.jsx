@@ -96,7 +96,9 @@ const dataProvider = {
     return httpClient(`${apiUrl}/${resource}/${params.id}`, {
       method: "PUT",
       body,
-      headers: isForm ? undefined : new Headers({ "Content-Type": "application/json" }),
+      credentials: "include",
+      
+      // headers: isForm ? undefined : new Headers({ "Content-Type": "application/json" }),
     }).then(({ json }) => ({ data: json }));
   },
   
