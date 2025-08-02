@@ -4,8 +4,9 @@ const API_URL = "http://localhost:10000"; // Update with your backend URL
 import {jwtDecode} from "jwt-decode" 
 const authProvider = {
     login: async ({ username, password }) => {
+      const url = `${import.meta.env.VITE_GITHUB_URI}/api/login`;
 
-        const response = await fetch("http://localhost:10000/api/login", {
+        const response = await fetch(`${import.meta.env.VITE_GITHUB_URI}/api/login`, {
           method: "POST",
           body: JSON.stringify({ email: username, password }),
           headers: { "Content-Type": "application/json" },
@@ -49,7 +50,7 @@ const authProvider = {
       },
     
       logout: async () => {
-        await fetch("http://localhost:10000/api/logout", {
+        await fetch(`${import.meta.env.VITE_GITHUB_URI}/api/logout`, {
           method: "POST",
           credentials: "include",
         });
@@ -65,9 +66,9 @@ const authProvider = {
       },
       checkError: async (error) => {
         
-      },
+      },`${import.meta.env.VITE_GITHUB_URI}/api/users/logged`
       checkAuth: async () => {
-        const response = await fetch("http://localhost:10000/api/users/logged", {
+        const response = await fetch(`${import.meta.env.VITE_GITHUB_URI}/api/users/logged`, {
           method: "GET",
           credentials: "include",
         });

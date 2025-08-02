@@ -44,8 +44,6 @@ export const ItemList = (props) => (
 
             <DeleteButton basePath='/items' />
             {/* <TextField source="itemPics" />  */}
-
-
             {/* <TextField source="website" />
             <TextField source="company.name" /> */}
         </Datagrid>

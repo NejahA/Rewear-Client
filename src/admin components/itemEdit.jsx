@@ -8,6 +8,7 @@ import {
   DateInput,
   ImageField,
   NumberInput,
+  useRecordContext,
   defaultTheme,
   SimpleFormIterator,
   ArrayInput,
@@ -21,6 +22,7 @@ import TagInput from "./TagInput";
 import UserField from "./userField.";
 import { deepPurple } from "@mui/material/colors";
 const customTheme = createTheme({
+
   components: {
     RaImageField: {
       styleOverrides: {
@@ -45,6 +47,8 @@ const customTheme = createTheme({
 });
 
 const itemEdit = (props) => {
+   const record = useRecordContext();
+
   return (
     <Edit title="Edit Item" {...props}>
       <SimpleForm>
@@ -81,7 +85,7 @@ const itemEdit = (props) => {
             <TextInput source="condition" fullWidth />
             <TextInput
               source="adminComment"
-              multiline
+              multiline 
               rows={5}
               fullWidth
             />
@@ -95,65 +99,68 @@ const itemEdit = (props) => {
               sx={{
                 width: "500px", // Force larger width
                 height: "auto",
-                "& img": {
+                "& img": { 
                   width: "100% !important", // Ensure it scales up
                   height: "auto !important",
                   maxWidth: "unset !important", // Remove default size limits
                 },
               }}
             />
-
-
-
-
 </Grid> */}
 
+ {/* <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", justifyContent: "center" }}>
+      {record?.itemPics.map((pic, index) => 
+      "dljsdl"
+      // (
+      //   <ImageField
+      //     key={index}
+      //     source="" // Not needed since we're setting the record directly
+      //     record={{ url: pic.url }}
+      //     title={`Image ${index + 1}`}
+      //   />
+      // )
+    )}
+    </div> */}
 
- <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
-            <ImageInput 
-              source="itemPics" 
-              label="Item Images"
-              accept="image/*"
-              multiple
-              maxSize={5000000} // 5MB limit per file
-              sx={{
-                width: "100%",
-                "& .RaImageInput-dropZone": {
-                  minHeight: "200px",
-                  border: "2px dashed #ccc",
-                  borderRadius: "8px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "column",
-                  gap: "16px",
-                },
-                "& .RaImageInput-preview": {
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "16px",
-                  marginTop: "16px",
-                  justifyContent: "center",
-                }
-              }}
-            >
-              <ImageField 
-                source="src" 
-                title="title"
-                sx={{
-                  width: "200px",
-                  height: "200px",
-                  "& img": {
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                  },
-                }}
-              />
-            </ImageInput>
-          </Grid>
-        </Grid>
+          {
+          //   <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
+          //   <ImageInput
+          //     source="itemPics"
+          //     label="Item Images"
+          //     accept="image/*"
+          //     multiple
+          //     maxSize={5000000} // 5MB limit per file
+          //     sx={{
+          //       width: "100%",
+          //       "& .RaImageInput-dropZone": {
+          //         minHeight: "200px",
+          //         border: "2px dashed #ccc",
+          //         borderRadius: "8px",
+          //         display: "flex",
+          //         alignItems: "center",
+          //         justifyContent: "center",
+          //         flexDirection: "column",
+          //         gap: "16px",
+          //       },
+          //       "& .RaImageInput-preview": {
+          //         display: "flex",
+          //         flexWrap: "wrap",
+          //         gap: "16px",
+          //         marginTop: "16px",
+          //         justifyContent: "center",
+          //       }
+          //     }}
+          //   >
+
+
+
+              
+          //   </ImageInput>
+            
+            
+          // </Grid>
+          }
+        {/* </Grid> */}
       </SimpleForm>
     </Edit>
   );

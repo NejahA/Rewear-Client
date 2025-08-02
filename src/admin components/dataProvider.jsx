@@ -89,22 +89,22 @@ const dataProvider = {
   },
 
   
-  update: (resource, params) => {
-    const isForm = isMultipart(resource, params.data);
-    const body = isForm ? convertToFormData(params.data, resource) : JSON.stringify(params.data);
+  // update: (resource, params) => {
+  //   const isForm = isMultipart(resource, params.data);
+  //   const body = isForm ? convertToFormData(params.data, resource) : JSON.stringify(params.data);
 
-    return httpClient(`${apiUrl}/${resource}/${params.id}`, {
-      method: "PUT",
-      body,
-      headers: isForm ? undefined : new Headers({ "Content-Type": "application/json" }),
-    }).then(({ json }) => ({ data: json }));
-  },
-
-  // update: (resource, params) =>
-  //   httpClient(`${apiUrl}/${resource}/${params.id}`, {
+  //   return httpClient(`${apiUrl}/${resource}/${params.id}`, {
   //     method: "PUT",
-  //     body: JSON.stringify(params.data),
-  //   }).then(({ json }) => ({ data: json })),
+  //     body,
+  //     headers: isForm ? undefined : new Headers({ "Content-Type": "application/json" }),
+  //   }).then(({ json }) => ({ data: json }));
+  // },
+
+  update: (resource, params) =>
+    httpClient(`${apiUrl}/${resource}/${params.id}`, {
+      method: "PUT",
+      body: JSON.stringify(params.data),
+    }).then(({ json }) => ({ data: json })),
 
   delete: (resource, params) =>
     httpClient(`${apiUrl}/${resource}/${params.id}`, {
