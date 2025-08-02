@@ -80,7 +80,7 @@ const itemEdit = (props) => {
 
           <Grid item xs={6}>
             {/* <UserField /> */}
-            <TextInput source="user.email" disabled fullWidth />
+            {/* <TextInput source="user.email" disabled fullWidth /> */}
             <TextInput source="description" multiline rows={3} fullWidth />
             <NumberInput source="price" fullWidth />
             <DateInput source="created_at" disabled fullWidth />
