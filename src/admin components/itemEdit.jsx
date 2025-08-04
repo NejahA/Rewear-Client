@@ -21,36 +21,36 @@ import { Autocomplete, TextField, Chip } from "@mui/material";
 import TagInput from "./TagInput";
 import UserField from "./userField.";
 import { deepPurple } from "@mui/material/colors";
-const customTheme = createTheme({
+// const customTheme = createTheme({
 
-  components: {
-    RaImageField: {
-      styleOverrides: {
-        root: {
-          display: "flex",
-          justifyContent: "center",
-          marginTop: "16px",
-          width: "400px !important",
-          height: "auto !important",
-          maxWidth: "100% !important",
-          borderRadius: "8px",
-        },
-        image: {
+//   components: {
+//     RaImageField: {
+//       styleOverrides: {
+//         root: {
+//           display: "flex",
+//           justifyContent: "center",
+//           marginTop: "16px",
+//           width: "400px !important",
+//           height: "auto !important",
+//           maxWidth: "100% !important",
+//           borderRadius: "8px",
+//         },
+//         image: {
           
-          width: "400px !important",
-          height: "auto !important",
-          maxWidth: "100% !important",
-          borderRadius: "8px",
-        },
-      },
-    },
-  },
-});
+//           width: "400px !important",
+//           height: "auto !important",
+//           maxWidth: "100% !important",
+//           borderRadius: "8px",
+//         },
+//       },
+//     },
+//   },
+// });
 
 
 const itemEdit = (props) => {
-// const record = useRecordContext();
 
+  
 
   return (
     <Edit title="Edit Item" {...props}>
@@ -95,7 +95,7 @@ const itemEdit = (props) => {
           </Grid>
 
 
-          <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
+          {/* <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
             <ImageField
               source="itemPics"
               src="url"
@@ -110,7 +110,7 @@ const itemEdit = (props) => {
                 },
               }}
             />
-</Grid>
+</Grid> */}
 
  {/* <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", justifyContent: "center" }}>
       {record?.itemPics.map((pic, index) => 

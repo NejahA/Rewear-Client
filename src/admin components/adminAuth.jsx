@@ -2,11 +2,13 @@ import axios from "axios";
 axios.defaults.withCredentials = true; // Allow cookies to be sent
 // const API_URL = "http://localhost:10000"; // Update with your backend URL
 import {jwtDecode} from "jwt-decode" 
+// const apiUrl = "https://fantastic-engine-ww965p6rpv4c994-10000.app.github.dev/api/mod"; // Replace with your actual API URL
 const authProvider = {
     login: async ({ username, password }) => {
       const url = `${import.meta.env.VITE_GITHUB_URI}/api/login`;
 
-        const response = await fetch(`${import.meta.env.VITE_GITHUB_URI}/api/login`, {
+        const response = await fetch(url, {
+        // const response = await fetch(`${import.meta.env.VITE_GITHUB_URI}/api/login`, {
           method: "POST",
           body: JSON.stringify({ email: username, password }),
           headers: { "Content-Type": "application/json" },
@@ -16,6 +18,8 @@ const authProvider = {
           throw new Error("Invalid credentials");
         }
         const json = await response.json();
+        localStorage.setItem('userToken', json);
+        localStorage.setItem('token', json);
         console.log("json ",json)
           const decodedToken = jwtDecode(json.token);
           localStorage.setItem('permissions', decodedToken.isAdmin);
@@ -82,20 +86,14 @@ const authProvider = {
         } else {
           return Promise.reject("You do not have admin authorization");
         }
-
-        axios.get('http://localhost:10000/api/users/logged', { withCredentials: true })
-            .then(res => {
-              return Promise.resolve();
-            })
-            .catch( err => new Error(err.response.data)
-            )
+        
       },
   
 
-      getPermissions: () => {
-        const role = localStorage.getItem('permissions');
-        return role==true ? Promise.resolve(role) : Promise.reject();
-    }
+    //   getPermissions: () => {
+    //     const role = localStorage.getItem('permissions');
+    //     return role==true ? Promise.resolve(role) : Promise.reject();
+    // }
     
       // getIdentity: async () => {
       //   const response = await fetch("http://localhost:10000/api/users/logged", {
