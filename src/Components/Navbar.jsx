@@ -10,8 +10,6 @@ import { createTheme, alpha, getContrastRatio } from "@mui/material/styles";
 import { ThemeProvider } from "react-admin";
 
 
-import logo from '/logo/logo.svg';
-
 
 
 // import axios from '../axios'; // Adjust the import path as necessary
@@ -77,7 +75,7 @@ const location = useLocation();
               <img
                 style={{ cursor: "pointer" }}
                 className="rewearlogo ms-5 btn"
-                src={logo}
+                src="'/logo/logo.svg"
                 alt="logoPic"
               />
               <button
