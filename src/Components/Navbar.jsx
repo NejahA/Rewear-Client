@@ -10,7 +10,7 @@ import { createTheme, alpha, getContrastRatio } from "@mui/material/styles";
 import { ThemeProvider } from "react-admin";
 
 
-import logo from './logo/logo.svg';
+import logo from '/logo/logo.svg';
 
 
 
