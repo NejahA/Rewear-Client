@@ -75,7 +75,7 @@ const location = useLocation();
               <img
                 style={{ cursor: "pointer" }}
                 className="rewearlogo ms-5 btn"
-                src="'/logo/logo.png"
+                src="/logo/logo.png"
                 alt="logoPic"
               />
               <button
