@@ -130,7 +130,7 @@ const Edit = () => {
   }, []);
 
   const handleFileChange = (e) => {
-    if (e.target.files) {
+    if ( e && e.target &&e.target.files) {
       const newFiles = Array.from(e.target.files);
       setSelectedFiles(prevFiles => [...prevFiles, ...newFiles]);
     }
