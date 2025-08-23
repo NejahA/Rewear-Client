@@ -221,7 +221,7 @@ const Edit = () => {
               </div>
               <div className="d-flex flex-row flex-wrap gap-2">
                 {/* Existing images */}
-                {existingImages.map((image, idx) => (
+                {existingImages && existingImages.map((image, idx) => (
                   <div key={`existing-${idx}`} className="imgsel">
                     <img
                       src={image.url}
@@ -239,7 +239,7 @@ const Edit = () => {
                 ))}
                 
                 {/* Newly selected files */}
-                {selectedFiles.map((file, idx) => (
+                {selectedFiles && selectedFiles.map((file, idx) => (
                   <div key={`new-${idx}`} className="imgsel">
                     <img
                       src={URL.createObjectURL(file)}
