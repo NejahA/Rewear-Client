@@ -81,7 +81,7 @@ const Edit = () => {
   const handleSliderChange = (event, newValue) => {
     setItem({ ...item, size: newValue });
     };
-  const [selectedFiles, setSelectedFiles] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [errors, setErrors] = useState(null);
     useEffect(() => {
       console.log("item changed ===>", item);
