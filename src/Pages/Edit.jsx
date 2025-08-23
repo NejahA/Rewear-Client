@@ -86,6 +86,8 @@ const Edit = () => {
     useEffect(() => {
       console.log("item changed ===>", item);
     }, [item]);
+      const [existingImages, setExistingImages] = useState([]);
+
   // const nav = useNavigate();
   const navigate = useNavigate();
 
@@ -122,23 +124,20 @@ const Edit = () => {
       // }).catch((err) => console.log(err));
     
   }, []);
+
   const handleFileChange = (e) => {
-    setSelectedFiles(e.target.files);
-    console.log("FILE =====> :", selectedFiles);
-  };
-  const handleRemoveImage = (index) => { 
-    if (selectedFiles) {
-      const updatedFiles = Array.from(selectedFiles);
-      updatedFiles.splice(index, 1);
-      setSelectedFiles(updatedFiles);
-      
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      setSelectedFiles(prevFiles => [...prevFiles, ...newFiles]);
     }
-    if (item && item.itemPics){
-            
-      item && item.itemPics && setItem ( { ...item, itemPics:item.itemPics.filter(() => false)
-    })
-  }
-    
+  };
+
+  const handleRemoveNewImage = (index) => {
+    setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+  };
+
+  const handleRemoveExistingImage = (index) => {
+    setExistingImages(prevImages => prevImages.filter((_, i) => i !== index));
   };
 
     const handleUpload = async (e) => {
@@ -213,60 +212,56 @@ const Edit = () => {
                   className="inputPic "
                   type="file"
                   multiple
-                  required={false}
                   onChange={handleFileChange}
                 />
                 <span className="material-symbols-rounded">
-                  <i class="bi bi-cloud-plus"></i>
+                  <i className="bi bi-cloud-plus"></i>
                 </span>{" "}
                 Upload File
               </div>
               <div className="d-flex flex-row flex-wrap gap-2">
-                {
-                  selectedFiles
-                    ? Array.from(selectedFiles).map((file, idx) => (
-                        <div key={idx} className="imgsel">
-                          <img
-                            src={URL.createObjectURL(file)}
-                            className="selectedImg "
-                            alt={`preview-${idx}`}
-                          />
-                          <button
-                            className="x rounded-circle "
-                            type="button"
-                            onClick={() => handleRemoveImage(idx)}
-                          >
-                            <i class="bi bi-trash-fill"></i>
-                          </button>
-                        </div>
-                      ))
-                    : item.itemPics &&
-                      Array.from(item.itemPics).map((imagepath, idx) => (
-                        <div key={idx} className="imgsel">
-                          <img
-                            src={imagepath.url}
-                            className="selectedImg "
-                            alt={`preview-${idx}`}
-                          />
-                          <button
-                            className="x rounded-circle "
-                            type="button"
-                            onClick={() => handleRemoveImage(idx)}
-                          >
-                            <i class="bi bi-trash-fill"></i>
-                          </button>
-                        </div>
-                      ))
-
-                  // <img src={item.itemPics[0]} />
-                }
+                {/* Existing images */}
+                {existingImages.map((image, idx) => (
+                  <div key={`existing-${idx}`} className="imgsel">
+                    <img
+                      src={image.url}
+                      className="selectedImg "
+                      alt={`preview-${idx}`}
+                    />
+                    <button
+                      className="x rounded-circle "
+                      type="button"
+                      onClick={() => handleRemoveExistingImage(idx)}
+                    >
+                      <i className="bi bi-trash-fill"></i>
+                    </button>
+                  </div>
+                ))}
+                
+                {/* Newly selected files */}
+                {selectedFiles.map((file, idx) => (
+                  <div key={`new-${idx}`} className="imgsel">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      className="selectedImg "
+                      alt={`preview-${idx}`}
+                    />
+                    <button
+                      className="x rounded-circle "
+                      type="button"
+                      onClick={() => handleRemoveNewImage(idx)}
+                    >
+                      <i className="bi bi-trash-fill"></i>
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
             <div className="d-flex gap-2 border p-3">
               <div>
                 <i
                   style={{ color: "#5C2D9A" }}
-                  class="bi bi-info-circle-fill"
+                  className="bi bi-info-circle-fill"
                 ></i>
               </div>
               <div>
@@ -327,7 +322,7 @@ const Edit = () => {
                 onChange={(e) =>
                   setItem({ ...item, description: e.target.value })
                 }
-                value={item && item.title}
+                value={item && item.description}
                 type="text"
               />
             </div>
