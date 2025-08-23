@@ -109,6 +109,10 @@ const Edit = () => {
             // size: match ? match.label : null
           };
           setItem(updatedItem);
+          setExistingImages(updatedItem.itemPics || []);
+          // setItem(res.data)
+          // setExistingImages(res.data.itemPics || []);
+          // setItem({ ...res.data, size: found ? found.value : res.data.size });
           console.log("updated state item ===>", res.data);
       })
      
@@ -247,7 +251,7 @@ const Edit = () => {
                       alt={`preview-${idx}`}
                     />
                     <button
-                      className="x rounded-circle "
+                      // className="x rounded-circle "
                       type="button"
                       onClick={() => handleRemoveNewImage(idx)}
                     >
