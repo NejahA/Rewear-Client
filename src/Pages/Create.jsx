@@ -98,14 +98,28 @@ const tagOptions = [
 ];
 const Create = () => {
   const [item, setItem] = useState({ tags: [] });
-  const [selectedFiles, setSelectedFiles] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [errors, setErrors] = useState(null);
   const nav = useNavigate();
-  const handleFileChange = (e) => {
+    const [totalImageCount, setTotalImageCount] = useState(0);
+
+  const handleFileChange0 = (e) => {
     const files = e.target.files;
     setSelectedFiles(files);
     console.log("FILES ====>", files); // This will always be the latest
   };
+
+    const handleFileChange = (e) => {
+    if (!e.target.files || totalImageCount >= 5) return;
+    
+    const files = Array.from(e.target.files);
+    const availableSlots = 5 - totalImageCount;
+    const filesToAdd = files.slice(0, availableSlots);
+    
+    setSelectedFiles(prev => [...prev, ...filesToAdd]);
+    console.log("FILES ====>", filesToAdd);
+  };
+
   const navigate = useNavigate();
   // const token = localStorage.getItem('token')
 
@@ -113,6 +127,10 @@ const Create = () => {
     setItem({ ...item, size: newValue });
   };
 
+  useEffect(() => {
+    // Update total image count whenever selectedFiles changes
+    setTotalImageCount(selectedFiles.length);
+  }, [selectedFiles]);
   useEffect(() => {
     // if (!token) {
     //     navigate('/')
@@ -131,8 +149,13 @@ const Create = () => {
         });
     }
   }, []);
-  const handleRemoveImage = (index) => {
+  const handleRemoveImage0 = (index) => {
     const updatedFiles = Array.from(selectedFiles);
+    updatedFiles.splice(index, 1);
+    setSelectedFiles(updatedFiles);
+  };
+   const handleRemoveImage = (index) => {
+    const updatedFiles = [...selectedFiles];
     updatedFiles.splice(index, 1);
     setSelectedFiles(updatedFiles);
   };
@@ -194,7 +217,9 @@ const found = sizeMarks.find((mark) => mark.value === item.size);
         }}
       >
         <div className="container d-flex flex-column gap-5 p-5">
-          <div className="card p-3 d-flex flex-column gap-3">
+
+
+          {/* <div className="card p-3 d-flex flex-column gap-3">
             <p>Ajoute jusqu'à 5 photos</p>
             <div className=" p-3 d-flex gap-5 imageCompo ">
               <div className="file-btn upload col-2">
@@ -247,6 +272,52 @@ const found = sizeMarks.find((mark) => mark.value === item.size);
               </div>
             </div>
           </div>
+          
+           */}
+          
+          
+
+<div className="card p-3 d-flex flex-column gap-3">
+            <p>Ajoute jusqu'à 5 photos ({totalImageCount}/5)</p>
+            <div className=" p-3 d-flex gap-5 imageCompo ">
+              <div className={`file-btn upload col-2 ${totalImageCount >= 5 ? 'disabled' : ''}`}>
+                <input
+                  className="inputPic "
+                  type="file"
+                  multiple
+                  disabled={totalImageCount >= 5}
+                  onChange={handleFileChange}
+                />
+                <span className="material-symbols-rounded">
+                  <i class="bi bi-cloud-plus"></i>
+                </span>{" "}
+                {totalImageCount >= 5 ? 'Maximum atteint' : 'Upload File'}
+              </div>
+              <div className="d-flex flex-row flex-wrap gap-2">
+                {selectedFiles &&
+                  Array.from(selectedFiles).map((file, idx) => (
+                    <div key={idx} className="imgsel">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        className="selectedImg "
+                        alt={`preview-${idx}`}
+                      />
+                      <button
+                        className="x rounded-circle "
+                        type="button"
+                        onClick={() => handleRemoveImage(idx)}
+                      >
+                        <i class="bi bi-trash-fill"></i>
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            </div>
+            </div>
+
+
+
+          
           <div className="card p-3">
             <div className="d-flex justify-content-between">
               <label htmlFor="title">Title</label>
