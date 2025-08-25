@@ -124,7 +124,7 @@ const Edit = () => {
       .catch((err) => console.log(err));
     console.log();
     // }axios
-    // axios.get(""+import.meta.env.VITE_GITHUB_URI+"/api/users/logged", { withCredentials: true })selectedFilesit
+    // axios.get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", { withCredentials: true })selectedFilesit
     // .then((res) => {
     //   console.log("user obj ===>", res.data);
     //   setItem({ ...item, user: res.data.id })
@@ -231,7 +231,11 @@ const Edit = () => {
 
     console.log("raw itemPics from formdata ==>", formData.get("itemPics"));        // should print the JSON string
     console.log("type of itemPics in formdata:", typeof formData.get("itemPics"));  // should be "string"
-
+ formData.delete("tags"); 
+ 
+if (item.tags && item.tags.length) {
+  item.tags.forEach(tag => formData.append('tags', tag));
+}    
     axios
       .put("" + import.meta.env.VITE_GITHUB_URI + "/api/items/" + id, formData, { withCredentials: true })
       .then((res) => {
@@ -805,6 +809,54 @@ const Edit = () => {
         ))}
       </select> */}
 
+              {/* <Select
+                sx={{
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#8356C0", // border color on focus
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#8356C0", // another way to ensure border color
+                    },
+                  },
+                }}
+                className="form-control w-25 align-content-center"
+                labelId="category-label"
+                value={item.tags || ""}
+                onChange={(e) => setItem({ ...item, tags: e.target.value })}
+                displayEmpty
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 300,
+                      overflowY: "auto",
+                    },
+                  },
+                  MenuListProps: {
+                    style: {
+                      display: "grid",
+                      gridTemplateColumns: "repeat(3, 1fr)", // 3 columns across
+                      gap: "8px", // spacing between items
+                    },
+                  },
+                }}
+              >
+                {tagOptions.map((tag, index) => (
+                  <MenuItem
+                    selected={item.tags?.includes(tag)}
+                    key={index}
+                    value={tag}
+                  >
+                    <Checkbox checked={item.tags?.includes(tag)} />
+                    <ListItemText primary={tag} />{" "}
+                    {tag}
+                  </MenuItem>
+                ))}
+              </Select>
+             */}
+
+
+
 
               <Select
                 multiple
@@ -883,9 +935,6 @@ const Edit = () => {
                   </MenuItem>
                 ))}
               </Select>
-
-
-
             
             </div>
 
