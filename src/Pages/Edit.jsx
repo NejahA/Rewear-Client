@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import Logout from "../Components/Logout";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import Cookies from 'universal-cookie';
 
 // import {
 //   Radio,
@@ -9,10 +10,10 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 //   ThemeProvider
 // } from "@material-tailwind/react";
 import Box from '@mui/material/Box';
-import { Checkbox, ListItemText,  Slider, Typography } from "@mui/material";
+import { Checkbox, ListItemText, Slider, Typography } from "@mui/material";
 import { Select, MenuItem, InputLabel, FormControl, Input, TextField } from '@mui/material';
 import {
- Radio,
+  Radio,
   FormLabel,
   RadioGroup,
   FormControlLabel,
@@ -26,27 +27,27 @@ const sizeMarks = [
   { value: 4, label: 'L' },
   { value: 5, label: 'XL' },
   { value: 6, label: 'XXL' },
-  // { value: 7, label: 'XXXL' }
+  { value: 7, label: 'XXXL' }
 ];
 
 const genderOptions = ["Male", "Female", "Unisex"];
-const ageOptions =['Baby', 'Child', 'Teen', 'Adult'];
+const ageOptions = ['Baby', 'Child', 'Teen', 'Adult'];
 
 // const genderOptions = ['Men', 'Women', 'Unisex', 'Kids'];
-const categoryOptions = [    'T-Shirts', 'Shirts', 'Sweaters', 'Jeans', 'Trousers', 'Shorts', 
-  'Jackets', 'Coats', 'Dresses', 'Skirts', 'Bags', 'Accessories', 'Activewear', 'Sleepwear', 
-  'Swimwear', 'Kidswear', 'Babywear','Shoes', 'Sneakers', 
-  'Heels', "Boots","Sandals"
+const categoryOptions = ['T-Shirts', 'Shirts', 'Sweaters', 'Jeans', 'Trousers', 'Shorts',
+  'Jackets', 'Coats', 'Dresses', 'Skirts', 'Bags', 'Accessories', 'Activewear', 'Sleepwear',
+  'Swimwear', 'Kidswear', 'Babywear', 'Shoes', 'Sneakers',
+  'Heels', "Boots", "Sandals"
 ];
-const footwearCategories = ['Shoes', 'Sneakers', 'Heels',"Boots","Sandals"];  // Based on your model
+const footwearCategories = ['Shoes', 'Sneakers', 'Heels', "Boots", "Sandals"];  // Based on your model
 
 const conditionOptions = ['New with tags', 'Like new', 'Good', 'Acceptable'];
-const adultSizes = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL'];
+const adultSizes = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 const kidSizes = [
-'0-3M', '3-6M', '6-9M', '9-12M', '12-18M', '18-24M',
-'2Y', '3Y', '4Y', '5Y', '6Y', '7Y', '8Y', '9Y', '10Y', '12Y', '14Y', '16Y'
+  '0-3M', '3-6M', '6-9M', '9-12M', '12-18M', '18-24M',
+  '2Y', '3Y', '4Y', '5Y', '6Y', '7Y', '8Y', '9Y', '10Y', '12Y', '14Y', '16Y'
 ];
-const tagOptions = [ 'Eco-friendly',
+const tagOptions = ['Eco-friendly',
   'Sustainable',
   'Vintage',
   'Minimal',
@@ -77,90 +78,136 @@ const Edit = () => {
   //   price: "",
   //   status:""
   // });
+  const [totalImageCount, setTotalImageCount] = useState(0);
 
   const handleSliderChange = (event, newValue) => {
     setItem({ ...item, size: newValue });
-    };
+  };
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [errors, setErrors] = useState(null);
-    useEffect(() => {
-      console.log("item changed ===>", item);
-    }, [item]);
-      const [existingImages, setExistingImages] = useState([]);
+  useEffect(() => {
+    console.log("item changed ===>", item);
 
+    const existingImagesCount = item && item.itemPics ? item.itemPics.length : 0;
+    const newFilesCount = selectedFiles.length;
+    setTotalImageCount(existingImagesCount + newFilesCount);
+  }, [item,selectedFiles]);
   // const nav = useNavigate();
   const navigate = useNavigate();
+  const cookies = new Cookies();
 
   // const token = localStorage.getItem("token");
   const { id } = useParams();
   // console.log("this is id : ",id);
 
   useEffect(() => {
-    
-      axios
-        .get(""+import.meta.env.VITE_GITHUB_URI+"/api/items/" + id,{withCredentials:true})
-        .then( async (res) => { 
-          const itemData = res.data;
-          const found = sizeMarks.find(mark => mark.label === itemData.size);
-            // const match = sizeMarks.find(mark => mark.value === value);
-          const updatedItem = {
-            ...itemData,
-            size: found ? found.value : itemData.size
-            // size: match ? match.label : null
-          };
-          setItem(updatedItem);
-          setExistingImages(updatedItem.itemPics || []);
-          // setItem(res.data)
-          // setExistingImages(res.data.itemPics || []);
-          // setItem({ ...res.data, size: found ? found.value : res.data.size });
-          console.log("updated state item ===>", res.data);
+    // if (!cookies.get("userToken")) {
+    //   navigate("/");
+    // } else {
+
+    axios
+      .get("" + import.meta.env.VITE_GITHUB_URI + "/api/items/" + id, { withCredentials: true })
+      .then(async (res) => {
+        const itemData = res.data;
+        const found = sizeMarks.find(mark => mark.label === itemData.size);
+        // const match = sizeMarks.find(mark => mark.value === value);
+        const updatedItem = {
+          ...itemData,
+          size: found ? found.value : itemData.size
+          // size: match ? match.label : null
+        };
+        setItem(updatedItem);
+        console.log("updated state item ===>", res.data);
       })
-     
 
-        .catch((err) => console.log(err));
-      console.log();
-      // }axios
-      // axios.get(""+import.meta.env.VITE_GITHUB_URI+"/api/users/logged", { withCredentials: true })selectedFilesit
-      // .then((res) => {
-      //   console.log("user obj ===>", res.data);
-      //   setItem({ ...item, user: res.data.id })
 
-      // }).catch((err) => console.log(err));
-    
+      .catch((err) => console.log(err));
+    console.log();
+    // }axios
+    // axios.get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", { withCredentials: true })selectedFilesit
+    // .then((res) => {
+    //   console.log("user obj ===>", res.data);
+    //   setItem({ ...item, user: res.data.id })
+
+    // }).catch((err) => console.log(err));
+    // }
   }, []);
-
   const handleFileChange = (e) => {
-    if ( e && e.target &&e.target.files) {
-      setSelectedFiles(prevFiles => [...prevFiles, e.target.files]);
+    // let files = [] 
+    // if (e){
+
+
+    // const files =e.target.files
+    // // setSelectedFiles( [...selectedFiles,...files] );
+    // setSelectedFiles( prev =>[...prev,...files] );
+
+
+    // }
+    //  if (files && files.length>0) 
+    // {
+
+    // }
+    // setSelectedFiles( prev=>[...prev, ...files] );
+    // console.log("FILE =====> :", selectedFiles);
+
+
+    const files = Array.from(e.target.files);
+    const availableSlots = 5 - totalImageCount;
+    const filesToAdd = files.slice(0, availableSlots);
+
+    setSelectedFiles(prev => [...prev, ...filesToAdd]);
+  };
+  const handleRemoveImage0 = (index) => {
+    if (selectedFiles) {
+      const updatedFiles = Array.from(selectedFiles);
+      updatedFiles.splice(index, 1);
+      setSelectedFiles(updatedFiles);
+
+    }
+    if (item && item.itemPics) {
+
+      item && item.itemPics && setItem({
+        ...item, itemPics: item.itemPics.filter(() => false)
+      })
+    }
+
+  };
+
+  const handleRemoveImage = (index, isExistingImage = false) => {
+    if (isExistingImage) {
+      // Remove from existing images
+      if (item && item.itemPics) {
+        const updatedPics = [...item.itemPics];
+        updatedPics.splice(index, 1);
+        setItem({ ...item, itemPics: updatedPics });
+      }
+    } else {
+      // Remove from selected files
+      const updatedFiles = [...selectedFiles];
+      updatedFiles.splice(index, 1);
+      setSelectedFiles(updatedFiles);
     }
   };
-
-  const handleRemoveNewImage = (index) => {
-    setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
-  };
-
-  const handleRemoveExistingImage = (index) => {
-    setExistingImages(prevImages => prevImages.filter((_, i) => i !== index));
-  };
-
-    const handleUpload = async (e) => {
+  const handleUpload = async (e) => {
     // const formData = new FormData();
     // formData.append("file", selectedFiles);
     e.preventDefault();
 
     const formData = new FormData();
-    setItem({ ...item, gender: (item?.category === "Babywear" ||
-      item?.category === "Kidswear") ? "kid" : item?.gender  });
-        
-    formData.append("user", item.user._id  )
+    setItem({
+      ...item, gender: (item?.category === "Babywear" ||
+        item?.category === "Kidswear") ? "kid" : item?.gender
+    });
+
+    formData.append("user", item.user._id)
     console.log("user from formdata ===>", item.user);
     for (const [key, value] of Object.entries(item)) {
-      if ((key !== 'user' &&  key !== 'size' )&& value) {
+      if ((key !== 'user' && key !== 'size') && value) {
         formData.append(key, value); /// Append only if value is present
       }
     }
     const found = sizeMarks.find(mark => mark.value === item.size);
-    console.log("fund ===>",found && found.label);
+    console.log("fund ===>", found && found.label);
     if (found) {
       formData.append("size", found.label); // Append only if value is present
     }    // formData.append("user", item.user  )
@@ -168,27 +215,27 @@ const Edit = () => {
       formData.append("size", item.size);
     }
     // console.log("selected files ===>", selectedFiles&&selectedFiles);
-    if(selectedFiles){
+    if (selectedFiles) {
       for (let i = 0; i < selectedFiles.length; i++) {
         // newarr.push(selectedFiles[i]);
         formData.append("files", selectedFiles[i]);
       }
     }
-  
-        const oldPics = item.itemPics || [];
-        const  serializedPics = await JSON.stringify(oldPics)
+
+    const oldPics = item.itemPics || [];
+    const serializedPics = await JSON.stringify(oldPics)
     console.log("serializedPics ===>", serializedPics, "type:", typeof serializedPics);
     formData.delete("itemPics");
 
-     formData.append('itemPics', serializedPics);
+    formData.append('itemPics', serializedPics);
 
     console.log("raw itemPics from formdata ==>", formData.get("itemPics"));        // should print the JSON string
     console.log("type of itemPics in formdata:", typeof formData.get("itemPics"));  // should be "string"
 
     axios
-      .put(""+import.meta.env.VITE_GITHUB_URI+"/api/items/" + id, formData,{withCredentials:true})
+      .put("" + import.meta.env.VITE_LOCAL_URL + "/api/items/" + id, formData, { withCredentials: true })
       .then((res) => {
-        console.log("update result ===>",JSON.stringify(res.data));
+        console.log("update result ===>", JSON.stringify(res.data));
         // console.log(JSON.stringify(formData));
         navigate("/");
       })
@@ -207,7 +254,7 @@ const Edit = () => {
         style={{ position: "relative" }}
       >
         <div className="container d-flex flex-column gap-5 p-5">
-          <div className="card p-3 d-flex flex-column gap-3">
+          {/* <div className="card p-3 d-flex flex-column gap-3">
             <p>Ajoute jusqu'à 5 photos</p>
             <div className=" p-3 d-flex gap-5 imageCompo ">
               <div className="file-btn upload col-2">
@@ -215,56 +262,86 @@ const Edit = () => {
                   className="inputPic "
                   type="file"
                   multiple
+
+                  required={false}
                   onChange={handleFileChange}
                 />
                 <span className="material-symbols-rounded">
-                  <i className="bi bi-cloud-plus"></i>
+                  <i class="bi bi-cloud-plus"></i>
                 </span>{" "}
                 Upload File
               </div>
               <div className="d-flex flex-row flex-wrap gap-2">
-                {/* Existing images */}
-                {existingImages && existingImages.map((image, idx) => (
-                  <div key={`existing-${idx}`} className="imgsel">
-                    <img
-                      src={image.url}
-                      className="selectedImg "
-                      alt={`preview-${idx}`}
-                    />
-                    <button
-                      className="x rounded-circle "
-                      type="button"
-                      onClick={() => handleRemoveExistingImage(idx)}
-                    >
-                      <i className="bi bi-trash-fill"></i>
-                    </button>
-                  </div>
-                ))}
-                
-                {/* Newly selected files */}
-                {selectedFiles && selectedFiles.map((file, idx) => (
-                  <div key={`new-${idx}`} className="imgsel">
-                    <img
-                      src={URL.createObjectURL(file)}
-                      className="selectedImg "
-                      alt={`preview-${idx}`}
-                    />
-                    <button
-                      // className="x rounded-circle "
-                      type="button"
-                      onClick={() => handleRemoveNewImage(idx)}
-                    >
-                      <i className="bi bi-trash-fill"></i>
-                    </button>
-                  </div>
-                ))}
+                {
+                  selectedFiles
+                  && Array.from(selectedFiles).map((file, idx) => (
+                    <div key={idx} className="imgsel">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        className="selectedImg "
+                        alt={`preview-${idx}`}
+                      />
+                      <button
+                        className="x rounded-circle "
+                        type="button"
+                        onClick={() => handleRemoveImage(idx, false)}
+                      >
+                        <i class="bi bi-trash-fill"></i>
+                      </button>
+                    </div>
+                  ))
+                }
+                {item && item.itemPics &&
+                  Array.from(item.itemPics).map((imagepath, idx) => (
+                    <div key={idx} className="imgsel">
+                      <img
+                        src={imagepath.url}
+                        className="selectedImg "
+                        alt={`preview-${idx}`}
+                      />
+                      <button
+                        className="x rounded-circle "
+                        type="button"
+                        onClick={() => handleRemoveImage(idx, true)}
+                      >
+                        <i class="bi bi-trash-fill"></i>
+                      </button>
+                    </div>
+                  ))
+
+                  // <img src={item.itemPics[0]} />
+                }
               </div>
             </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             <div className="d-flex gap-2 border p-3">
               <div>
                 <i
                   style={{ color: "#5C2D9A" }}
-                  className="bi bi-info-circle-fill"
+                  class="bi bi-info-circle-fill"
                 ></i>
               </div>
               <div>
@@ -277,7 +354,73 @@ const Edit = () => {
                 </h6>
               </div>
             </div>
+          </div> */}
+
+
+
+
+          <div className="card p-3 d-flex flex-column gap-3">
+            <p>Ajoute jusqu'à 5 photos ({totalImageCount}/5)</p>
+            <div className=" p-3 d-flex gap-5 imageCompo ">
+              <div className={`file-btn upload col-2 ${totalImageCount >= 5 ? 'disabled' : ''}`}>
+                <input
+                  className="inputPic "
+                  type="file"
+                  multiple
+                  disabled={totalImageCount >= 5}
+                  required={false}
+                  onChange={handleFileChange}
+                />
+                <span className="material-symbols-rounded">
+                  <i class="bi bi-cloud-plus"></i>
+                </span>{" "}
+                {totalImageCount >= 5 ? 'Maximum atteint' : 'Upload File'}
+              </div>
+              <div className="d-flex flex-row flex-wrap gap-2">
+                {/* Display existing item images */}
+                {item && item.itemPics &&
+                  item.itemPics.map((imagepath, idx) => (
+                    <div key={`existing-${idx}`} className="imgsel">
+                      <img
+                        src={imagepath.url}
+                        className="selectedImg "
+                        alt={`preview-${idx}`}
+                      />
+                      <button
+                        className="x rounded-circle "
+                        type="button"
+                        onClick={() => handleRemoveImage(idx, true)}
+                      >
+                        <i class="bi bi-trash-fill"></i>
+                      </button>
+                    </div>
+                  ))
+                }
+
+                {/* Display newly selected files */}
+                {selectedFiles &&
+                  Array.from(selectedFiles).map((file, idx) => (
+                    <div key={`new-${idx}`} className="imgsel">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        className="selectedImg "
+                        alt={`preview-${idx}`}
+                      />
+                      <button
+                        className="x rounded-circle "
+                        type="button"
+                        onClick={() => handleRemoveImage(idx, false)}
+                      >
+                        <i class="bi bi-trash-fill"></i>
+                      </button>
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
           </div>
+
+
 
           <div className="card p-3">
             <div className="d-flex justify-content-between">
@@ -386,7 +529,7 @@ const Edit = () => {
           <div className="card p-3">
             <div className="d-flex justify-content-between align-items-center">
               <label>Genre</label>
-               <div className="d-flex gap-4">
+              <div className="d-flex gap-4">
                 <RadioGroup
                   row
                   aria-labelledby="condition-label"
@@ -402,7 +545,7 @@ const Edit = () => {
                       value={c}
                       control={
                         <Radio
-                        className="rounded-none"
+                          className="rounded-none"
                           checked={
                             ((item?.category === "Babywear" ||
                               item?.category === "Kidswear") &&
@@ -442,22 +585,22 @@ const Edit = () => {
                            </select> */}
             </div>
           </div>
- <div className="card p-3">
-                  <div className="d-flex justify-content-between align-items-center">
-                              <label>Age</label>
-              
-                              <div className="d-flex gap-4">
-                               
-                                 <RadioGroup
+          <div className="card p-3">
+            <div className="d-flex justify-content-between align-items-center">
+              <label>Age</label>
+
+              <div className="d-flex gap-4">
+
+                <RadioGroup
                   row
                   aria-labelledby="condition-label"
                   name="condition"
                   value={
-                  item && item.age}
+                    item && item.age}
                   onChange={(e) => {
-                      const selectedAge = e.target.value;
+                    const selectedAge = e.target.value;
                     setItem({ ...item, age: e.target.value })
-                    console.log("age",selectedAge)
+                    console.log("age", selectedAge)
                   }}
                 >
                   {ageOptions.map((c) => (
@@ -466,15 +609,15 @@ const Edit = () => {
                       value={c}
                       control={
                         <Radio
-                        // checked={
+                          // checked={
                           checked={
                             item?.age === c
                           }
-                        //   // (
-                        //   //  (item?.category === "Babywear" || item?.category === "Kidswear" )&& c== "Kids"  ||  
-                        //   //       c== item?.gender&& (item?.category !== "Babywear" && item?.category !== "Kidswear" )   )
-                        // }
-                        // disabled={(item?.category === "Babywear" || item?.category === "Kidswear" )&& c!== "Kids" }
+                          //   // (
+                          //   //  (item?.category === "Babywear" || item?.category === "Kidswear" )&& c== "Kids"  ||  
+                          //   //       c== item?.gender&& (item?.category !== "Babywear" && item?.category !== "Kidswear" )   )
+                          // }
+                          // disabled={(item?.category === "Babywear" || item?.category === "Kidswear" )&& c!== "Kids" }
                           sx={{
                             '&.Mui-checked': {
                               color: '#8356C0', // custom checked color
@@ -489,9 +632,9 @@ const Edit = () => {
                     />
                   ))}
                 </RadioGroup>
-                              </div>
-              
-                              {/* 
+              </div>
+
+              {/* 
                   <select className="form-select w-25"
                     onChange={(e) => setItem({ ...item, gender: e.target.value })}>
                     <option value="">Sélectionner un genre</option>
@@ -499,8 +642,8 @@ const Edit = () => {
                       <option key={g} value={g}>{g}</option>
                     ))}
                   </select> */}
-                            </div>
             </div>
+          </div>
           <div className="card p-3">
             <div className="d-flex justify-content-between">
               <label
@@ -603,7 +746,7 @@ const Edit = () => {
                     step={1}
                     marks={sizeMarks}
                     min={0}
-                    max={6}
+                    max={7}
                   />
                 </>
               )}
@@ -662,8 +805,11 @@ const Edit = () => {
         ))}
       </select> */}
 
+
               <Select
-                sx={{
+                multiple
+              
+               sx={{
                   "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                     borderColor: "#8356C0", // border color on focus
                   },
@@ -673,11 +819,17 @@ const Edit = () => {
                     },
                   },
                 }}
-                className="form-control w-25 align-content-center"
+                className="form-control  w-25 align-content-center"
                 labelId="category-label"
-                value={item.tags || ""}
-                onChange={(e) => setItem({ ...item, tags: e.target.value })}
+                value={item.tags || []}
+                onChange={(e) => {
+                  console.log("tags", item.tags);
+                  setItem({ ...item, tags: e.target.value });
+                }}
                 displayEmpty
+                renderValue={(selected) =>
+                  Array.isArray(selected) ? selected.join(", ") : ""
+                }
                 MenuProps={{
                   PaperProps: {
                     style: {
@@ -694,19 +846,49 @@ const Edit = () => {
                   },
                 }}
               >
-                {tagOptions.map((tag, index) => (
-                  <MenuItem
-                    selected={item.tags?.includes(tag)}
-                    key={index}
-                    value={tag}
+                {/* {tagOptions.map((categoryName, index) => (
+                  <MenuItem key={index} value={categoryName}>
+                    {categoryName}
+                  </MenuItem>
+                ))} */}
+
+                {tagOptions.map((tag) => (
+                  <MenuItem key={tag} value={tag}  
+                  sx={{
+    "&.Mui-selected": {
+      // backgroundColor: "violet.main", // selected color
+      backgroundColor: "rgba(131, 86, 192, 0.1)", // selected color
+      color: "black", // text color when selected
+    },
+    "&.Mui-selected:hover": {
+      backgroundColor: "white", // darker shade on hover
+      color: "black", // text color on hover
+    },
+    "&:hover": {
+      backgroundColor: "rgba(131, 86, 192, 0.1)", // hover color
+    },
+  }}
+
                   >
-                    {/* <Checkbox checked={item.tags?.includes(tag)} />
-                    <ListItemText primary={tag} />{" "} */}
-                    {tag}
+                    <Checkbox
+                      sx={{
+                        
+                        "&.Mui-checked": {
+                          color: "violet.main",
+                        },
+                      }}
+                      checked={item.tags?.includes(tag)}
+                    />
+                    <ListItemText primary={tag} />
                   </MenuItem>
                 ))}
               </Select>
+
+
+
+            
             </div>
+
           </div>
 
           <div className="card p-3">
@@ -720,7 +902,7 @@ const Edit = () => {
               <Input
                 sx={{
                   "&:after": {
-                    borderBottom: "2px solid #8356C0", // underline color on focus
+                    borderBottom: "2px solid #8356C0",
                   },
                 }}
                 className="form-control w-25"
@@ -758,7 +940,7 @@ const Edit = () => {
           </div>
 
           <button className="btn-submit w-25 rounded p-2 text-light">
-            Edit Article
+            Add Article
           </button>
         </div>
       </form>
