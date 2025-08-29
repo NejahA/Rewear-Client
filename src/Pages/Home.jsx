@@ -96,7 +96,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
 
   useEffect(() => {
     axios
-      .get("" + import.meta.env.VITE_GITHUB_URI + "/api/users/logged")
+      .get("" + import.meta.env.VITE_VERCEL_URI + "/api/users/logged")
       .then((res) => {
         setUser(res.data);
       })
@@ -183,7 +183,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
       params.delete("tags");
     }
 
-    const url = `${import.meta.env.VITE_GITHUB_URI}/api/items?${params.toString()}`;
+    const url = `${import.meta.env.VITE_VERCEL_URI}/api/items?${params.toString()}`;
 
     axios
       .get(url, { withCredentials: true })

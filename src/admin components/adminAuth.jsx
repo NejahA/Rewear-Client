@@ -5,10 +5,10 @@ import {jwtDecode} from "jwt-decode"
 // const apiUrl = "https://fantastic-engine-ww965p6rpv4c994-10000.app.github.dev/api/mod"; // Replace with your actual API URL
 const authProvider = {
     login: async ({ username, password }) => {
-      const url = `${import.meta.env.VITE_GITHUB_URI}/api/login`;
+      const url = `${import.meta.env.VITE_VERCEL_URI}/api/login`;
 
         const response = await fetch(url, {
-        // const response = await fetch(`${import.meta.env.VITE_GITHUB_URI}/api/login`, {
+        // const response = await fetch(`${import.meta.env.VITE_VERCEL_URI}/api/login`, {
           method: "POST",
           body: JSON.stringify({ email: username, password }),
           headers: { "Content-Type": "application/json" },
@@ -54,7 +54,7 @@ const authProvider = {
       },
     
       logout: async () => {
-        await fetch(`${import.meta.env.VITE_GITHUB_URI}/api/logout`, {
+        await fetch(`${import.meta.env.VITE_VERCEL_URI}/api/logout`, {
           method: "POST",
           credentials: "include",
         });
@@ -72,7 +72,7 @@ const authProvider = {
         
       },
       checkAuth: async () => {
-        const response = await fetch(`${import.meta.env.VITE_GITHUB_URI}/api/users/logged`, {
+        const response = await fetch(`${import.meta.env.VITE_VERCEL_URI}/api/users/logged`, {
           method: "GET",
           credentials: "include",
         });

@@ -28,11 +28,11 @@ const Edit = () => {
     //   navigate('/')
     // } else 
     {
-      axios.get(""+import.meta.env.VITE_GITHUB_URI+"/api/items/" + id,{withCredentials:true})
+      axios.get(""+import.meta.env.VITE_VERCEL_URI+"/api/items/" + id,{withCredentials:true})
         .then(res => {
           setItem(res.data)
         })
-        .then(axios.get(''+import.meta.env.VITE_GITHUB_URI+'/api/users/logged',{withCredentials:true})
+        .then(axios.get(''+import.meta.env.VITE_VERCEL_URI+'/api/users/logged',{withCredentials:true})
         .then((res)=> {
           console.log("res ===>",res.data);
           SetUserId(res.data._id)
@@ -84,7 +84,7 @@ const Edit = () => {
       }
   
     axios
-      .put(""+import.meta.env.VITE_GITHUB_URI+"/api/items/"+id, formData,{withCredentials:true})
+      .put(""+import.meta.env.VITE_VERCEL_URI+"/api/items/"+id, formData,{withCredentials:true})
       .then((res) => {
         console.log(res);
         console.log(JSON.stringify(formData));

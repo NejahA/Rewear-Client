@@ -106,7 +106,7 @@ const Edit = () => {
     // } else {
 
     axios
-      .get("" + import.meta.env.VITE_GITHUB_URI + "/api/items/" + id, { withCredentials: true })
+      .get("" + import.meta.env.VITE_VERCEL_URI + "/api/items/" + id, { withCredentials: true })
       .then(async (res) => {
         const itemData = res.data;
         const found = sizeMarks.find(mark => mark.label === itemData.size);
@@ -237,7 +237,7 @@ if (item.tags && item.tags.length) {
   item.tags.forEach(tag => formData.append('tags', tag));
 }    
     axios
-      .put("" + import.meta.env.VITE_GITHUB_URI + "/api/items/" + id, formData, { withCredentials: true })
+      .put("" + import.meta.env.VITE_VERCEL_URI + "/api/items/" + id, formData, { withCredentials: true })
       .then((res) => {
         console.log("update result ===>", JSON.stringify(res.data));
         // console.log(JSON.stringify(formData));

@@ -12,7 +12,7 @@ const ModalLog = ({ open ,setOpenModalLog, setOpenModalReg,setLogged}) => {
     const login = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(''+import.meta.env.VITE_GITHUB_URI+'/api/login', user, 
+            const response = await axios.post(''+import.meta.env.VITE_VERCEL_URI+'/api/login', user, 
             { withCredentials: true }
             )
             console.log('SERVER RESPONSE:', response.data)

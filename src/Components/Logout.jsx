@@ -28,14 +28,14 @@ const Logout = ({setLogged}) => {
 
       // async () =>{
         //     try {
-          //         await axios.post(''+import.meta.env.VITE_GITHUB_URI+'/api/logout',{}, {withCredentials:true})
+          //         await axios.post(''+import.meta.env.VITE_VERCEL_URI+'/api/logout',{}, {withCredentials:true})
           //         localStorage.removeItem('token')
           //         navigate('/')
           //     } catch (error) {
             //         console.log('Error', error)
             //     }
             // }
-            axios.post(''+import.meta.env.VITE_GITHUB_URI+'/api/logout', {} ,
+            axios.post(''+import.meta.env.VITE_VERCEL_URI+'/api/logout', {} ,
             {withCredentials:true}
             )
             .then(res => {

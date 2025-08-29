@@ -28,7 +28,7 @@ const UpdateUser = () => {
 
   useEffect(() => {
       axios
-        .get(""+import.meta.env.VITE_GITHUB_URI+"/api/users/logged", {
+        .get(""+import.meta.env.VITE_VERCEL_URI+"/api/users/logged", {
           withCredentials: true,
         })
         .then((res) => {
@@ -101,7 +101,7 @@ const handleToggle = (field) => (event) => {
     //   formData.append("profilePic",JSON.stringify(user.profilePic[0])  );
 
     axios
-      .put(""+import.meta.env.VITE_GITHUB_URI+"/api/users/" + user._id, formData, {
+      .put(""+import.meta.env.VITE_VERCEL_URI+"/api/users/" + user._id, formData, {
         withCredentials: true,
       })
       .then((res) => {

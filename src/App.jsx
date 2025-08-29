@@ -77,7 +77,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <div style={{ height: "100vh" }}>
-        {/* <Admin authProvider={adminAuth} loginPage={<><Navbar setOpenModalReg={setOpenModalReg}  setOpenModalLog={setOpenModalLog} /><Home setOpenModalReg={setOpenModalReg} setOpenModalLog={setOpenModalLog} /></> }  dataProvider= {simpleRestProvider(''+import.meta.env.VITE_GITHUB_URI+'/api' )} >
+        {/* <Admin authProvider={adminAuth} loginPage={<><Navbar setOpenModalReg={setOpenModalReg}  setOpenModalLog={setOpenModalLog} /><Home setOpenModalReg={setOpenModalReg} setOpenModalLog={setOpenModalLog} /></> }  dataProvider= {simpleRestProvider(''+import.meta.env.VITE_VERCEL_URI+'/api' )} >
     <Resource name="items" edit={itemEdit} list={ItemList} />
   </Admin>; */}
         <ModalLog

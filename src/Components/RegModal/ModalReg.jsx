@@ -24,7 +24,7 @@ const ModalReg = ({ open, setOpenModalLog, setOpenModalReg,setLogged }) => {
         e.preventDefault();
         try {
             const response = await axios.post(
-                ""+import.meta.env.VITE_GITHUB_URI+"/api/register",
+                ""+import.meta.env.VITE_VERCEL_URI+"/api/register",
                 user,
                 { withCredentials: true }
             );

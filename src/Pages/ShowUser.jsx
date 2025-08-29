@@ -43,7 +43,7 @@ const ShowUser = ({logged}) => {
         profilePic: null,
       });
       axios
-        .get(""+import.meta.env.VITE_GITHUB_URI+"/api/users/logged", {
+        .get(""+import.meta.env.VITE_VERCEL_URI+"/api/users/logged", {
           withCredentials: true,
         })
         .then((res) => {
@@ -56,7 +56,7 @@ const ShowUser = ({logged}) => {
           console.log(err)});
 
       axios
-        .get(""+import.meta.env.VITE_GITHUB_URI+"/api/users/" + id, {
+        .get(""+import.meta.env.VITE_VERCEL_URI+"/api/users/" + id, {
           withCredentials: true,
         })
         .then((res) => {

@@ -58,7 +58,7 @@ const testhome = (
 
   // useEffect( ()  => {
   //     if (  cookies.get("userToken"))  {
-  //       axios.get(''+import.meta.env.VITE_GITHUB_URI+'/api/items',{withCredentials:true})
+  //       axios.get(''+import.meta.env.VITE_VERCEL_URI+'/api/items',{withCredentials:true})
   //       .then(  res => {
   //         const allItems = [...res.data]
   //         setItems([...allItems]);

@@ -1,7 +1,7 @@
 const authProvider3 = {
     async login({ email, password }) {
-        // axios.post(''+import.meta.env.VITE_GITHUB_URI+'/api/login', user, { withCredentials: true })
-        const request = new Request(""+import.meta.env.VITE_GITHUB_URI+"/api/login", {
+        // axios.post(''+import.meta.env.VITE_VERCEL_URI+'/api/login', user, { withCredentials: true })
+        const request = new Request(""+import.meta.env.VITE_VERCEL_URI+"/api/login", {
             method: "POST",
             body: JSON.stringify({ email, password }),
             headers: new Headers({ "Content-Type": "application/json" }),

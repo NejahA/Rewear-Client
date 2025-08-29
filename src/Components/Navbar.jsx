@@ -39,7 +39,7 @@ const location = useLocation();
       console.log("theres token in navbar");
       console.log("cookies",cookies.get("userToken"));
       axios
-        .get(""+import.meta.env.VITE_GITHUB_URI+"/api/users/logged", {
+        .get(""+import.meta.env.VITE_VERCEL_URI+"/api/users/logged", {
           withCredentials: true,
         })
         .then((res) => {

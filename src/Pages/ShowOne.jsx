@@ -50,7 +50,7 @@ const ShowOne = () => {
     });
     
     axios
-      .get(""+import.meta.env.VITE_GITHUB_URI+"/api/items/" + id, {})
+      .get(""+import.meta.env.VITE_VERCEL_URI+"/api/items/" + id, {})
       .then((res) => {
         const fetchedItem = res.data;
         setItem(fetchedItem);
@@ -63,7 +63,7 @@ const ShowOne = () => {
       .catch((err) => console.log(err));
 
     axios
-      .get(""+import.meta.env.VITE_GITHUB_URI+"/api/users/logged", {
+      .get(""+import.meta.env.VITE_VERCEL_URI+"/api/users/logged", {
         withCredentials: true,
       })
       .then((res) => {
@@ -82,7 +82,7 @@ const ShowOne = () => {
 
   const deleteItem = (itemId) => {
     axios
-      .delete(""+import.meta.env.VITE_GITHUB_URI+"/api/items/" + itemId, {
+      .delete(""+import.meta.env.VITE_VERCEL_URI+"/api/items/" + itemId, {
         withCredentials: true,
       })
       .then((response) => {
@@ -101,7 +101,7 @@ const ShowOne = () => {
   
   try {
     const response = await axios.post(
-      `${import.meta.env.VITE_GITHUB_URI}/api/paymee/create-payment`,
+      `${import.meta.env.VITE_VERCEL_URI}/api/paymee/create-payment`,
       {
         itemId: item._id,
         quantity: 1
@@ -173,7 +173,7 @@ const ShowOne = () => {
     
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_GITHUB_URI}/api/paymee/check-status/${token}`,
+        `${import.meta.env.VITE_VERCEL_URI}/api/paymee/check-status/${token}`,
         { withCredentials: true, timeout: 10000 }
       );
 
@@ -188,7 +188,7 @@ const ShowOne = () => {
         
         // Refresh item data
         setTimeout(() => {
-          axios.get(`${import.meta.env.VITE_GITHUB_URI}/api/items/${id}`, {})
+          axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/items/${id}`, {})
             .then((res) => setItem(res.data))
             .catch(err => console.error('Error refreshing item:', err));
         }, 2000);

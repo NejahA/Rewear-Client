@@ -9,7 +9,7 @@ const Register = (props) => {
     const register = async (e) => {
         e.preventDefault()
         try {
-            const response = await axios.post(''+import.meta.env.VITE_GITHUB_URI+'/api/register', user,{withCredentials:true})
+            const response = await axios.post(''+import.meta.env.VITE_VERCEL_URI+'/api/register', user,{withCredentials:true})
             console.log('SERVER RESPONSE:', response.data)
             // localStorage.setItem('token',response.data.token)
             navigate('/')

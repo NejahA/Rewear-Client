@@ -9,8 +9,8 @@ const Login = (props) => {
     const login = async (e) => {
         e.preventDefault()
         
-            // const response = await axios.post(''+import.meta.env.VITE_GITHUB_URI+'/api/login', user, { withCredentials: true })
-              await axios.post(''+import.meta.env.VITE_GITHUB_URI+'/api/login', user, { withCredentials: true })
+            // const response = await axios.post(''+import.meta.env.VITE_VERCEL_URI+'/api/login', user, { withCredentials: true })
+              await axios.post(''+import.meta.env.VITE_VERCEL_URI+'/api/login', user, { withCredentials: true })
               .then(res=>{
                 // sessionStorage.setItem("token", res.data.token);
                 console.log("token from login" ,res.data);
