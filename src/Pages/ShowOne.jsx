@@ -245,8 +245,9 @@ const ShowOne = () => {
   </DialogTitle>
   <DialogContent>
     {paymentStatus === 'pending' && (
-      <div className="text-center">
+        <>
         <MoonLoader size={30} color="#8356C0" />
+      <div className="text-center">
         <Typography variant="body1" className="mt-2">
           Waiting for payment confirmation...
         </Typography>
@@ -267,6 +268,7 @@ const ShowOne = () => {
           </a>
         </Typography>
       </div>
+              </>
     )}
     
     {paymentStatus === 'success' && (

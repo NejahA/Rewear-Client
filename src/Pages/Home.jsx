@@ -949,7 +949,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                   className="d-flex flex-wrap gap-3"
                   style={{ minHeight: "100vh" }}
                 >
-                  {items.map((item) => (
+                  {items  && items.map((item) => (
                     <ItemCard
                       userId={user?.id}
                       fName={user?.fName}
