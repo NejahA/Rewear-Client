@@ -14,6 +14,7 @@ import {
   TextField,
 } from "@mui/material";
 import { FormLabel, RadioGroup, FormControlLabel, Radio } from "@mui/material";
+import Swal from 'sweetalert2';
 
 const sizeMarks = [
   { value: 0, label: "XXS" },
@@ -101,7 +102,7 @@ const Create = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [errors, setErrors] = useState(null);
   const nav = useNavigate();
-    const [totalImageCount, setTotalImageCount] = useState(0);
+  const [totalImageCount, setTotalImageCount] = useState(0);
 
   const handleFileChange0 = (e) => {
     const files = e.target.files;
@@ -109,15 +110,25 @@ const Create = () => {
     console.log("FILES ====>", files); // This will always be the latest
   };
 
-    const handleFileChange = (e) => {
+  const handleFileChange = (e) => {
     if (!e.target.files || totalImageCount >= 5) return;
-    
+
     const files = Array.from(e.target.files);
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+    const invalidFiles = files.filter(file => !allowedTypes.includes(file.type));
+
+    if (invalidFiles.length > 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Type de fichier non supporté',
+        text: 'Seules les images JPEG, PNG, GIF et JPG sont autorisées',
+      });
+      return;
+    }
+
     const availableSlots = 5 - totalImageCount;
     const filesToAdd = files.slice(0, availableSlots);
-    
     setSelectedFiles(prev => [...prev, ...filesToAdd]);
-    console.log("FILES ====>", filesToAdd);
   };
 
   const navigate = useNavigate();
@@ -137,7 +148,7 @@ const Create = () => {
     // } else
     {
       axios
-        .get(""+import.meta.env.VITE_VERCEL_URI+"/api/users/logged", {
+        .get("" + import.meta.env.VITE_VERCEL_URI + "/api/users/logged", {
           withCredentials: true,
         })
         .then((res) => {
@@ -154,7 +165,7 @@ const Create = () => {
     updatedFiles.splice(index, 1);
     setSelectedFiles(updatedFiles);
   };
-   const handleRemoveImage = (index) => {
+  const handleRemoveImage = (index) => {
     const updatedFiles = [...selectedFiles];
     updatedFiles.splice(index, 1);
     setSelectedFiles(updatedFiles);
@@ -174,18 +185,18 @@ const Create = () => {
 
     formData.append("user", item.user);
     for (const [key, value] of Object.entries(item)) {
-      if (key !== "user" && key !== "size"&&  key!=="tags  " && value) {
+      if (key !== "user" && key !== "size" && key !== "tags  " && value) {
         formData.append(key, value); // Append only if value is present
       }
     }
     formData.delete("tags"); // Remove size if it exists, we'll append it later
-if (item.tags && item.tags.length) {
-  item.tags.forEach(tag => formData.append('tags', tag));
-}    
-const found = sizeMarks.find((mark) => mark.value === item.size);
-    console.log("fund ===>",found && found.label);
+    if (item.tags && item.tags.length) {
+      item.tags.forEach(tag => formData.append('tags', tag));
+    }
+    const found = sizeMarks.find((mark) => mark.value === item.size);
+    console.log("fund ===>", found && found.label);
     if (found) {
-      formData.append("size",  found.label || null); // Append only if value is present
+      formData.append("size", found.label || null); // Append only if value is present
     }
     if (selectedFiles) {
       for (let i = 0; i < selectedFiles.length; i++) {
@@ -194,17 +205,34 @@ const found = sizeMarks.find((mark) => mark.value === item.size);
       }
     }
     console.log("item ====>", item);
+    if (totalImageCount === 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: 'Veuillez ajouter au moins une image',
+      });
+      return;
+    }
     axios
-      .post(""+import.meta.env.VITE_VERCEL_URI+"/api/items", formData, {
+      .post("" + import.meta.env.VITE_VERCEL_URI + "/api/items", formData, {
         withCredentials: true,
       })
       .then((res) => {
-        console.log(res);
-        console.log(JSON.stringify(formData));
-        navigate("/");
+        Swal.fire({
+          icon: 'success',
+          title: 'Succès',
+          text: 'Article créé avec succès',
+        }).then(() => {
+          navigate("/");
+        });
       })
       .catch((err) => {
         console.log(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur',
+          text: err.response?.data?.message || 'Une erreur est survenue',
+        });
         setErrors(err.response.data.errors);
       });
   };
@@ -274,16 +302,17 @@ const found = sizeMarks.find((mark) => mark.value === item.size);
           </div>
           
            */}
-          
-          
 
-<div className="card p-3 d-flex flex-column gap-3">
+
+
+          <div className="card p-3 d-flex flex-column gap-3">
             <p>Ajoute jusqu'à 5 photos ({totalImageCount}/5)</p>
             <div className=" p-3 d-flex gap-5 imageCompo ">
               <div className={`file-btn upload col-2 ${totalImageCount >= 5 ? 'disabled' : ''}`}>
                 <input
                   className="inputPic "
                   type="file"
+                  accept="image/jpeg, image/png, image/gif, image/jpg"
                   multiple
                   disabled={totalImageCount >= 5}
                   onChange={handleFileChange}
@@ -313,11 +342,11 @@ const found = sizeMarks.find((mark) => mark.value === item.size);
                   ))}
               </div>
             </div>
-            </div>
+          </div>
 
 
 
-          
+
           <div className="card p-3">
             <div className="d-flex justify-content-between">
               <label htmlFor="title">Title</label>
@@ -695,8 +724,8 @@ const found = sizeMarks.find((mark) => mark.value === item.size);
 
               <Select
                 multiple
-              
-               sx={{
+
+                sx={{
                   "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                     borderColor: "#8356C0", // border color on focus
                   },
@@ -740,26 +769,26 @@ const found = sizeMarks.find((mark) => mark.value === item.size);
                 ))} */}
 
                 {tagOptions.map((tag) => (
-                  <MenuItem key={tag} value={tag}  
-                  sx={{
-    "&.Mui-selected": {
-      // backgroundColor: "violet.main", // selected color
-      backgroundColor: "rgba(131, 86, 192, 0.1)", // selected color
-      color: "black", // text color when selected
-    },
-    "&.Mui-selected:hover": {
-      backgroundColor: "white", // darker shade on hover
-      color: "black", // text color on hover
-    },
-    "&:hover": {
-      backgroundColor: "rgba(131, 86, 192, 0.1)", // hover color
-    },
-  }}
+                  <MenuItem key={tag} value={tag}
+                    sx={{
+                      "&.Mui-selected": {
+                        // backgroundColor: "violet.main", // selected color
+                        backgroundColor: "rgba(131, 86, 192, 0.1)", // selected color
+                        color: "black", // text color when selected
+                      },
+                      "&.Mui-selected:hover": {
+                        backgroundColor: "white", // darker shade on hover
+                        color: "black", // text color on hover
+                      },
+                      "&:hover": {
+                        backgroundColor: "rgba(131, 86, 192, 0.1)", // hover color
+                      },
+                    }}
 
                   >
                     <Checkbox
                       sx={{
-                        
+
                         "&.Mui-checked": {
                           color: "violet.main",
                         },

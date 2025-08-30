@@ -41,19 +41,45 @@ const UpdateUser = () => {
       // }
   }, []);
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setSelectedFiles(e.target.files);
+    const file  = e.target.files[0];
+  
+  if (file) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+    
+    if (!allowedTypes.includes(file.type)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Type de fichier non supporté',
+        text: 'Seules les images JPEG, PNG, GIF et JPG sont autorisées',
+      });
+      e.target.value = '';
+      return;
+    }
+    
+    setSelectedFiles(file);
     console.log("FILE from change/add=====> :", file);
-  };
+  }
+};
 
   const handleRemoveImage = () => {
-    //   const updatedFiles = Array.from(selectedFiles);
-    // const empty = []
-    //   selectedFiles.filter(() => false);
-    setSelectedFiles(null);
-    console.log("FILE from remove =====> :", selectedFiles);
-    // user && user.profilePic && setUser ( { ...user, profilePic: setUser({ ...user, profilePic: null})})
-    // console.log("FILE from delete=====> :", file);
+     if (!e.target.files || totalImageCount >= 5) return;
+  
+      const files = Array.from(e.target.files);
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+      const invalidFiles = files.filter(file => !allowedTypes.includes(file.type));
+  
+      if (invalidFiles.length > 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Type de fichier non supporté',
+          text: 'Seules les images JPEG, PNG, GIF et JPG sont autorisées',
+        });
+        return;
+      }
+  
+      const availableSlots = 5 - totalImageCount;
+      const filesToAdd = files.slice(0, availableSlots);
+      setSelectedFiles(prev => [...prev, ...filesToAdd]);
   };
 const handleToggle = (field) => (event) => {
     setUser((prev) => ({
@@ -128,6 +154,7 @@ const handleToggle = (field) => (event) => {
                 <input
                   className="inputPic "
                   type="file"
+                  accept="image/jpeg, image/png, image/gif, image/jpg" // ← Ajoutez cette ligne
                   required={false}
                   onChange={(e) => {
                     // setSelectedFiles(e.target.files);console.log("FILE =====> :", selectedFiles)

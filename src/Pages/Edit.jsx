@@ -91,7 +91,7 @@ const Edit = () => {
     const existingImagesCount = item && item.itemPics ? item.itemPics.length : 0;
     const newFilesCount = selectedFiles.length;
     setTotalImageCount(existingImagesCount + newFilesCount);
-  }, [item,selectedFiles]);
+  }, [item, selectedFiles]);
   // const nav = useNavigate();
   const navigate = useNavigate();
   const cookies = new Cookies();
@@ -133,27 +133,15 @@ const Edit = () => {
     // }
   }, []);
   const handleFileChange = (e) => {
-    // let files = [] 
-    // if (e){
 
 
-    // const files =e.target.files
-    // // setSelectedFiles( [...selectedFiles,...files] );
-    // setSelectedFiles( prev =>[...prev,...files] );
-
-
-    // }
-    //  if (files && files.length>0) 
-    // {
-
-    // }
-    // setSelectedFiles( prev=>[...prev, ...files] );
-    // console.log("FILE =====> :", selectedFiles);
 
 
     const files = Array.from(e.target.files);
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+    const validFiles = files.filter(file => allowedTypes.includes(file.type));
     const availableSlots = 5 - totalImageCount;
-    const filesToAdd = files.slice(0, availableSlots);
+    const filesToAdd = validFiles.slice(0, availableSlots);
 
     setSelectedFiles(prev => [...prev, ...filesToAdd]);
   };
@@ -231,21 +219,37 @@ const Edit = () => {
 
     console.log("raw itemPics from formdata ==>", formData.get("itemPics"));        // should print the JSON string
     console.log("type of itemPics in formdata:", typeof formData.get("itemPics"));  // should be "string"
- formData.delete("tags"); 
- 
-if (item.tags && item.tags.length) {
-  item.tags.forEach(tag => formData.append('tags', tag));
-}    
+    formData.delete("tags");
+
+    if (item.tags && item.tags.length) {
+      item.tags.forEach(tag => formData.append('tags', tag));
+    }
+    if (totalImageCount === 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: 'Veuillez ajouter au moins une image',
+      });
+      return;
+    }
     axios
       .put("" + import.meta.env.VITE_VERCEL_URI + "/api/items/" + id, formData, { withCredentials: true })
       .then((res) => {
-        console.log("update result ===>", JSON.stringify(res.data));
-        // console.log(JSON.stringify(formData));
-        navigate("/");
+        Swal.fire({
+          icon: 'success',
+          title: 'Succès',
+          text: 'Article modifié avec succès',
+        }).then(() => {
+          navigate("/");
+        });
       })
       .catch((err) => {
         console.log(err);
-        setErrors(err.response.data.errors);
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur',
+          text: err.response?.data?.message || 'Une erreur est survenue',
+        });
       });
   };
 
@@ -370,6 +374,7 @@ if (item.tags && item.tags.length) {
                 <input
                   className="inputPic "
                   type="file"
+                  accept="image/jpeg, image/png, image/gif, image/jpg" // ← Ajoutez cette ligne
                   multiple
                   disabled={totalImageCount >= 5}
                   required={false}
@@ -860,8 +865,8 @@ if (item.tags && item.tags.length) {
 
               <Select
                 multiple
-              
-               sx={{
+
+                sx={{
                   "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                     borderColor: "#8356C0", // border color on focus
                   },
@@ -905,26 +910,26 @@ if (item.tags && item.tags.length) {
                 ))} */}
 
                 {tagOptions.map((tag) => (
-                  <MenuItem key={tag} value={tag}  
-                  sx={{
-    "&.Mui-selected": {
-      // backgroundColor: "violet.main", // selected color
-      backgroundColor: "rgba(131, 86, 192, 0.1)", // selected color
-      color: "black", // text color when selected
-    },
-    "&.Mui-selected:hover": {
-      backgroundColor: "white", // darker shade on hover
-      color: "black", // text color on hover
-    },
-    "&:hover": {
-      backgroundColor: "rgba(131, 86, 192, 0.1)", // hover color
-    },
-  }}
+                  <MenuItem key={tag} value={tag}
+                    sx={{
+                      "&.Mui-selected": {
+                        // backgroundColor: "violet.main", // selected color
+                        backgroundColor: "rgba(131, 86, 192, 0.1)", // selected color
+                        color: "black", // text color when selected
+                      },
+                      "&.Mui-selected:hover": {
+                        backgroundColor: "white", // darker shade on hover
+                        color: "black", // text color on hover
+                      },
+                      "&:hover": {
+                        backgroundColor: "rgba(131, 86, 192, 0.1)", // hover color
+                      },
+                    }}
 
                   >
                     <Checkbox
                       sx={{
-                        
+
                         "&.Mui-checked": {
                           color: "violet.main",
                         },
@@ -935,7 +940,7 @@ if (item.tags && item.tags.length) {
                   </MenuItem>
                 ))}
               </Select>
-            
+
             </div>
 
           </div>
