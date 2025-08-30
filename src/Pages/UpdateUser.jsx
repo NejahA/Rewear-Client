@@ -3,6 +3,7 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 // import Logout from "../Components/Logout";
 import { useNavigate, useParams } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 const UpdateUser = () => {
   const [user, setUser] = useState({
