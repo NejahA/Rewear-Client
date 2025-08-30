@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Logout from "../Components/Logout";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Cookies from 'universal-cookie';
+import Swal from 'sweetalert2';
 
 // import {
 //   Radio,
