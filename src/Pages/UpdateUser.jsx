@@ -16,7 +16,7 @@ const UpdateUser = () => {
     phone: "",
   });
 
-  const [selectedFiles, setSelectedFiles] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [errors, setErrors] = useState(null);
   const [emailCheck, setEmailCheck] = useState(true)
   const [phoneCheck, setPhoneCheck] = useState(true)
@@ -41,7 +41,7 @@ const UpdateUser = () => {
       console.log();
       // }
   }, []);
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file  = e.target.files[0];
   
   if (file) {
@@ -57,8 +57,8 @@ const UpdateUser = () => {
       return;
     }
     
-    setSelectedFiles(file);
-    console.log("FILE from change/add=====> :", file);
+    await setSelectedFile(file);
+    console.log("FILE from change/add=====> :", selectedFile);
   }
 };
 
@@ -80,7 +80,7 @@ const UpdateUser = () => {
   
       const availableSlots = 5 - totalImageCount;
       const filesToAdd = files.slice(0, availableSlots);
-      setSelectedFiles(prev => [...prev, ...filesToAdd]);
+      setSelectedFile(prev => [...prev, ...filesToAdd]);
   };
 const handleToggle = (field) => (event) => {
     setUser((prev) => ({
@@ -90,7 +90,7 @@ const handleToggle = (field) => (event) => {
   };
   const handleUpload = async (e) => {
     // const formData = new FormData();
-    // formData.append("file", selectedFiles);
+    // formData.append("file", selectedFile);
     e.preventDefault();
     const formData = new FormData();
     formData.append("email", user.email);
@@ -102,14 +102,15 @@ const handleToggle = (field) => (event) => {
     formData.append("showAdress", user.showAdress);
     // formData.append("user", user.user  )
 
-    // for (let i = 0; i < selectedFiles.length; i++) {
-    // newarr.push(selectedFiles[i]);
-    if (selectedFiles) {
-      for (let i = 0; i < selectedFiles.length; i++) {
-        // newarr.push(selectedFiles[i]);
-        formData.append("files", selectedFiles[i]);
-      }
-    }
+    // for (let i = 0; i < selectedFile.length; i++) {
+    // newarr.push(selectedFile[i]);
+    selectedFile && formData.append("files", selectedFile);
+    // if (selectedFile) {
+    //   for (let i = 0; i < selectedFile.length; i++) {
+    //     // newarr.push(selectedFile[i]);
+    //     formData.append("files", selectedFile[i]);
+    //   }
+    // }
     const oldPics = user.profilePic || {};
     const serializedPics = await JSON.stringify(oldPics);
     console.log(
@@ -122,8 +123,8 @@ const handleToggle = (field) => (event) => {
 
     formData.append("profilePic", serializedPics);
 
-    // selectedFiles && selectedFiles.length>0 &&
-    // formData.append("profilePic",JSON.stringify(selectedFiles[0])  );
+    // selectedFile && selectedFile.length>0 &&
+    // formData.append("profilePic",JSON.stringify(selectedFile[0])  );
 
     //   formData.append("profilePic",JSON.stringify(user.profilePic[0])  );
 
@@ -158,7 +159,7 @@ const handleToggle = (field) => (event) => {
                   accept="image/jpeg, image/png, image/gif, image/jpg" // ← Ajoutez cette ligne
                   required={false}
                   onChange={(e) => {
-                    // setSelectedFiles(e.target.files);console.log("FILE =====> :", selectedFiles)
+                    // setSelectedFile(e.target.files);console.log("FILE =====> :", selectedFile)
                     handleFileChange(e);
                   }}
                 />
@@ -168,14 +169,13 @@ const handleToggle = (field) => (event) => {
                 Choisir une Photo
               </div>
               <div className="d-flex flex-row flex-wrap gap-2">
-                {selectedFiles ? (
-                  Array.from(selectedFiles).map((file, idx) => (
-                    <div key={idx} className="imgsel">
+                {selectedFile ? (
+                    <div  className="imgsel">
                       <img
-                        src={URL.createObjectURL(file)}
+                        src={URL.createObjectURL(selectedFile)}
                         className=" "
                         style={{ borderRadius: "100%", width: "190px" }}
-                        alt={`preview-${idx}`}
+                        alt={`preview-${selectedFile.name}`}
                       />
                       <button
                         className="x rounded-circle "
@@ -187,7 +187,7 @@ const handleToggle = (field) => (event) => {
                         <i class="bi bi-trash-fill"></i>
                       </button>
                     </div>
-                  ))
+                
                 ) : user.profilePic && user.profilePic.url ? (
                   <div className="imgsel">
                     <img src={user.profilePic.url} className="selectedImg " />
