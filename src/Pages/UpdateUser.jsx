@@ -4,13 +4,16 @@ import React, { useState, useEffect } from "react";
 // import Logout from "../Components/Logout";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from 'sweetalert2';
+import LocationPicker from "../Components/LocationPicker";
 
 const UpdateUser = () => {
   const [user, setUser] = useState({
     email: "",
     fName: "",
     lName: "",
-    adress: "",
+    adress: "",  
+      location: { lat: null, lng: null }, // ADD THIS: Store coordinates
+
     profilePic: {},
     itemHistory: [],
     phone: "",
@@ -62,25 +65,12 @@ const UpdateUser = () => {
   }
 };
 
-  const handleRemoveImage = () => {
-     if (!e.target.files || totalImageCount >= 5) return;
-  
-      const files = Array.from(e.target.files);
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
-      const invalidFiles = files.filter(file => !allowedTypes.includes(file.type));
-  
-      if (invalidFiles.length > 0) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Type de fichier non supporté',
-          text: 'Seules les images JPEG, PNG, GIF et JPG sont autorisées',
-        });
-        return;
-      }
-  
-      const availableSlots = 5 - totalImageCount;
-      const filesToAdd = files.slice(0, availableSlots);
-      setSelectedFile(prev => [...prev, ...filesToAdd]);
+  const handleRemoveImage = (e) => {
+    setSelectedFile(null);
+    setUser((prev) => ({
+      ...prev,
+      profilePic: null,
+    }))
   };
 const handleToggle = (field) => (event) => {
     setUser((prev) => ({
@@ -88,6 +78,17 @@ const handleToggle = (field) => (event) => {
       [field]: event.target.checked,
     }));
   };
+    const handleLocationSelect = async (coordinates,addressName = null) => {
+      addressName && console.log("Selected address name:", addressName);
+      coordinates && console.log("Selected coordinates:", coordinates);
+
+   await coordinates && addressName &&  setUser(prev => ({
+    ...prev,
+    location: { lat: coordinates[0], lng: coordinates[1] },
+    ...(addressName && { adress: addressName })
+  }));
+  console.log("user after update ===>",JSON.stringify(user));
+  };  
   const handleUpload = async (e) => {
     // const formData = new FormData();
     // formData.append("file", selectedFile);
@@ -101,6 +102,8 @@ const handleToggle = (field) => (event) => {
     formData.append("showPhone", user.showPhone);
     formData.append("showAdress", user.showAdress);
     // formData.append("user", user.user  )
+    formData.append("lat", user.location.lat);
+    formData.append("lng", user.location.lng);
 
     // for (let i = 0; i < selectedFile.length; i++) {
     // newarr.push(selectedFile[i]);
@@ -173,14 +176,14 @@ const handleToggle = (field) => (event) => {
                     <div  className="imgsel">
                       <img
                         src={URL.createObjectURL(selectedFile)}
-                        className=" "
+                        className=" selectedImg"
                         style={{ borderRadius: "100%", width: "190px" }}
                         alt={`preview-${selectedFile.name}`}
                       />
                       <button
                         className="x rounded-circle "
                         type="button"
-                        onClick={(e) => {
+                        onClick={() => {
                           handleRemoveImage();
                         }}
                       >
@@ -190,17 +193,14 @@ const handleToggle = (field) => (event) => {
                 
                 ) : user.profilePic && user.profilePic.url ? (
                   <div className="imgsel">
-                    <img src={user.profilePic.url} className="selectedImg " />
+                    <img src={user.profilePic.url} 
+                    style={{ borderRadius: "100%", width: "190px" }}
+                    className="selectedImg " />
                     <button
                       className="x rounded-circle "
                       type="button"
-                      onClick={(e) => {
-                        user &&
-                          user.profilePic &&
-                          setUser({
-                            ...user,
-                            profilePic: setUser({ ...user, profilePic: null }),
-                          });
+                      onClick={() => {
+                        handleRemoveImage();
                       }}
                     >
                       <i class="bi bi-trash-fill"></i>
@@ -281,10 +281,11 @@ const handleToggle = (field) => (event) => {
                 placeholder="Joe@gmail.com"
                 value={user.email}
                 onChange={(e) => setUser({ ...user, email: e.target.value })}
-                value={user.email}
               />
             </div>
           </div>
+ 
+ 
           <div className="card h-auto p-3">
             <div className="d-flex justify-content-between">
               <label className="col-3 d-flex justify-content-between align-items-center">
@@ -319,11 +320,10 @@ const handleToggle = (field) => (event) => {
                 placeholder="12 345 678"
                 value={user.phone}
                 onChange={(e) => setUser({ ...user, phone: e.target.value })}
-                value={user.phone}
               />
             </div>
           </div>
-          <div className="card h-auto p-3">
+          {/* <div className="card h-auto p-3">
             <div className="d-flex justify-content-between">
               <label className="col-3 d-flex justify-content-between align-items-center">
                 <span className="">Adresse </span>
@@ -358,11 +358,58 @@ const handleToggle = (field) => (event) => {
                 placeholder="12 345 678"
                 value={user.adress}
                 onChange={(e) => setUser({ ...user, adress: e.target.value })}
-                value={user.adress}
+                // value={user.adress}
               />
+              
             </div>
-          </div>
+          </div> */}
+<div className="card h-auto p-3">
+              <div className="d-flex justify-content-between">
 
+  <label className="col-3 d-flex justify-content-between align-items-center">
+                <span className="">Adresse </span>
+                <FormControlLabel
+                  className=" "
+                  control={
+                    <Switch
+                      sx={{
+                        "& .MuiSwitch-switchBase.Mui-checked": {
+                          color: "violet.main",
+                        },
+                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
+                          {
+                            backgroundColor: "violet.main",
+                          },
+                      }}
+                      checked={user.showAdress}
+                    //   onChange={(e) => {
+                    //     console.log("showadress  ", user.showAdress);
+                    //     setUser({ ...user, showAdress: e.target.checked });
+                    //   }}
+                    onChange={handleToggle("showAdress")}
+
+                    />
+                  }
+                  label={`Show: ${user.showAdress ? "Yes" : "No"}`}
+                />
+              </label>
+              {/* {user.adress} */}
+              {/* <input
+                className="form-control w-25"
+                type="text"
+                placeholder="12 345 678"
+                value={user.adress}
+                onChange={(e) => setUser({ ...user, adress: e.target.value })}
+                // value={user.adress}
+              />            */}
+              </div>
+               <LocationPicker 
+              onLocationSelect={handleLocationSelect}
+              initialAddress={user?.adress || ''}
+              initialPosition={user?.location?.lat ? [user.location.lat, user.location.lng] : null}
+            />
+            
+          </div>
           <button className="btn-submit w-25 rounded p-2 text-light">
             Edit Profile
           </button>
