@@ -20,6 +20,18 @@
     /* justify-content: center; */
     background-image: url('../../../public/logo/eclaboussure-abstraite-peinture-violette_23-2147809147.jpg');
     background-size: cover;
-    z-index:100
+    z-index:100;
+  background-color: rgba(0, 0, 0, 0.7);
 
+}
+.text-success {
+  color: green;
+}
+
+.text-danger {
+  color: red;
+}
+
+.VioletCred {
+  color: #5C2D9A;
 }

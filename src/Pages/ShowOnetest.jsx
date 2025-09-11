@@ -30,7 +30,7 @@ const ShowOne = () => {
     // if (!token) {
     //   navigate('/')
     // }
-     else {
+      {
       axios.get(""+import.meta.env.VITE_VERCEL_URI+"/api/items/" + id)
         .then(res => {
           setItem(res.data)

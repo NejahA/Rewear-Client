@@ -43,6 +43,7 @@ import {
 } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import theme from "./Components/theme";
+import ResetPassword from "./Pages/ResetPassword";
 const violetBase = "#7745B9";
 const violetMain = alpha(violetBase, 0.7);
 
@@ -150,7 +151,10 @@ function App() {
             }
           />
           {/* <Route path='/' element={<UpdateUser />  } /> */}
-
+          <Route
+            path="/reset-password/:token"
+            element={<ResetPassword />}
+  />
           <Route
             path="/"
             element={

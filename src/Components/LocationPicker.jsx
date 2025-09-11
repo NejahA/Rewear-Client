@@ -76,7 +76,7 @@ const LocationPicker = ({ onLocationSelect, initialPosition, initialAddress }) =
   const getAddressFromCoordinates = useCallback(async (lat, lng) => {
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=ar,fr`
       );
       
       if (!response.ok) throw new Error('Network response was not ok');
@@ -263,7 +263,7 @@ const LocationPicker = ({ onLocationSelect, initialPosition, initialAddress }) =
 
       // Add tile layer
       L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attributions">CARTO</a>',
         maxZoom: 19,
       }).addTo(mapInstance.current);
 
@@ -282,8 +282,12 @@ const LocationPicker = ({ onLocationSelect, initialPosition, initialAddress }) =
         setGoogleMapsUrl(mapsUrl);
       }
 
-      // Initialize geocoder
-      geocoderRef.current = Geocoder.nominatim();
+      // Initialize geocoder with language preference
+      geocoderRef.current = Geocoder.nominatim({
+        geocoder: {
+          language: 'ar,fr'
+        }
+      });
       
       // Create geocoder control without automatically adding markers
       geocoderControlRef.current = L.Control.geocoder({
@@ -316,8 +320,10 @@ const LocationPicker = ({ onLocationSelect, initialPosition, initialAddress }) =
         }
         
         // Set the view with new position and appropriate zoom
-        mapInstance.current.setView(newPosition, newZoom);
-        setZoomLevel(newZoom);
+        if (mapInstance.current) {
+          mapInstance.current.setView(newPosition, newZoom);
+          setZoomLevel(newZoom);
+        }
         
         // Complete the location selection
         handleLocationSelectComplete(newPosition, name);

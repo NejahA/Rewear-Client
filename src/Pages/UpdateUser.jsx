@@ -13,7 +13,6 @@ const UpdateUser = () => {
     lName: "",
     adress: "",  
       location: { lat: null, lng: null }, // ADD THIS: Store coordinates
-
     profilePic: {},
     itemHistory: [],
     phone: "",
@@ -175,7 +174,7 @@ const handleToggle = (field) => (event) => {
                 {selectedFile ? (
                     <div  className="imgsel">
                       <img
-                        src={URL.createObjectURL(selectedFile)}
+                        src={URL.createObject(selectedFile)}
                         className=" selectedImg"
                         style={{ borderRadius: "100%", width: "190px" }}
                         alt={`preview-${selectedFile.name}`}
@@ -183,7 +182,7 @@ const handleToggle = (field) => (event) => {
                       <button
                         className="x rounded-circle "
                         type="button"
-                        onClick={() => {
+                        onClick={() =>  {
                           handleRemoveImage();
                         }}
                       >
