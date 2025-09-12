@@ -86,6 +86,20 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
   const [user, setUser] = useState();
   const [categoryCounts, setCategoryCounts] = useState();
   const location = useLocation();
+  
+const useIsDesktop = () => {
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 992);
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 992);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return isDesktop;
+};
+
+  const isDesktop = useIsDesktop(); // detect mode
 
   // NEW: ensure sort.category is an array at startup
   useEffect(() => {
@@ -249,6 +263,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
     const timer = setTimeout(() => {
       fetchItems(0, true);
     }, 1000);
+    isDesktop==false && setSort({ ...sort, nav: false });
     return () => clearTimeout(timer);
   };
 
@@ -279,7 +294,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
       <div className="d-flex">
         {sort && sort.nav && (
           <div
-            className=" col-3 d-flex flex-column px-5 bg-body-tertiary  "
+            className=" col-lg-3 col-12 d-flex flex-column px-5 bg-body-tertiary  "
             style={{
               display: "hidden",
               maxHeight: "100%",
@@ -290,7 +305,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
               <form className=" d-flex flex-column " onSubmit={handleFilterSubmit}>
                 <button
                   type="submit"
-                  className="btn rounded text-light w-50 align-self-end mb-3"
+  className="btn rounded text-center text-light w-50 mx-auto mb-3"
                   style={{ backgroundColor: "#713CC5" }}
                 >
                   Apply Filters
@@ -922,7 +937,9 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
             }
           </div>
         )}
-        <div className="container py-5 col-10">
+        <div  className={`container py-5 col-10 d-lg-block ${
+    sort && sort.nav ? "d-none" : ""
+  }`} >
           <div className="">
             <div
               className="scroll-container    d-flex flex-wrap gap-3 
