@@ -176,9 +176,9 @@ const Navbar = ({
                       src={userNav?.profilePic?.url}
                       alt="Profile"
                     />
-                    <span className="ms-2 d-none d-lg-inline">
+                    {/* <span className="ms-2 d-none d-lg-inline">
                       {userNav.fName}
-                    </span>
+                    </span> */}
                   </Link>
 
                   <Link
@@ -191,39 +191,64 @@ const Navbar = ({
                       alt="Sell item"
                       style={{ width: "24px", height: "24px" }}
                     />
-                    <span className="ms-2 d-none d-lg-inline">Sell Item</span>
+                    {/* <span className="ms-2 d-none d-lg-inline">Sell Item</span> */}
                   </Link>
 
                   <Logout setLogged={setLogged} />
                 </>
               ) : (
-                <>
-                  <Button
-                    color="secondary"
-                    fullWidth={!isDesktop}
-                    onClick={() => {
-                      setOpenModalReg(!openReg);
-                      setOpenModalLog(false);
-                    }}
-                    className={!isDesktop ? "flex-fill" : ""}
-                  >
-                    <i className="bi bi-box-arrow-in-right pe-2"></i>
-                    Sign Up
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="violet"
-                    fullWidth={!isDesktop}
-                    onClick={() => {
-                      setOpenModalLog(!openLog);
-                      setOpenModalReg(false);
-                    }}
-                    className={!isDesktop ? "flex-fill" : ""}
-                  >
-                    <i className="bi bi-person-fill pe-2"></i>
-                    Log in
-                  </Button>
-                </>
+               <>
+  <Button
+    variant="outlined"
+    sx={{
+      // color: "#8a2be2",
+      color: "#7745B9",
+      borderColor: "#7745B9",
+      "&:hover": {
+        borderColor: "#7745B9",
+        backgroundColor: "rgba(138, 43, 226, 0.04)",
+      },
+      whiteSpace: "nowrap",
+      textTransform: "none",
+      fontWeight: 500,
+    }}
+    fullWidth={!isDesktop}
+    onClick={() => {
+      setOpenModalReg(!openReg);
+      setOpenModalLog(false);
+    }}
+    className={`d-flex align-items-center justify-content-center gap-2 py-2 px-3 rounded-3 ${
+      !isDesktop ? "flex-fill" : ""
+    }`}
+  >
+    <i className="bi bi-box-arrow-in-right"></i>
+    Sign Up
+  </Button>
+
+  <Button
+    variant="contained"
+    sx={{
+      backgroundColor: "#7745B9",
+      "&:hover": { backgroundColor: "#7745B9" },
+      whiteSpace: "nowrap",
+      textTransform: "none",
+      fontWeight: 500,
+    }}
+    fullWidth={!isDesktop}
+    onClick={() => {
+      setOpenModalLog(!openLog);
+      setOpenModalReg(false);
+    }}
+    className={`d-flex align-items-center justify-content-center gap-2 py-2 px-3 rounded-3 ${
+      !isDesktop ? "flex-fill" : ""
+    }`}
+  >
+    <i className="bi bi-person-fill"></i>
+    Log in
+  </Button>
+</>
+
+
               )}
             </div>
           </div>

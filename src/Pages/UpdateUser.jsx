@@ -1,4 +1,4 @@
-import { FormControlLabel, Switch, TextField, Input } from "@mui/material";
+import { FormControlLabel, Switch, TextField, Input, Typography } from "@mui/material";
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -10,7 +10,7 @@ const UpdateUser = () => {
     email: "",
     fName: "",
     lName: "",
-    adress: "",  
+    adress: "",
     location: { lat: null, lng: null },
     profilePic: {},
     itemHistory: [],
@@ -23,7 +23,7 @@ const UpdateUser = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [errors, setErrors] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
-  
+
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -44,10 +44,10 @@ const UpdateUser = () => {
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
-  
+
     if (file) {
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
-      
+
       if (!allowedTypes.includes(file.type)) {
         Swal.fire({
           icon: 'error',
@@ -57,7 +57,7 @@ const UpdateUser = () => {
         e.target.value = '';
         return;
       }
-      
+
       // Check file size (limit to 5MB)
       if (file.size > 5 * 1024 * 1024) {
         Swal.fire({
@@ -68,12 +68,12 @@ const UpdateUser = () => {
         e.target.value = '';
         return;
       }
-      
+
       setSelectedFile(file);
       // Create preview URL
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
-      
+
       console.log("FILE from change/add=====> :", file);
     }
   };
@@ -111,10 +111,10 @@ const UpdateUser = () => {
     }
     console.log("user after update ===>", JSON.stringify(user));
   };
-  
+
   const handleUpload = async (e) => {
     e.preventDefault();
-    
+
     const formData = new FormData();
     formData.append("email", user.email);
     formData.append("fName", user.fName);
@@ -138,11 +138,11 @@ const UpdateUser = () => {
 
     try {
       const response = await axios.put(
-        "" + import.meta.env.VITE_VERCEL_URI + "/api/users/" + user._id, 
-        formData, 
+        "" + import.meta.env.VITE_VERCEL_URI + "/api/users/" + user._id,
+        formData,
         { withCredentials: true }
       );
-      
+
       Swal.fire({
         icon: 'success',
         title: 'Succès',
@@ -150,11 +150,11 @@ const UpdateUser = () => {
       }).then(() => {
         navigate(-1);
       });
-      
+
     } catch (err) {
       console.log(err);
       setErrors(err.response?.data?.errors);
-      
+
       Swal.fire({
         icon: 'error',
         title: 'Erreur',
@@ -172,16 +172,63 @@ const UpdateUser = () => {
     };
   }, [previewUrl]);
 
+
+  const [passwordFields, setPasswordFields] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmNewPassword: ""
+  });
+
+  // New handler for updating password state
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordFields({ ...passwordFields, [name]: value });
+  };
+
+  // New handler for submitting password change
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      console.log("inside handlePasswordSubmit with fields:", passwordFields);
+      const response = await axios.put(
+        "" + import.meta.env.VITE_VERCEL_URI + "/api/update-password",
+        passwordFields,
+        { withCredentials: true }
+      );
+      Swal.fire({
+        icon: "success",
+        title: "Password Updated!",
+        text: response.data.message,
+        showConfirmButton: false,
+        timer: 2000
+      });
+      // Reset password fields after successful update
+      setPasswordFields({
+        currentPassword: "",
+        newPassword: "",
+        confirmNewPassword: ""
+      });
+    } catch (err) {
+      console.error("Password update error :", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: err.response.data.message || "Failed to update password.",
+      });
+    }
+  };
+
   return (
     <div className="min-vh-100" style={{ backgroundColor: "#f8f9fa" }}>
       <form onSubmit={handleUpload} className="w-100">
         <div className="container-fluid px-3 py-4" style={{ maxWidth: "100%" }}>
           <div className="d-flex flex-column gap-4">
-            
+
             {/* Header */}
             <div className="d-flex align-items-center gap-3 mb-2">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => navigate(-1)}
                 className="btn btn-light d-flex align-items-center justify-content-center"
                 style={{ width: "40px", height: "40px", borderRadius: "50%" }}
@@ -195,7 +242,7 @@ const UpdateUser = () => {
             <div className="card p-4">
               <div className="d-flex flex-column align-items-center gap-3">
                 <h6 className="fw-bold mb-0">Photo de profil</h6>
-                
+
                 {/* Profile Picture Preview */}
                 <div className="position-relative">
                   {previewUrl ? (
@@ -203,9 +250,9 @@ const UpdateUser = () => {
                       <img
                         src={previewUrl}
                         className="rounded-circle"
-                        style={{ 
-                          width: "120px", 
-                          height: "120px", 
+                        style={{
+                          width: "120px",
+                          height: "120px",
                           objectFit: "cover",
                           border: "4px solid #8356C0"
                         }}
@@ -213,9 +260,9 @@ const UpdateUser = () => {
                       />
                       <button
                         className="btn btn-danger btn-sm position-absolute"
-                        style={{ 
-                          top: "-8px", 
-                          right: "-8px", 
+                        style={{
+                          top: "-8px",
+                          right: "-8px",
                           borderRadius: "50%",
                           width: "32px",
                           height: "32px",
@@ -230,11 +277,11 @@ const UpdateUser = () => {
                       </button>
                     </div>
                   ) : (
-                    <div 
+                    <div
                       className="rounded-circle d-flex align-items-center justify-content-center"
-                      style={{ 
-                        width: "120px", 
-                        height: "120px", 
+                      style={{
+                        width: "120px",
+                        height: "120px",
                         backgroundColor: "#f0f0f0",
                         border: "2px dashed #8356C0"
                       }}
@@ -256,8 +303,8 @@ const UpdateUser = () => {
                   <button
                     type="button"
                     className="btn d-flex align-items-center gap-2 px-4 py-2"
-                    style={{ 
-                      backgroundColor: "#8356C0", 
+                    style={{
+                      backgroundColor: "#8356C0",
                       color: "white",
                       border: "none",
                       borderRadius: "25px"
@@ -273,7 +320,7 @@ const UpdateUser = () => {
             {/* Personal Information */}
             <div className="card p-3">
               <h6 className="fw-bold mb-3">Informations personnelles</h6>
-              
+
               {/* First Name */}
               <div className="mb-3">
                 <label className="fw-bold mb-2 d-block">Prénom</label>
@@ -317,10 +364,69 @@ const UpdateUser = () => {
               </div>
             </div>
 
+
+            <div className="col-12 mt-4">
+              <Typography variant="h6" gutterBottom>
+                Change Password
+              </Typography>
+              <form >
+                <div className="mb-3">
+                  <TextField
+                    fullWidth
+                    label="Current Password"
+                    variant="outlined"
+                    type="password"
+                    name="currentPassword"
+                    value={passwordFields.currentPassword}
+                    onChange={handlePasswordChange}
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <TextField
+                    fullWidth
+                    label="New Password"
+                    variant="outlined"
+                    type="password"
+                    name="newPassword"
+                    value={passwordFields.newPassword}
+                    onChange={handlePasswordChange}
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <TextField
+                    fullWidth
+                    label="Confirm New Password"
+                    variant="outlined"
+                    type="password"
+                    name="confirmNewPassword"
+                    value={passwordFields.confirmNewPassword}
+                    onChange={handlePasswordChange}
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="btn w-100 py-3 fw-bold text-white mb-4"
+                  style={{
+                    backgroundColor: "#8356C0",
+                    border: "none",
+                    borderRadius: "12px",
+                    fontSize: "1.1rem",
+                    minHeight: "56px",
+                  }}
+                  onClick={handlePasswordSubmit}
+                >
+                  Change Password
+                </button>
+              </form>
+            </div>
+
             {/* Contact Information */}
             <div className="card p-3">
               <h6 className="fw-bold mb-3">Informations de contact</h6>
-              
+
               {/* Email */}
               <div className="mb-4">
                 <div className="d-flex justify-content-between align-items-center mb-2">
@@ -444,10 +550,10 @@ const UpdateUser = () => {
                   labelPlacement="start"
                 />
               </div>
-              
+
               {/* Location Picker Component */}
               <div className="mt-3">
-                <LocationPicker 
+                <LocationPicker
                   onLocationSelect={handleLocationSelect}
                   initialAddress={user?.adress || ''}
                   initialPosition={user?.location?.lat ? [user.location.lat, user.location.lng] : null}
@@ -472,6 +578,7 @@ const UpdateUser = () => {
               </button>
             </div>
           </div>
+
         </div>
       </form>
     </div>
