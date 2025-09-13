@@ -2,14 +2,9 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import Logout from "../Components/Logout";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import Cookies from 'universal-cookie';
+// import Cookies from 'universal-cookies';
 import Swal from 'sweetalert2';
 
-// import {
-//   Radio,
-//   RadioGroup,
-//   ThemeProvider
-// } from "@material-tailwind/react";
 import Box from '@mui/material/Box';
 import { Checkbox, ListItemText, Slider, Typography } from "@mui/material";
 import { Select, MenuItem, InputLabel, FormControl, Input, TextField } from '@mui/material';
@@ -33,156 +28,84 @@ const sizeMarks = [
 
 const genderOptions = ["Male", "Female", "Unisex"];
 const ageOptions = ['Baby', 'Child', 'Teen', 'Adult'];
-
-// const genderOptions = ['Men', 'Women', 'Unisex', 'Kids'];
 const categoryOptions = ['T-Shirts', 'Shirts', 'Sweaters', 'Jeans', 'Trousers', 'Shorts',
   'Jackets', 'Coats', 'Dresses', 'Skirts', 'Bags', 'Accessories', 'Activewear', 'Sleepwear',
   'Swimwear', 'Kidswear', 'Babywear', 'Shoes', 'Sneakers',
   'Heels', "Boots", "Sandals"
 ];
-const footwearCategories = ['Shoes', 'Sneakers', 'Heels', "Boots", "Sandals"];  // Based on your model
-
+const footwearCategories = ['Shoes', 'Sneakers', 'Heels', "Boots", "Sandals"];
 const conditionOptions = ['New with tags', 'Like new', 'Good', 'Acceptable'];
 const adultSizes = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 const kidSizes = [
   '0-3M', '3-6M', '6-9M', '9-12M', '12-18M', '18-24M',
   '2Y', '3Y', '4Y', '5Y', '6Y', '7Y', '8Y', '9Y', '10Y', '12Y', '14Y', '16Y'
 ];
-const tagOptions = ['Eco-friendly',
-  'Sustainable',
-  'Vintage',
-  'Minimal',
-  'Streetwear',
-  'Luxury',
-  'Formal',
-  'Casual',
-  'Colorful',
-  'Neutral',
-  'Trendy',
-  'Classic',
-  '90s',
-  'Y2K',
-  'Preppy',
-  'Boho',
-  'Sporty',
-  'Plus Size'];
+const tagOptions = ['Eco-friendly', 'Sustainable', 'Vintage', 'Minimal', 'Streetwear', 'Luxury', 'Formal', 'Casual', 'Colorful', 'Neutral', 'Trendy', 'Classic', '90s', 'Y2K', 'Preppy', 'Boho', 'Sporty', 'Plus Size'];
 
 const Edit = () => {
   const [item, setItem] = useState({});
-
-  // const [item, setItem] = useState({
-  //   title: "",
-  //   category: "",
-  //   brand: "",
-  //   size: "",
-  //   description: "",
-  //   price: "",
-  //   status:""
-  // });
   const [totalImageCount, setTotalImageCount] = useState(0);
-
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [errors, setErrors] = useState(null);
+  
   const handleSliderChange = (event, newValue) => {
     setItem({ ...item, size: newValue });
   };
-  const [selectedFiles, setSelectedFiles] = useState([]);
-  const [errors, setErrors] = useState(null);
+
   useEffect(() => {
     console.log("item changed ===>", item);
-
     const existingImagesCount = item && item.itemPics ? item.itemPics.length : 0;
     const newFilesCount = selectedFiles.length;
     setTotalImageCount(existingImagesCount + newFilesCount);
   }, [item, selectedFiles]);
-  // const nav = useNavigate();
-  const navigate = useNavigate();
-  const cookies = new Cookies();
 
-  // const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+  // const cookies = new Cookies();
   const { id } = useParams();
-  // console.log("this is id : ",id);
 
   useEffect(() => {
-    // if (!cookies.get("userToken")) {
-    //   navigate("/");
-    // } else {
-
     axios
       .get("" + import.meta.env.VITE_VERCEL_URI + "/api/items/" + id, { withCredentials: true })
       .then(async (res) => {
         const itemData = res.data;
         const found = sizeMarks.find(mark => mark.label === itemData.size);
-        // const match = sizeMarks.find(mark => mark.value === value);
         const updatedItem = {
           ...itemData,
           size: found ? found.value : itemData.size
-          // size: match ? match.label : null
         };
         setItem(updatedItem);
         console.log("updated state item ===>", res.data);
       })
-
-
       .catch((err) => console.log(err));
-    console.log();
-    // }axios
-    // axios.get(""+import.meta.env.VITE_LOCAL_URL+"/api/users/logged", { withCredentials: true })selectedFilesit
-    // .then((res) => {
-    //   console.log("user obj ===>", res.data);
-    //   setItem({ ...item, user: res.data.id })
-
-    // }).catch((err) => console.log(err));
-    // }
   }, []);
+
   const handleFileChange = (e) => {
-
-
-
-
     const files = Array.from(e.target.files);
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
     const validFiles = files.filter(file => allowedTypes.includes(file.type));
     const availableSlots = 5 - totalImageCount;
     const filesToAdd = validFiles.slice(0, availableSlots);
-
     setSelectedFiles(prev => [...prev, ...filesToAdd]);
-  };
-  const handleRemoveImage0 = (index) => {
-    if (selectedFiles) {
-      const updatedFiles = Array.from(selectedFiles);
-      updatedFiles.splice(index, 1);
-      setSelectedFiles(updatedFiles);
-
-    }
-    if (item && item.itemPics) {
-
-      item && item.itemPics && setItem({
-        ...item, itemPics: item.itemPics.filter(() => false)
-      })
-    }
-
   };
 
   const handleRemoveImage = (index, isExistingImage = false) => {
     if (isExistingImage) {
-      // Remove from existing images
       if (item && item.itemPics) {
         const updatedPics = [...item.itemPics];
         updatedPics.splice(index, 1);
         setItem({ ...item, itemPics: updatedPics });
       }
     } else {
-      // Remove from selected files
       const updatedFiles = [...selectedFiles];
       updatedFiles.splice(index, 1);
       setSelectedFiles(updatedFiles);
     }
   };
-  const handleUpload = async (e) => {
-    // const formData = new FormData();
-    // formData.append("file", selectedFiles);
-    e.preventDefault();
 
+  const handleUpload = async (e) => {
+    e.preventDefault();
     const formData = new FormData();
+    
     setItem({
       ...item, gender: (item?.category === "Babywear" ||
         item?.category === "Kidswear") ? "kid" : item?.gender
@@ -190,23 +113,23 @@ const Edit = () => {
 
     formData.append("user", item.user._id)
     console.log("user from formdata ===>", item.user);
+    
     for (const [key, value] of Object.entries(item)) {
       if ((key !== 'user' && key !== 'size') && value) {
-        formData.append(key, value); /// Append only if value is present
+        formData.append(key, value);
       }
     }
+    
     const found = sizeMarks.find(mark => mark.value === item.size);
     console.log("fund ===>", found && found.label);
     if (found) {
-      formData.append("size", found.label); // Append only if value is present
-    }    // formData.append("user", item.user  )
-    else {
+      formData.append("size", found.label);
+    } else {
       formData.append("size", item.size);
     }
-    // console.log("selected files ===>", selectedFiles&&selectedFiles);
+    
     if (selectedFiles) {
       for (let i = 0; i < selectedFiles.length; i++) {
-        // newarr.push(selectedFiles[i]);
         formData.append("files", selectedFiles[i]);
       }
     }
@@ -215,16 +138,16 @@ const Edit = () => {
     const serializedPics = await JSON.stringify(oldPics)
     console.log("serializedPics ===>", serializedPics, "type:", typeof serializedPics);
     formData.delete("itemPics");
-
     formData.append('itemPics', serializedPics);
 
-    console.log("raw itemPics from formdata ==>", formData.get("itemPics"));        // should print the JSON string
-    console.log("type of itemPics in formdata:", typeof formData.get("itemPics"));  // should be "string"
+    console.log("raw itemPics from formdata ==>", formData.get("itemPics"));
+    console.log("type of itemPics in formdata:", typeof formData.get("itemPics"));
     formData.delete("tags");
 
     if (item.tags && item.tags.length) {
       item.tags.forEach(tag => formData.append('tags', tag));
     }
+    
     if (totalImageCount === 0) {
       Swal.fire({
         icon: 'error',
@@ -233,6 +156,7 @@ const Edit = () => {
       });
       return;
     }
+    
     axios
       .put("" + import.meta.env.VITE_VERCEL_URI + "/api/items/" + id, formData, { withCredentials: true })
       .then((res) => {
@@ -255,748 +179,462 @@ const Edit = () => {
   };
 
   return (
+    <div className="min-vh-100" style={{ backgroundColor: "#f8f9fa" }}>
+      <form onSubmit={handleUpload} className="w-100">
+        {/* Mobile-optimized container with proper padding */}
+        <div className="container-fluid px-3 py-4" style={{ maxWidth: "100%" }}>
+          <div className="d-flex flex-column gap-4">
+            
+            {/* Image Upload Section - Mobile Optimized */}
+            <div className="card p-3">
+              <div className="d-flex flex-column gap-3">
+                <div className="d-flex justify-content-between align-items-center">
+                  <h6 className="mb-0 fw-bold">Photos</h6>
+                  <small className="text-muted">({totalImageCount}/5)</small>
+                </div>
+                
+                {/* Mobile-friendly file upload button */}
+                      <div className={`position-relative file-upload-container ${totalImageCount >= 5 ? 'upload-disabled' : ''}`}>
+  <input
+    className="position-absolute w-100 h-100 opacity-0"
+    style={{ 
+      cursor: totalImageCount >= 5 ? 'not-allowed' : 'pointer', 
+      zIndex: 2 
+    }}
+    type="file"
+    accept="image/jpeg, image/png, image/gif, image/jpg"
+    multiple
+    disabled={totalImageCount >= 5}
+    onChange={handleFileChange}
+  />
+  <div 
+    className="upload-area d-flex flex-column align-items-center justify-content-center gap-2 p-4 text-center"
+    style={{ 
+      backgroundColor: totalImageCount >= 5 ? "#f8f9fa" : "#f0e6ff", 
+      color: totalImageCount >= 5 ? "#6c757d" : "#5a4b81",
+      border: `2px dashed ${totalImageCount >= 5 ? "#ced4da" : "#8356C0"}`,
+      borderRadius: "12px",
+      minHeight: "140px",
+      transition: "all 0.3s ease"
+    }}
+  >
+    <i 
+      className={`bi ${totalImageCount >= 5 ? 'bi-cloud-slash' : 'bi-cloud-plus-fill'}`} 
+      style={{ fontSize: "2.5rem", color: totalImageCount >= 5 ? "#adb5bd" : "#8356C0" }}
+    ></i>
     <div>
-      <form
-        onSubmit={(e) => {
-          handleUpload(e);
-        }}
-        style={{ position: "relative" }}
-      >
-        <div className="container d-flex flex-column gap-5 p-5">
-          {/* <div className="card p-3 d-flex flex-column gap-3">
-            <p>Ajoute jusqu'à 5 photos</p>
-            <div className=" p-3 d-flex gap-5 imageCompo ">
-              <div className="file-btn upload col-2">
-                <input
-                  className="inputPic "
-                  type="file"
-                  multiple
+      <span className="fw-bold d-block">
+        {totalImageCount >= 5 ? 'Maximum atteint (5/5)' : `Ajouter des photos (${totalImageCount}/5)`}
+      </span>
+      <small className="text-muted">
+        {totalImageCount >= 5 ? 'Vous avez atteint la limite maximale' : 'Glissez-déposez ou cliquez pour ajouter'}
+      </small>
+    </div>
+    {totalImageCount >= 5 && (
+      <small className="text-info mt-1">
+        <i className="bi bi-info-circle me-1"></i>
+        Supprimez une photo pour en ajouter une nouvelle
+      </small>
+    )}
+  </div>
+</div>
 
-                  required={false}
-                  onChange={handleFileChange}
-                />
-                <span className="material-symbols-rounded">
-                  <i class="bi bi-cloud-plus"></i>
-                </span>{" "}
-                Upload File
-              </div>
-              <div className="d-flex flex-row flex-wrap gap-2">
-                {
-                  selectedFiles
-                  && Array.from(selectedFiles).map((file, idx) => (
-                    <div key={idx} className="imgsel">
-                      <img
-                        src={URL.createObjectURL(file)}
-                        className="selectedImg "
-                        alt={`preview-${idx}`}
-                      />
-                      <button
-                        className="x rounded-circle "
-                        type="button"
-                        onClick={() => handleRemoveImage(idx, false)}
-                      >
-                        <i class="bi bi-trash-fill"></i>
-                      </button>
-                    </div>
-                  ))
-                }
-                {item && item.itemPics &&
-                  Array.from(item.itemPics).map((imagepath, idx) => (
-                    <div key={idx} className="imgsel">
-                      <img
-                        src={imagepath.url}
-                        className="selectedImg "
-                        alt={`preview-${idx}`}
-                      />
-                      <button
-                        className="x rounded-circle "
-                        type="button"
-                        onClick={() => handleRemoveImage(idx, true)}
-                      >
-                        <i class="bi bi-trash-fill"></i>
-                      </button>
-                    </div>
-                  ))
-
-                  // <img src={item.itemPics[0]} />
-                }
-              </div>
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            <div className="d-flex gap-2 border p-3">
-              <div>
-                <i
-                  style={{ color: "#5C2D9A" }}
-                  class="bi bi-info-circle-fill"
-                ></i>
-              </div>
-              <div>
-                <h5 style={{ color: "#5C2D9A" }}>
-                  Utilise uniquement tes propres photos
-                </h5>
-                <h6>
-                  Cette annonce peut être masquée ou supprimée si elle contient
-                  des photos qui ne sont pas les tiennes
-                </h6>
+                {/* Image preview grid - Mobile optimized */}
+                <div 
+  className="d-flex flex-nowrap overflow-x-auto" 
+  style={{ gap: "1rem" }}
+>
+  {/* Existing images */}
+  {item?.itemPics?.map((imagepath, idx) => (
+    <div key={`existing-${idx}`} className="col-6 col-sm-4 col-md-3" style={{ flex: "0 0 auto" }}>
+      <div className="position-relative">
+        <img
+          src={imagepath.url}
+          className="w-100 rounded"
+          style={{ aspectRatio: "1/1", objectFit: "cover" }}
+          alt={`preview-${idx}`}
+        />
+        <button
+          className="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 p-1 d-flex align-items-center justify-content-center"
+          style={{ width: "32px", height: "32px", borderRadius: "50%" }}
+          type="button"
+          onClick={() => handleRemoveImage(idx, true)}
+        >
+          <i className="bi bi-trash-fill" style={{ fontSize: "0.8rem" }}></i>
+        </button>
+      </div>
+    </div>
+  ))}
+  
+  {/* New selected files */}
+  {selectedFiles?.map((file, idx) => (
+    <div key={`new-${idx}`} className="col-6 col-sm-4 col-md-3" style={{ flex: "0 0 auto" }}>
+      <div className="position-relative">
+        <img
+          src={URL.createObjectURL(file)}
+          className="w-100 rounded"
+          style={{ aspectRatio: "1/1", objectFit: "cover" }}
+          alt={`preview-${idx}`}
+        />
+        <button
+          className="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 p-1 d-flex align-items-center justify-content-center"
+          style={{ width: "32px", height: "32px", borderRadius: "50%" }}
+          type="button"
+          onClick={() => handleRemoveImage(idx, false)}
+        >
+          <i className="bi bi-trash-fill" style={{ fontSize: "0.8rem" }}></i>
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
               </div>
             </div>
-          </div> */}
 
-
-
-
-          <div className="card p-3 d-flex flex-column gap-3">
-            <p>Ajoute jusqu'à 5 photos ({totalImageCount}/5)</p>
-            <div className=" p-3 d-flex gap-5 imageCompo ">
-              <div className={`file-btn upload col-2 ${totalImageCount >= 5 ? 'disabled' : ''}`}>
-                <input
-                  className="inputPic "
-                  type="file"
-                  accept="image/jpeg, image/png, image/gif, image/jpg" // ← Ajoutez cette ligne
-                  multiple
-                  disabled={totalImageCount >= 5}
-                  required={false}
-                  onChange={handleFileChange}
-                />
-                <span className="material-symbols-rounded">
-                  <i class="bi bi-cloud-plus"></i>
-                </span>{" "}
-                {totalImageCount >= 5 ? 'Maximum atteint' : 'Upload File'}
-              </div>
-              <div className="d-flex flex-row flex-wrap gap-2">
-                {/* Display existing item images */}
-                {item && item.itemPics &&
-                  item.itemPics.map((imagepath, idx) => (
-                    <div key={`existing-${idx}`} className="imgsel">
-                      <img
-                        src={imagepath.url}
-                        className="selectedImg "
-                        alt={`preview-${idx}`}
-                      />
-                      <button
-                        className="x rounded-circle "
-                        type="button"
-                        onClick={() => handleRemoveImage(idx, true)}
-                      >
-                        <i class="bi bi-trash-fill"></i>
-                      </button>
-                    </div>
-                  ))
-                }
-
-                {/* Display newly selected files */}
-                {selectedFiles &&
-                  Array.from(selectedFiles).map((file, idx) => (
-                    <div key={`new-${idx}`} className="imgsel">
-                      <img
-                        src={URL.createObjectURL(file)}
-                        className="selectedImg "
-                        alt={`preview-${idx}`}
-                      />
-                      <button
-                        className="x rounded-circle "
-                        type="button"
-                        onClick={() => handleRemoveImage(idx, false)}
-                      >
-                        <i class="bi bi-trash-fill"></i>
-                      </button>
-                    </div>
-                  ))
-                }
+            {/* Title and Description - Stacked on mobile */}
+            <div className="card p-3">
+              <div className="d-flex flex-column gap-3">
+                <div className="d-flex flex-column gap-2">
+                  <label htmlFor="title" className="fw-bold mb-0">Titre</label>
+                  <Input
+                    fullWidth
+                    value={item?.title || ""}
+                    sx={{
+                      "&:after": { borderBottom: "2px solid #8356C0" },
+                    }}
+                    type="text"
+                    placeholder="ex: sweatshirt noir"
+                    onChange={(e) => setItem({ ...item, title: e.target.value })}
+                  />
+                  {errors?.title?.message && (
+                    <small className="text-danger">Veuillez insérer un titre</small>
+                  )}
+                </div>
+                
+                <div className="d-flex flex-column gap-2">
+                  <label htmlFor="description" className="fw-bold mb-0">Description</label>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={3}
+                    sx={{
+                      "& label.Mui-focused": { color: "#8356C0" },
+                      "& .MuiOutlinedInput-root": {
+                        "&.Mui-focused fieldset": { borderColor: "#8356C0" },
+                      },
+                    }}
+                    placeholder="ex: porté quelques fois, taille correcte"
+                    onChange={(e) => setItem({ ...item, description: e.target.value })}
+                    value={item?.description || ""}
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-
-
-          <div className="card p-3">
-            <div className="d-flex justify-content-between">
-              <label htmlFor="title">Title</label>
-              <Input
-                value={item && item.title}
-                sx={{
-                  "&:after": {
-                    borderBottom: "2px solid #8356C0", // underline color on focus
-                  },
-                }}
-                className="form-control w-25"
-                type="text"
-                placeholder="ex: sweatshirt noir"
-                onChange={(e) => setItem({ ...item, title: e.target.value })}
-              />
-
-              {/* !!!!!!!!!!!!!!!!!!!!!!!!!!! ERROR VALIDATOR FOR TITLE (COPY PASTE FOR ALL FEILDS) */}
-
-              {errors && errors.title && errors.title.message && (
-                <p>Veuillez inserer un titre</p>
-              )}
-            </div>
-            <hr />
-            <div className="d-flex justify-content-between">
-              <label htmlFor="description">Description</label>
-              <TextField
-                sx={{
-                  "& label.Mui-focused": {
-                    color: "#8356C0", // your custom color for the label
-                  },
-                  "& .MuiOutlinedInput-root": {
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#8356C0", // your custom color for the border
-                    },
-                  },
-                }}
-                className="form-control description w-50"
-                name=""
-                id="description"
-                cols=""
-                multiline
-                rows={4}
-                placeholder="ex: porté quelques fois,taille correcte"
-                onChange={(e) =>
-                  setItem({ ...item, description: e.target.value })
-                }
-                value={item && item.description}
-                type="text"
-              />
-            </div>
-          </div>
-
-          {/* Category */}
-
-          <div className="card p-3">
-            <div className="d-flex justify-content-between">
-              <label htmlFor="category" className=" w-25 align-content-center">
-                Categories
-              </label>
-              {/* <FormControl fullWidth> */}
-              {/* <InputLabel id="category-label">Category</InputLabel> */}
-              <Select
-                sx={{
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#8356C0", // border color on focus
-                  },
-                  "& .MuiOutlinedInput-root": {
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#8356C0", // another way to ensure border color
-                    },
-                  },
-                }}
-                className="form-control w-25 align-content-center"
-                labelId="category-label"
-                value={item.category || ""}
-                defaultValue={item && item.category}
-                onChange={(e) => setItem({ ...item, category: e.target.value })}
-                displayEmpty
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      maxHeight: 300,
-                      overflowY: "auto",
-                    },
-                  },
-                  MenuListProps: {
-                    style: {
-                      display: "grid",
-                      gridTemplateColumns: "repeat(3, 1fr)", // 3 columns across
-                      gap: "8px", // spacing between items
-                    },
-                  },
-                }}
-              >
-                {categoryOptions.map((categoryName, index) => (
-                  <MenuItem key={index} value={categoryName}>
-                    {categoryName}
-                  </MenuItem>
-                ))}
-              </Select>
-              {/* </FormControl> */}
-            </div>
-          </div>
-
-          <div className="card p-3">
-            <div className="d-flex justify-content-between align-items-center">
-              <label>Genre</label>
-              <div className="d-flex gap-4">
-                <RadioGroup
-                  row
-                  aria-labelledby="condition-label"
-                  name="condition"
-                  value={item && item.gender}
-                  onChange={(e) => {
-                    setItem({ ...item, gender: e.target.value });
-                  }}
-                >
-                  {genderOptions.map((c) => (
-                    <FormControlLabel
-                      key={c}
-                      value={c}
-                      control={
-                        <Radio
-                          className="rounded-none"
-                          checked={
-                            ((item?.category === "Babywear" ||
-                              item?.category === "Kidswear") &&
-                              c == "Kids") ||
-                            (c == item?.gender &&
-                              item?.category !== "Babywear" &&
-                              item?.category !== "Kidswear")
-                          }
-                          disabled={
-                            (item?.category === "Babywear" ||
-                              item?.category === "Kidswear") &&
-                            c !== "Kids"
-                          }
-                          sx={{
-                            "&.Mui-checked": {
-                              color: "#8356C0", // custom checked color
-                            },
-                            "&.Mui-focusVisible": {
-                              outline: "2px solid #8356C0", // optional focus ring
-                            },
-                          }}
-                        />
-                      }
-                      label={c}
-                    />
-                  ))}
-                </RadioGroup>
-              </div>
-
-              {/* 
-                           <select className="form-select w-25"
-                             onChange={(e) => setItem({ ...item, gender: e.target.value })}>
-                             <option value="">Sélectionner un genre</option>
-                             {genderOptions.map(g => (
-                               <option key={g} value={g}>{g}</option>
-                             ))}
-                           </select> */}
-            </div>
-          </div>
-          <div className="card p-3">
-            <div className="d-flex justify-content-between align-items-center">
-              <label>Age</label>
-
-              <div className="d-flex gap-4">
-
-                <RadioGroup
-                  row
-                  aria-labelledby="condition-label"
-                  name="condition"
-                  value={
-                    item && item.age}
-                  onChange={(e) => {
-                    const selectedAge = e.target.value;
-                    setItem({ ...item, age: e.target.value })
-                    console.log("age", selectedAge)
-                  }}
-                >
-                  {ageOptions.map((c) => (
-                    <FormControlLabel
-                      key={c}
-                      value={c}
-                      control={
-                        <Radio
-                          // checked={
-                          checked={
-                            item?.age === c
-                          }
-                          //   // (
-                          //   //  (item?.category === "Babywear" || item?.category === "Kidswear" )&& c== "Kids"  ||  
-                          //   //       c== item?.gender&& (item?.category !== "Babywear" && item?.category !== "Kidswear" )   )
-                          // }
-                          // disabled={(item?.category === "Babywear" || item?.category === "Kidswear" )&& c!== "Kids" }
-                          sx={{
-                            '&.Mui-checked': {
-                              color: '#8356C0', // custom checked color
-                            },
-                            '&.Mui-focusVisible': {
-                              outline: '2px solid #8356C0', // optional focus ring
-                            },
-                          }}
-                        />
-                      }
-                      label={c}
-                    />
-                  ))}
-                </RadioGroup>
-              </div>
-
-              {/* 
-                  <select className="form-select w-25"
-                    onChange={(e) => setItem({ ...item, gender: e.target.value })}>
-                    <option value="">Sélectionner un genre</option>
-                    {genderOptions.map(g => (
-                      <option key={g} value={g}>{g}</option>
-                    ))}
-                  </select> */}
-            </div>
-          </div>
-          <div className="card p-3">
-            <div className="d-flex justify-content-between">
-              <label
-                htmlFor="brand"
-                className=" form-check-label align-content-center"
-              >
-                Brand
-              </label>
-              <Input
-                sx={{
-                  "&:after": {
-                    borderBottom: "2px solid #8356C0", // underline color on focus
-                  },
-                }}
-                value={item && item.brand}
-                className="form-control w-25"
-                type="text"
-                placeholder="Zara,Bershka,ect.."
-                onChange={(e) => setItem({ ...item, brand: e.target.value })}
-              />
-            </div>
-          </div>
-
-          <div className="card p-3">
-            <div className="d-flex justify-content-between align-items-center">
-              <label>Taille</label>
-              {footwearCategories.includes(item?.category) ? (
-                <Input
-                  value={item && item.size}
-                  sx={{
-                    "&:after": {
-                      borderBottom: "2px solid #8356C0", // underline color on focus
-                    },
-                  }}
-                  className="form-control w-25"
-                  type="number"
-                  placeholder="Pointure (ex: 40)"
-                  onChange={(e) => setItem({ ...item, size: e.target.value })}
-                />
-              ) : item?.gender === "Kids" ||
-                item?.category === "Babywear" ||
-                item?.category === "Kidswear" ? (
+            {/* Category - Mobile optimized */}
+            <div className="card p-3">
+              <div className="d-flex flex-column gap-2">
+                <label className="fw-bold mb-0">Catégorie</label>
                 <Select
+                  fullWidth
                   sx={{
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#8356C0", // border color on focus
-                    },
-                    "& .MuiOutlinedInput-root": {
-                      "&.Mui-focused fieldset": {
-                        borderColor: "#8356C0", // another way to ensure border color
-                      },
+                      borderColor: "#8356C0",
                     },
                   }}
-                  className="form-control w-25 align-content-center"
+                  value={item.category || ""}
+                  onChange={(e) => setItem({ ...item, category: e.target.value })}
+                  displayEmpty
                   MenuProps={{
                     PaperProps: {
-                      style: {
-                        maxHeight: 300,
-                        overflowY: "auto",
-                      },
-                    },
-                    MenuListProps: {
-                      style: {
-                        display: "grid",
-                        gridTemplateColumns: "repeat(3, 1fr)", // 3 columns across
-                        gap: "8px", // spacing between items
-                      },
+                      style: { maxHeight: 300, overflowY: "auto" },
                     },
                   }}
-                  labelId="size-select-label"
-                  value={item && item.size}
-                  // label="Sélectionner une taille"
-                  onChange={(e) => setItem({ ...item, size: e.target.value })}
                 >
-                  {kidSizes.map((s) => (
-                    <MenuItem key={s} value={s}>
-                      {s}
+                  <MenuItem value="" disabled>
+                    <em>Sélectionner une catégorie</em>
+                  </MenuItem>
+                  {categoryOptions.map((categoryName, index) => (
+                    <MenuItem key={index} value={categoryName}>
+                      {categoryName}
                     </MenuItem>
                   ))}
                 </Select>
-              ) : (
-                <>
-                  <Slider
-                    sx={{
-                      color: "#8356C0", // base color (thumb, track, active state)
-                      "& .MuiSlider-thumb": {
-                        "&:hover, &.Mui-focusVisible, &.Mui-active": {
-                          boxShadow: "0 0 0 8px #8356C0)", // optional focus ring
-                        },
-                      },
-                    }}
-                    className=" w-25"
-                    disabled={!item?.category}
-                    value={item.size || ""}
-                    onChange={handleSliderChange}
-                    valueLabelDisplay="auto"
-                    valueLabelFormat={(value) =>
-                      sizeMarks.find((mark) => mark.value === value)?.label
-                    }
-                    step={1}
-                    marks={sizeMarks}
-                    min={0}
-                    max={7}
-                  />
-                </>
-              )}
+              </div>
             </div>
-          </div>
 
-          {/* Condition */}
-          <div className="card p-3">
-            <div className="d-flex justify-content-between align-items-center">
-              <label>Condition</label>
-              <div className="d-flex gap-4">
+            {/* Gender - Mobile optimized radio buttons */}
+            <div className="card p-3">
+              <div className="d-flex flex-column gap-3">
+                <label className="fw-bold mb-0">Genre</label>
                 <RadioGroup
-                  row
-                  aria-labelledby="condition-label"
-                  name="condition"
-                  value={item.condition || ""}
-                  onChange={(e) =>
-                    setItem({ ...item, condition: e.target.value })
-                  }
+                  row={false} // Stack vertically on mobile for better touch targets
+                  className="d-flex flex-row flex-wrap gap-2"
+                  value={item?.gender || ""}
+                  onChange={(e) => setItem({ ...item, gender: e.target.value })}
                 >
-                  {conditionOptions.map((c) => (
+                  {genderOptions.map((option) => (
                     <FormControlLabel
-                      key={c}
-                      value={c}
+                      key={option}
+                      value={option}
                       control={
                         <Radio
                           sx={{
-                            "&.Mui-checked": {
-                              color: "#8356C0", // custom checked color
-                            },
-                            "&.Mui-focusVisible": {
-                              outline: "2px solid #8356C0", // optional focus ring
-                            },
+                            "&.Mui-checked": { color: "#8356C0" },
+                            padding: "12px", // Larger touch target
                           }}
                         />
                       }
-                      label={c}
+                      label={option}
+                      sx={{ margin: 0, minWidth: "fit-content" }}
                     />
                   ))}
                 </RadioGroup>
               </div>
             </div>
-          </div>
 
-          {/* Tags (multi-select) */}
-          <div className="card p-3">
-            <div className="d-flex justify-content-between align-items-center">
-              <label>Tags</label>
-              {/* <select multiple className="form-select w-50"
-        onChange={(e) => {
-          const selected = Array.from(e.target.selectedOptions, o => o.value);
-          setItem({ ...item, tags: selected });
-        }}>
-        {tagOptions.map(tag => (
-          <option key={tag} value={tag}>{tag}</option>
-        ))}
-      </select> */}
+            {/* Age - Mobile optimized */}
+            <div className="card p-3">
+              <div className="d-flex flex-column gap-3">
+                <label className="fw-bold mb-0">Âge</label>
+                <RadioGroup
+                  className="d-flex flex-row flex-wrap gap-2"
+                  value={item?.age || ""}
+                  onChange={(e) => setItem({ ...item, age: e.target.value })}
+                >
+                  {ageOptions.map((option) => (
+                    <FormControlLabel
+                      key={option}
+                      value={option}
+                      control={
+                        <Radio
+                          sx={{
+                            "&.Mui-checked": { color: "#8356C0" },
+                            padding: "12px",
+                          }}
+                        />
+                      }
+                      label={option}
+                      sx={{ margin: 0, minWidth: "fit-content" }}
+                    />
+                  ))}
+                </RadioGroup>
+              </div>
+            </div>
 
-              {/* <Select
-                sx={{
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#8356C0", // border color on focus
-                  },
-                  "& .MuiOutlinedInput-root": {
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#8356C0", // another way to ensure border color
-                    },
-                  },
-                }}
-                className="form-control w-25 align-content-center"
-                labelId="category-label"
-                value={item.tags || ""}
-                onChange={(e) => setItem({ ...item, tags: e.target.value })}
-                displayEmpty
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      maxHeight: 300,
-                      overflowY: "auto",
-                    },
-                  },
-                  MenuListProps: {
-                    style: {
-                      display: "grid",
-                      gridTemplateColumns: "repeat(3, 1fr)", // 3 columns across
-                      gap: "8px", // spacing between items
-                    },
-                  },
-                }}
-              >
-                {tagOptions.map((tag, index) => (
-                  <MenuItem
-                    selected={item.tags?.includes(tag)}
-                    key={index}
-                    value={tag}
-                  >
-                    <Checkbox checked={item.tags?.includes(tag)} />
-                    <ListItemText primary={tag} />{" "}
-                    {tag}
-                  </MenuItem>
-                ))}
-              </Select>
-             */}
+            {/* Brand */}
+            <div className="card p-3">
+              <div className="d-flex flex-column gap-2">
+                <label className="fw-bold mb-0">Marque</label>
+                <Input
+                  fullWidth
+                  value={item?.brand || ""}
+                  sx={{ "&:after": { borderBottom: "2px solid #8356C0" } }}
+                  type="text"
+                  placeholder="Zara, Bershka, etc.."
+                  onChange={(e) => setItem({ ...item, brand: e.target.value })}
+                />
+              </div>
+            </div>
 
-
-
-
-              <Select
-                multiple
-
-                sx={{
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#8356C0", // border color on focus
-                  },
-                  "& .MuiOutlinedInput-root": {
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#8356C0", // another way to ensure border color
-                    },
-                  },
-                }}
-                className="form-control  w-25 align-content-center"
-                labelId="category-label"
-                value={item.tags || []}
-                onChange={(e) => {
-                  console.log("tags", item.tags);
-                  setItem({ ...item, tags: e.target.value });
-                }}
-                displayEmpty
-                renderValue={(selected) =>
-                  Array.isArray(selected) ? selected.join(", ") : ""
-                }
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      maxHeight: 300,
-                      overflowY: "auto",
-                    },
-                  },
-                  MenuListProps: {
-                    style: {
-                      display: "grid",
-                      gridTemplateColumns: "repeat(3, 1fr)", // 3 columns across
-                      gap: "8px", // spacing between items
-                    },
-                  },
-                }}
-              >
-                {/* {tagOptions.map((categoryName, index) => (
-                  <MenuItem key={index} value={categoryName}>
-                    {categoryName}
-                  </MenuItem>
-                ))} */}
-
-                {tagOptions.map((tag) => (
-                  <MenuItem key={tag} value={tag}
+            {/* Size - Mobile optimized */}
+            <div className="card p-3">
+              <div className="d-flex flex-column gap-3">
+                <label className="fw-bold mb-0">Taille</label>
+                {footwearCategories.includes(item?.category) ? (
+                  <Input
+                    fullWidth
+                    value={item?.size || ""}
+                    sx={{ "&:after": { borderBottom: "2px solid #8356C0" } }}
+                    type="number"
+                    placeholder="Pointure (ex: 40)"
+                    onChange={(e) => setItem({ ...item, size: e.target.value })}
+                  />
+                ) : item?.gender === "Kids" || item?.category === "Babywear" || item?.category === "Kidswear" ? (
+                  <Select
+                    fullWidth
                     sx={{
-                      "&.Mui-selected": {
-                        // backgroundColor: "violet.main", // selected color
-                        backgroundColor: "rgba(131, 86, 192, 0.1)", // selected color
-                        color: "black", // text color when selected
-                      },
-                      "&.Mui-selected:hover": {
-                        backgroundColor: "white", // darker shade on hover
-                        color: "black", // text color on hover
-                      },
-                      "&:hover": {
-                        backgroundColor: "rgba(131, 86, 192, 0.1)", // hover color
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#8356C0",
                       },
                     }}
-
+                    value={item?.size || ""}
+                    onChange={(e) => setItem({ ...item, size: e.target.value })}
                   >
-                    <Checkbox
+                    {kidSizes.map((s) => (
+                      <MenuItem key={s} value={s}>{s}</MenuItem>
+                    ))}
+                  </Select>
+                ) : (
+                  <div className="px-2">
+                    <Slider
                       sx={{
-
-                        "&.Mui-checked": {
-                          color: "violet.main",
+                        color: "#8356C0",
+                        height: 8, // Thicker slider for easier mobile interaction
+                        "& .MuiSlider-thumb": {
+                          width: 24,
+                          height: 24, // Larger thumb for mobile
+                          "&:hover, &.Mui-focusVisible, &.Mui-active": {
+                            boxShadow: "0 0 0 8px rgba(131, 86, 192, 0.16)",
+                          },
                         },
                       }}
-                      checked={item.tags?.includes(tag)}
+                      disabled={!item?.category}
+                      value={item.size || 0}
+                      onChange={handleSliderChange}
+                      valueLabelDisplay="auto"
+                      valueLabelFormat={(value) =>
+                        sizeMarks.find((mark) => mark.value === value)?.label || ""
+                      }
+                      step={1}
+                      marks={sizeMarks}
+                      min={0}
+                      max={7}
                     />
-                    <ListItemText primary={tag} />
-                  </MenuItem>
-                ))}
-              </Select>
-
+                  </div>
+                )}
+              </div>
             </div>
 
-          </div>
+            {/* Condition - Mobile optimized */}
+            <div className="card p-3">
+              <div className="d-flex flex-column gap-3">
+                <label className="fw-bold mb-0">État</label>
+                <RadioGroup
+                  className="d-flex flex-column gap-1"
+                  value={item.condition || ""}
+                  onChange={(e) => setItem({ ...item, condition: e.target.value })}
+                >
+                  {conditionOptions.map((option) => (
+                    <FormControlLabel
+                      key={option}
+                      value={option}
+                      control={
+                        <Radio
+                          sx={{
+                            "&.Mui-checked": { color: "#8356C0" },
+                            padding: "12px",
+                          }}
+                        />
+                      }
+                      label={option}
+                      sx={{ margin: 0 }}
+                    />
+                  ))}
+                </RadioGroup>
+              </div>
+            </div>
 
-          <div className="card p-3">
-            <div className="d-flex justify-content-between">
-              <label
-                htmlFor="previousOwners"
-                className=" form-check-label align-content-center"
-              >
-                Previous Owners
-              </label>
-              <Input
-                sx={{
-                  "&:after": {
-                    borderBottom: "2px solid #8356C0",
-                  },
+            {/* Tags - Mobile optimized */}
+            <div className="card p-3">
+              <div className="d-flex flex-column gap-2">
+                <label className="fw-bold mb-0">Tags</label>
+                <Select
+                  multiple
+                  fullWidth
+                  sx={{
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#8356C0",
+                    },
+                  }}
+                  value={item.tags || []}
+                  onChange={(e) => setItem({ ...item, tags: e.target.value })}
+                  displayEmpty
+                  renderValue={(selected) =>
+                    Array.isArray(selected) ? selected.join(", ") : ""
+                  }
+                  MenuProps={{
+                    PaperProps: {
+                      style: { maxHeight: 300, overflowY: "auto" },
+                    },
+                  }}
+                >
+                  {tagOptions.map((tag) => (
+                    <MenuItem
+                      key={tag}
+                      value={tag}
+                      sx={{
+                        "&.Mui-selected": {
+                          backgroundColor: "rgba(131, 86, 192, 0.1)",
+                          color: "black",
+                        },
+                        "&.Mui-selected:hover": {
+                          backgroundColor: "rgba(131, 86, 192, 0.2)",
+                        },
+                        "&:hover": {
+                          backgroundColor: "rgba(131, 86, 192, 0.1)",
+                        },
+                        // Larger touch targets for mobile
+                        minHeight: "48px",
+                      }}
+                    >
+                      <Checkbox
+                        sx={{
+                          "&.Mui-checked": { color: "#8356C0" },
+                          padding: "12px",
+                        }}
+                        checked={item.tags?.includes(tag)}
+                      />
+                      <ListItemText primary={tag} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </div>
+            </div>
+
+            {/* Previous Owners and Price - Side by side on larger screens, stacked on mobile */}
+            <div className="row g-3">
+              <div className="col-12 col-md-6">
+                <div className="card p-3">
+                  <div className="d-flex flex-column gap-2">
+                    <label className="fw-bold mb-0">Propriétaires précédents</label>
+                    <Input
+                      fullWidth
+                      sx={{ "&:after": { borderBottom: "2px solid #8356C0" } }}
+                      type="number"
+                      min="0"
+                      placeholder="1"
+                      onChange={(e) => setItem({ ...item, previousOwners: e.target.value })}
+                      value={item?.previousOwners || ""}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="col-12 col-md-6">
+                <div className="card p-3">
+                  <div className="d-flex flex-column gap-2">
+                    <label className="fw-bold mb-0">Prix</label>
+                    <Input
+                      fullWidth
+                      sx={{ "&:after": { borderBottom: "2px solid #8356C0" } }}
+                      type="text"
+                      placeholder="0.00 DT"
+                      onChange={(e) => setItem({ ...item, price: e.target.value })}
+                      value={item?.price || ""}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Submit Button - Mobile optimized */}
+            <div className="sticky-bottom bg-white p-3 border-top mt-4">
+              <button
+                type="submit"
+                className="btn w-100 py-3 fw-bold text-white"
+                style={{
+                  backgroundColor: "#8356C0",
+                  border: "none",
+                  borderRadius: "12px",
+                  fontSize: "1.1rem",
+                  minHeight: "56px", // Larger touch target
                 }}
-                className="form-control w-25"
-                type="number"
-                min="0"
-                placeholder="1"
-                onChange={(e) =>
-                  setItem({ ...item, previousOwners: e.target.value })
-                }
-                value={item && item.previousOwners}
-              />
-            </div>
-          </div>
-          <div className="card p-3">
-            <div className="d-flex justify-content-between">
-              <label
-                htmlFor="price"
-                className=" form-check-label align-content-center"
               >
-                Price
-              </label>
-              <Input
-                sx={{
-                  "&:after": {
-                    borderBottom: "2px solid #8356C0", // underline color on focus
-                  },
-                }}
-                className="form-control w-25"
-                type="text"
-                placeholder="0.00 DT"
-                onChange={(e) => setItem({ ...item, price: e.target.value })}
-                value={item && item.price}
-              />
+                Modifier l'article
+              </button>
             </div>
           </div>
-
-          <button className="btn-submit w-25 rounded p-2 text-light">
-            Add Article
-          </button>
         </div>
       </form>
     </div>

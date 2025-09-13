@@ -177,13 +177,13 @@ function App() {
           <Route path="/admin/*" element={<AdminDash logged={logged}
             setLogged={setLogged} />} />
         </Routes>
-        <Footer
+        {/* <Footer
           userNav={userNav}
           setUserNav={setUserNav}
           setOpenModalReg={setOpenModalReg}
           setSort={setSort}
           setOpenModalLog={setOpenModalLog}
-        />
+        /> */}
       </div>
     </ThemeProvider>
   );

@@ -70,7 +70,33 @@ const Navbar = ({
                 style={{ height: "40px", width: "auto", cursor: "pointer" }}
               />
             </div>
-
+{/* Filter Button - Only on Homepage */}
+            {location.pathname === "/" && isDesktop && (
+              <div
+                className={`d-flex justify-content-center my-2 ${
+                  isDesktop ? "me-3" : ""
+                }`}
+              >
+                <button
+                  className="btn filter-btn d-flex align-items-center"
+                  onClick={() => {
+                    setSort({
+                      ...sort,
+                      nav: typeof sort.nav === "boolean" ? !sort.nav : true,
+                    });
+                  }}
+                >
+                  <i
+                    className="bi bi-filter-circle-fill me-2"
+                    style={{
+                      color: sort?.nav ? "#8356C0" : "#C2C3C4",
+                      fontSize: "1.5rem",
+                    }}
+                  ></i>
+                  <span>Filters</span>
+                </button>
+              </div>
+            )}
             {/* Search Bar - Moved to the middle on mobile */}
             <div
               className={`search-bar my-2 my-lg-0 ${
@@ -123,33 +149,7 @@ const Navbar = ({
             }`}
             id="navbarContent"
           >
-            {/* Filter Button - Only on Homepage */}
-            {location.pathname === "/" && (
-              <div
-                className={`d-flex justify-content-center my-2 ${
-                  isDesktop ? "me-3" : ""
-                }`}
-              >
-                <button
-                  className="btn filter-btn d-flex align-items-center"
-                  onClick={() => {
-                    setSort({
-                      ...sort,
-                      nav: typeof sort.nav === "boolean" ? !sort.nav : true,
-                    });
-                  }}
-                >
-                  <i
-                    className="bi bi-filter-circle-fill me-2"
-                    style={{
-                      color: sort?.nav ? "#8356C0" : "#C2C3C4",
-                      fontSize: "1.5rem",
-                    }}
-                  ></i>
-                  <span>Filters</span>
-                </button>
-              </div>
-            )}
+            
 
             {/* User Section */}
             <div

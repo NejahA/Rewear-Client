@@ -466,7 +466,7 @@ const LocationPicker = ({ onLocationSelect, initialPosition, initialAddress }) =
       <div className="mb-3">
         <small className="text-muted">
           {selectionMode === 'click' 
-            ? "Click on the map to set your precise location, or use the search box to find an address. Double-click to zoom."
+            ? "Click on the map to set your precise location, or use the search box to find an address."
             : "Pan the map to position the center on your desired location, then click the button above to select it."}
         </small>
       </div>
