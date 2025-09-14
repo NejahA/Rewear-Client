@@ -1,4 +1,5 @@
-import { FormControlLabel, Switch, TextField, Input, Typography } from "@mui/material";
+import { FormControlLabel, Switch, TextField, Input, Typography, Collapse, IconButton } from "@mui/material";
+import { ExpandMore, ExpandLess } from "@mui/icons-material";
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -23,6 +24,7 @@ const UpdateUser = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [errors, setErrors] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [showPasswordSection, setShowPasswordSection] = useState(false);
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -172,7 +174,6 @@ const UpdateUser = () => {
     };
   }, [previewUrl]);
 
-
   const [passwordFields, setPasswordFields] = useState({
     currentPassword: "",
     newPassword: "",
@@ -189,6 +190,34 @@ const UpdateUser = () => {
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
 
+    // Validation
+    if (!passwordFields.currentPassword || !passwordFields.newPassword || !passwordFields.confirmNewPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Erreur!",
+        text: "Veuillez remplir tous les champs de mot de passe.",
+      });
+      return;
+    }
+
+    if (passwordFields.newPassword !== passwordFields.confirmNewPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Erreur!",
+        text: "Les nouveaux mots de passe ne correspondent pas.",
+      });
+      return;
+    }
+
+    if (passwordFields.newPassword.length < 6) {
+      Swal.fire({
+        icon: "error",
+        title: "Erreur!",
+        text: "Le nouveau mot de passe doit contenir au moins 6 caractères.",
+      });
+      return;
+    }
+
     try {
       console.log("inside handlePasswordSubmit with fields:", passwordFields);
       const response = await axios.put(
@@ -198,25 +227,35 @@ const UpdateUser = () => {
       );
       Swal.fire({
         icon: "success",
-        title: "Password Updated!",
+        title: "Mot de passe mis à jour!",
         text: response.data.message,
         showConfirmButton: false,
         timer: 2000
       });
-      // Reset password fields after successful update
+      // Reset password fields and close section after successful update
       setPasswordFields({
         currentPassword: "",
         newPassword: "",
         confirmNewPassword: ""
       });
+      setShowPasswordSection(false);
     } catch (err) {
       console.error("Password update error :", err);
       Swal.fire({
         icon: "error",
-        title: "Error!",
-        text: err.response.data.message || "Failed to update password.",
+        title: "Erreur!",
+        text: err.response?.data?.message || "Échec de la mise à jour du mot de passe.",
       });
     }
+  };
+
+  const handleCancelPasswordChange = () => {
+    setPasswordFields({
+      currentPassword: "",
+      newPassword: "",
+      confirmNewPassword: ""
+    });
+    setShowPasswordSection(false);
   };
 
   return (
@@ -364,63 +403,105 @@ const UpdateUser = () => {
               </div>
             </div>
 
-
-            <div className="col-12 mt-4">
-              <Typography variant="h6" gutterBottom>
-                Change Password
-              </Typography>
-              <form >
-                <div className="mb-3">
-                  <TextField
-                    fullWidth
-                    label="Current Password"
-                    variant="outlined"
-                    type="password"
-                    name="currentPassword"
-                    value={passwordFields.currentPassword}
-                    onChange={handlePasswordChange}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <TextField
-                    fullWidth
-                    label="New Password"
-                    variant="outlined"
-                    type="password"
-                    name="newPassword"
-                    value={passwordFields.newPassword}
-                    onChange={handlePasswordChange}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <TextField
-                    fullWidth
-                    label="Confirm New Password"
-                    variant="outlined"
-                    type="password"
-                    name="confirmNewPassword"
-                    value={passwordFields.confirmNewPassword}
-                    onChange={handlePasswordChange}
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="btn w-100 py-3 fw-bold text-white mb-4"
-                  style={{
-                    backgroundColor: "#8356C0",
-                    border: "none",
-                    borderRadius: "12px",
-                    fontSize: "1.1rem",
-                    minHeight: "56px",
-                  }}
-                  onClick={handlePasswordSubmit}
+            {/* Password Change Section - Collapsible */}
+            <div className="card p-3">
+              <div 
+                className="d-flex justify-content-between align-items-center cursor-pointer"
+                style={{ cursor: "pointer" }}
+                onClick={() => setShowPasswordSection(!showPasswordSection)}
+              >
+                <h6 className="fw-bold mb-0">Changer le mot de passe</h6>
+                <IconButton 
+                  size="small" 
+                  style={{ color: "#8356C0" }}
                 >
-                  Change Password
-                </button>
-              </form>
+                  {showPasswordSection ? <ExpandLess /> : <ExpandMore />}
+                </IconButton>
+              </div>
+              
+              <Collapse in={showPasswordSection} timeout="auto" unmountOnExit>
+                <div className="mt-3 p-3" style={{ backgroundColor: "#f8f9fa", borderRadius: "8px" }}>
+                  <Typography variant="body2" className="text-muted mb-3">
+                    Entrez votre mot de passe actuel et choisissez-en un nouveau
+                  </Typography>
+                  
+                  <div className="mb-3">
+                    <TextField
+                      fullWidth
+                      label="Mot de passe actuel"
+                      variant="outlined"
+                      type="password"
+                      name="currentPassword"
+                      value={passwordFields.currentPassword}
+                      onChange={handlePasswordChange}
+                      sx={{
+                        "& label.Mui-focused": { color: "#8356C0" },
+                        "& .MuiOutlinedInput-root": {
+                          "&.Mui-focused fieldset": { borderColor: "#8356C0" },
+                        },
+                      }}
+                    />
+                  </div>
+                  
+                  <div className="mb-3">
+                    <TextField
+                      fullWidth
+                      label="Nouveau mot de passe"
+                      variant="outlined"
+                      type="password"
+                      name="newPassword"
+                      value={passwordFields.newPassword}
+                      onChange={handlePasswordChange}
+                      helperText="Minimum 6 caractères"
+                      sx={{
+                        "& label.Mui-focused": { color: "#8356C0" },
+                        "& .MuiOutlinedInput-root": {
+                          "&.Mui-focused fieldset": { borderColor: "#8356C0" },
+                        },
+                      }}
+                    />
+                  </div>
+                  
+                  <div className="mb-3">
+                    <TextField
+                      fullWidth
+                      label="Confirmer le nouveau mot de passe"
+                      variant="outlined"
+                      type="password"
+                      name="confirmNewPassword"
+                      value={passwordFields.confirmNewPassword}
+                      onChange={handlePasswordChange}
+                      sx={{
+                        "& label.Mui-focused": { color: "#8356C0" },
+                        "& .MuiOutlinedInput-root": {
+                          "&.Mui-focused fieldset": { borderColor: "#8356C0" },
+                        },
+                      }}
+                    />
+                  </div>
+                  
+                  <div className="d-flex gap-2">
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary flex-fill py-2"
+                      onClick={handleCancelPasswordChange}
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      type="button"
+                      className="btn flex-fill py-2 text-white"
+                      style={{
+                        backgroundColor: "#8356C0",
+                        border: "none",
+                      }}
+                      onClick={handlePasswordSubmit}
+                    >
+                      Mettre à jour
+                    </button>
+                  </div>
+                </div>
+              </Collapse>
             </div>
 
             {/* Contact Information */}

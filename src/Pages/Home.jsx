@@ -237,7 +237,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
     }, 300); // Reduced delay for better UX
     
     return () => clearTimeout(timer);
-  }, [sort.home]);
+  }, [sort.home, JSON.stringify(sort)]);
 
   useEffect(() => {
     if (items.length === 0) {
