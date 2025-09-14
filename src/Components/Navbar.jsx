@@ -32,6 +32,7 @@ const Navbar = ({
   const [search, setSearch] = useState("");
   const [userNav, setUserNav] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false); // New state for search focus
   const location = useLocation();
   // const cookies = new Cookies();
   const isDesktop = useIsDesktop(); // detect mode
@@ -48,7 +49,8 @@ const Navbar = ({
       .catch(() => setUserNav(null));
   }, [
     // JSON.stringify(cookies.get("userToken")),
-     location.pathname, logged]);
+    location.pathname, logged,
+  ]);
 
   // Close menu when route changes
   useEffect(() => {
@@ -60,6 +62,10 @@ const Navbar = ({
     setSort({ category: "", gender: "", search: "" });
   };
 
+  const mobileSearchStyle = isSearchFocused
+    ? { width: "100%", transition: "width 0.3s ease-in-out" }
+    : { width: "auto", transition: "width 0.3s ease-in-out" };
+
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -67,7 +73,7 @@ const Navbar = ({
           {/* Logo and Mobile Toggle */}
           <div className="d-flex align-items-center w-100">
             {/* Logo - Hidden on mobile when searching */}
-            {(isDesktop || !hasActiveSearch) && (
+            {(isDesktop || !isSearchFocused) && (
               <div
                 onClick={() => {
                   setSort({ home: sort.home ? false : true });
@@ -83,18 +89,16 @@ const Navbar = ({
                 />
               </div>
             )}
-
-            {/* Back button when searching on mobile */}
-            {/* {!isDesktop && hasActiveSearch && (
+{/* Back button when searching on mobile */}
+            {!isDesktop && isSearchFocused && (
               <button
                 className="btn btn-link p-0 me-2"
                 onClick={clearSearch}
-                style={{ color: "#666", fontSize: "1.2rem" }}
+                style={{ color: "#8356C0", fontSize: "1.2rem" }}
               >
                 <i className="bi bi-arrow-left"></i>
               </button>
-            )} */}
-
+            )}
             {/* Filter Button - Only on Homepage */}
             {location.pathname === "/" && isDesktop && (
               <div
@@ -128,10 +132,9 @@ const Navbar = ({
               className={`search-bar my-2 my-lg-0 ${
                 isDesktop 
                   ? "flex-grow-1 mx-4" 
-                  : hasActiveSearch 
-                    ? "flex-grow-1 me-2" 
-                    : "flex-grow-1 mx-3"
+                  : "flex-grow-1 mx-3"
               }`}
+              style={!isDesktop ? mobileSearchStyle : {}}
             >
               <form
                 role="search"
@@ -151,26 +154,18 @@ const Navbar = ({
                       setSearch(e.target.value);
                     }}
                     value={search}
+                    onFocus={() => setIsSearchFocused(true)} // Set focus state
+                    onBlur={() => setIsSearchFocused(false)} // Clear focus state
                   />
                   <button className="btn bg-white border" type="submit">
                     <i className="bi bi-search"></i>
                   </button>
-                  {/* Clear search button on mobile when searching */}
-                  {/* {!isDesktop && hasActiveSearch && (
-                    <button 
-                      className="btn bg-white border border-start-0" 
-                      type="button"
-                      onClick={clearSearch}
-                    >
-                      <i className="bi bi-x"></i>
-                    </button>
-                  )} */}
                 </div>
               </form>
             </div>
 
             {/* Mobile menu toggle - Hidden when searching */}
-            {!isDesktop && !hasActiveSearch && (
+            {!isDesktop && !isSearchFocused && (
               <button
                 className="navbar-toggler"
                 type="button"
@@ -184,7 +179,7 @@ const Navbar = ({
           </div>
 
           {/* Collapsible / Desktop Menu - Hidden on mobile when searching */}
-          {(isDesktop || !hasActiveSearch) && (
+          {(isDesktop || (!hasActiveSearch && !isSearchFocused)) && (
             <div
               className={`${
                 isDesktop ? "d-flex align-items-center ms-auto" : `collapse navbar-collapse ${isMenuOpen ? "show" : ""}`
@@ -216,9 +211,6 @@ const Navbar = ({
                         src={userNav?.profilePic?.url}
                         alt="Profile"
                       />
-                      {/* <span className="ms-2 d-none d-lg-inline">
-                        {userNav.fName}
-                      </span> */}
                     </Link>
 
                     <Link
@@ -231,7 +223,6 @@ const Navbar = ({
                         alt="Sell item"
                         style={{ width: "24px", height: "24px" }}
                       />
-                      {/* <span className="ms-2 d-none d-lg-inline">Sell Item</span> */}
                     </Link>
 
                     <Logout setLogged={setLogged} />
@@ -241,7 +232,6 @@ const Navbar = ({
                     <Button
                       variant="outlined"
                       sx={{
-                        // color: "#8a2be2",
                         color: "#7745B9",
                         borderColor: "#7745B9",
                         "&:hover": {
