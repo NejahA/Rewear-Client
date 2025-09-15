@@ -26,7 +26,7 @@ const ItemCard = ({ item, setOpenModalLog, setOpenModalReg, userId, fName, lName
                 </h6>
                 
                 {/* Price - Prominent */}
-                <h5 className="text-primary fw-bold mb-3">{item.price} DT</h5>
+                <h5 className="statuscl-1 fw-bold mb-3">{item.price} DT</h5>
                 
                 {/* Details Grid */}
                 <div className="row g-2 mb-3 flex-grow-1">

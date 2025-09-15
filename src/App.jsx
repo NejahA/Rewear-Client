@@ -44,6 +44,7 @@ import {
 import CssBaseline from "@mui/material/CssBaseline";
 import theme from "./Components/theme";
 import ResetPassword from "./Pages/ResetPassword";
+import VerifyEmail from "./Components/VerifyEmail/VerifyEmail";
 const violetBase = "#7745B9";
 const violetMain = alpha(violetBase, 0.7);
 
@@ -111,6 +112,8 @@ function App() {
         )}
 
         <Routes>
+          <Route path="/verify-email/:token" element={<VerifyEmail />} />
+
           <Route path="/logreg" element={<LogReg />} />
           <Route path="/items/new" element={<Create logged={logged}
             setLogged={setLogged} />} />

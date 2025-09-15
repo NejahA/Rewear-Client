@@ -3,7 +3,7 @@ import "./ModalLog.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const ModalLog = ({ open, setOpenModalLog, setOpenModalReg, setLogged }) => {
+const ModalLog0 = ({ open, setOpenModalLog, setOpenModalReg, setLogged }) => {
     const navigate = useNavigate();
     const [user, setUser] = useState({ email: "", password: "" });
     const [errors, setErrors] = useState({ email: "", password: "" });
@@ -11,67 +11,29 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg, setLogged }) => {
     const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
     const [forgotPasswordMessage, setForgotPasswordMessage] = useState("");
     const [loading, setLoading] = useState(false);
-    const [emailNotVerified, setEmailNotVerified] = useState(false);
-    const [unverifiedEmail, setUnverifiedEmail] = useState("");
 
     if (!open) return null;
 
     const login = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setErrors({});
-        setEmailNotVerified(false);
-        
         try {
-            const response = await axios.post(
-                `${import.meta.env.VITE_VERCEL_URI}/api/login`, 
-                user,
+            const response = await axios.post('' + import.meta.env.VITE_VERCEL_URI + '/api/login', user,
                 { withCredentials: true }
-            );
-            
-            console.log('SERVER RESPONSE:', response.data);
-            setLogged(true);
-            setOpenModalLog(false);
-            navigate('/');
-            
+            )
+            console.log('SERVER RESPONSE:', response.data)
+            setLogged(true)
+            console.log('TOKEN RESPONSE:', response.data.token)
+            setOpenModalLog(false)
+            navigate('/')
         } catch (error) {
-            console.log("Error:", error.response?.data);
-            
-            // Handle email not verified case
-            if (error.response?.data?.emailVerified === false) {
-                setEmailNotVerified(true);
-                setUnverifiedEmail(user.email);
-                setErrors({});
-            } else {
-                let tempErrors = {};
-                if (error.response?.data) {
-                    for (let key of Object.keys(error.response.data)) {
-                        if (key !== 'message') {
-                            tempErrors[key] = error.response.data[key].message;
-                        }
-                    }
-                }
-                setErrors({ ...tempErrors });
+            console.log("Error:", error.response.data);
+            let tempErrors = {}
+            for (let key of Object.keys(error.response.data)) {
+                console.log(key, '------', error.response.data[key].message);
+                tempErrors[key] = error.response.data[key].message
             }
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleResendVerification = async () => {
-        setLoading(true);
-        try {
-            const response = await axios.post(
-                `${import.meta.env.VITE_VERCEL_URI}/api/resend-verification`,
-                { email: unverifiedEmail }
-            );
-            
-            setForgotPasswordMessage("New verification email sent! Please check your inbox.");
-            setEmailNotVerified(false);
-        } catch (error) {
-            setForgotPasswordMessage(
-                error.response?.data?.message || "Failed to resend verification email."
-            );
+            setErrors({ ...tempErrors })
         } finally {
             setLoading(false);
         }
@@ -89,9 +51,10 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg, setLogged }) => {
             const response = await axios.post(
                 `${import.meta.env.VITE_VERCEL_URI}/api/forgot-password`,
                 { email: forgotPasswordEmail }
-            );
-            
-            setForgotPasswordMessage("Password reset instructions have been sent to your email");
+            ).then(res => {
+                setForgotPasswordMessage("Password reset instructions have been sent to your email");
+                console.log(res.data)});
+
             
         } catch (error) {
             setForgotPasswordMessage(
@@ -110,7 +73,7 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg, setLogged }) => {
                         <div className="d-flex flex-column gap-3 p-5 align-items-center">
                             <h3>Reset Password</h3>
                             
-                            <div className="w-100">
+                            <div className="">
                                 <input
                                     className="form-control"
                                     placeholder="Enter your email"
@@ -118,7 +81,6 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg, setLogged }) => {
                                     value={forgotPasswordEmail}
                                     onChange={e => setForgotPasswordEmail(e.target.value)}
                                     disabled={loading}
-                                    required
                                 />
                             </div>
                             
@@ -128,9 +90,9 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg, setLogged }) => {
                                 </div>
                             )}
                             
-                            <div className="d-flex gap-4 w-100">
+                            <div className="d-flex gap-4">
                                 <button
-                                    className="btn text-light w-100"
+                                    className="btn text-light w-100 mt-3"
                                     style={{ backgroundColor: "#5C2D9A" }}
                                     type="submit"
                                     disabled={loading}
@@ -139,11 +101,10 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg, setLogged }) => {
                                 </button>
                                 
                                 <button 
-                                    className="btn border w-100"
+                                    className="btn border w-100 mt-3"
                                     onClick={(e) => {
                                         e.preventDefault();
                                         setForgotPasswordMode(false);
-                                        setForgotPasswordMessage("");
                                     }}
                                     disabled={loading}
                                 >
@@ -152,42 +113,10 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg, setLogged }) => {
                             </div>
                         </div>
                     </form>
-                ) : emailNotVerified ? (
-                    <div className="d-flex flex-column gap-3 p-5 align-items-center">
-                        <div className="text-center">
-                            <i className="bi bi-envelope-exclamation-fill text-warning" style={{ fontSize: "3rem" }}></i>
-                            <h3 className="mt-3">Email Not Verified</h3>
-                            <p className="text-muted">
-                                Please verify your email address before logging in. 
-                                Check your inbox at <strong>{unverifiedEmail}</strong> or request a new verification email.
-                            </p>
-                        </div>
-                        
-                        <div className="d-flex gap-4 w-100">
-                            <button
-                                className="btn text-light w-100"
-                                style={{ backgroundColor: "#5C2D9A" }}
-                                onClick={handleResendVerification}
-                                disabled={loading}
-                            >
-                                {loading ? "Sending..." : "Resend Verification"}
-                            </button>
-                            
-                            <button 
-                                className="btn border w-100"
-                                onClick={() => setEmailNotVerified(false)}
-                                disabled={loading}
-                            >
-                                Try Again
-                            </button>
-                        </div>
-                    </div>
                 ) : (
                     <form onSubmit={login} className="d-flex justify-content-center">
                         <div className="d-flex flex-column gap-3 p-5 align-items-center">
-                            <h3>Login</h3>
-                            
-                            <div className="w-100">
+                            <div className="">
                                 <input
                                     className="form-control"
                                     placeholder="Email"
@@ -195,12 +124,10 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg, setLogged }) => {
                                     onChange={e => setUser({ ...user, email: e.target.value })}
                                     value={user.email}
                                     disabled={loading}
-                                    required
                                 />
-                                <span className="text-danger small">{errors.email}</span>
+                                <span className="text-danger">{errors.email}</span>
                             </div>
-                            
-                            <div className="w-100">
+                            <div className="">
                                 <input
                                     className="form-control"
                                     placeholder="Password"
@@ -208,9 +135,8 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg, setLogged }) => {
                                     onChange={e => setUser({ ...user, password: e.target.value })}
                                     value={user.password}
                                     disabled={loading}
-                                    required
                                 />
-                                <span className="text-danger small">{errors.password}</span>
+                                <span className="text-danger">{errors.password}</span>
                             </div>
                             
                             <a 
@@ -219,24 +145,22 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg, setLogged }) => {
                                     e.preventDefault();
                                     setForgotPasswordMode(true);
                                 }}
-                                style={{display: 'block', textAlign: 'right', marginBottom: '10px', width: '100%'}}
-                                className="text-decoration-none"
+                                style={{display: 'block', textAlign: 'right', marginBottom: '10px'}}
                             >
                                 Forgot Password?
                             </a>
                             
-                            <div className="d-flex gap-4 w-100">
+                            <div className="d-flex gap-4">
                                 <button
-                                    className="btn text-light w-100"
+                                    className="btn text-light w-100 mt-3"
                                     style={{ backgroundColor: "#5C2D9A" }}
                                     type="submit"
                                     disabled={loading}
                                 >
                                     {loading ? "Logging in..." : "Log In"}
                                 </button>
-                                
                                 <button 
-                                    className="btn border w-100"
+                                    className="btn border w-100 mt-3" 
                                     onClick={(e) => {
                                         e.preventDefault();
                                         setOpenModalLog(false);
@@ -252,17 +176,13 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg, setLogged }) => {
                 )}
                 
                 <i 
-                    className="bi bi-arrow-left-circle-fill VioletCred mt-2 fw-bold" 
-                    style={{ cursor: "pointer", position: "absolute", top: "10px", right: "10px" }} 
-                    onClick={() => {
-                        setOpenModalLog(false);
-                        setForgotPasswordMode(false);
-                        setEmailNotVerified(false);
-                    }}
+                    className="bi bi-arrow-left-circle-fill VioletCred mt-2 fw-bold " 
+                    style={{ cursor: "pointer" }} 
+                    onClick={(e) => setOpenModalLog(false)}
                 ></i>
             </div>
         </div>
     );
 };
 
-export default ModalLog;
+export default ModalLog0;
