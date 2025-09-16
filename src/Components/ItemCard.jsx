@@ -11,7 +11,7 @@ const ItemCard = ({ item, setOpenModalLog, setOpenModalReg, userId, fName, lName
             {/* Image Container with Aspect Ratio */}
             <div className="position-relative overflow-hidden" style={{ paddingTop: '75%' }}>
                 <img 
-                    src={item && item.itemPics[0] && item.itemPics[0].url ? item.itemPics[0].url : item.itemPics[0]} 
+                    src={item && item.itemPics && item.itemPics[0] && item.itemPics[0].url ? item.itemPics[0].url : ""} 
                     className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" 
                     alt="itemPic"
                     loading="lazy"

@@ -104,10 +104,18 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
   const location = useLocation();
   const { isMobile, isTablet, isDesktop } = useResponsive();
 
-  // Ensure sort.category is an array at startup
+  // State for temporary filters
+  const [tempFilters, setTempFilters] = useState({ ...sort });
+
+  // Update tempFilters when sort changes (from outside)
   useEffect(() => {
-    if (sort && !Array.isArray(sort.category)) {
-      setSort({ ...sort, category: sort.category ? [sort.category] : [] });
+    setTempFilters({ ...sort });
+  }, [sort]);
+
+  // Ensure tempFilters.category is an array at startup
+  useEffect(() => {
+    if (tempFilters && !Array.isArray(tempFilters.category)) {
+      setTempFilters({ ...tempFilters, category: tempFilters.category ? [tempFilters.category] : [] });
     }
   }, []);
 
@@ -131,7 +139,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
   }, [items]);
 
   const handleSliderChange = (event, newValue) => {
-    setSort({ ...sort, size: newValue });
+    setTempFilters({ ...tempFilters, size: newValue });
   };
 
   // Helper to determine if a name is footwear
@@ -139,13 +147,13 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
 
   // Multi-select toggle enforcing the rule
   const toggleCategory = (name) => {
-    const current = Array.isArray(sort.category) ? sort.category : [];
+    const current = Array.isArray(tempFilters.category) ? tempFilters.category : [];
     const selectedSet = new Set(current);
     const alreadySelected = selectedSet.has(name);
 
     if (alreadySelected) {
       selectedSet.delete(name);
-      setSort({ ...sort, category: Array.from(selectedSet) });
+      setTempFilters({ ...tempFilters, category: Array.from(selectedSet) });
       return;
     }
 
@@ -153,17 +161,83 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
       const onlyFootwear = Array.from(selectedSet).filter(isFootwear);
       onlyFootwear.push(name);
       const unique = Array.from(new Set(onlyFootwear));
-      setSort({ ...sort, category: unique });
+      setTempFilters({ ...tempFilters, category: unique });
     } else {
       const hasAnyFootwear = Array.from(selectedSet).some(isFootwear);
       let next = hasAnyFootwear ? [] : Array.from(selectedSet);
       next.push(name);
       const unique = Array.from(new Set(next.filter((n) => !isFootwear(n))));
-      setSort({ ...sort, category: unique });
+      setTempFilters({ ...tempFilters, category: unique });
     }
   };
 
-  const fetchItems = async (p, force = false) => {
+  // Handler for gender change
+  const handleGenderChange = (e) => {
+    setTempFilters({ ...tempFilters, gender: e.target.value });
+  };
+
+  // Handler for age change
+  const handleAgeChange = (e) => {
+    setTempFilters({ ...tempFilters, age: e.target.value });
+  };
+
+  // Handler for condition change
+  const handleConditionChange = (e) => {
+    setTempFilters({ ...tempFilters, condition: e.target.value });
+  };
+
+  // Handler for brand change
+  const handleBrandChange = (e) => {
+    setTempFilters({ ...tempFilters, brand: e.target.value });
+  };
+
+  // Handler for min price change
+  const handleMinPriceChange = (e) => {
+    const value = parseInt(e.target.value, 10);
+    const max = tempFilters?.maxP || 1000;
+    const minLimit = 0;
+
+    if (!isNaN(value) && value >= minLimit && value <= max) {
+      setTempFilters({ ...tempFilters, minP: value });
+    } else if (e.target.value === "") {
+      setTempFilters({ ...tempFilters, minP: "" });
+    }
+  };
+
+  // Handler for max price change
+  const handleMaxPriceChange = (e) => {
+    const value = parseInt(e.target.value, 10);
+    const min = tempFilters?.minP || 0;
+    const max = 1000;
+
+    if (!isNaN(value) && value >= min && value <= max) {
+      setTempFilters({ ...tempFilters, maxP: value });
+    } else if (e.target.value === "") {
+      setTempFilters({ ...tempFilters, maxP: "" });
+    }
+  };
+
+  // Handler for size change
+  const handleSizeChange = (e, newValue) => {
+    setTempFilters({ ...tempFilters, size: sizeLabels[newValue] });
+  };
+
+  // Handler for search change
+  const handleSearchChange = (e) => {
+    setTempFilters({ ...tempFilters, search: e.target.value });
+  };
+
+  // Handler for tag selection
+  const handleTagSelection = (tag) => {
+    const isSelected = tempFilters.tags && tempFilters.tags.includes(tag);
+    const updatedTags = isSelected
+      ? tempFilters.tags.filter((t) => t !== tag)
+      : [...(tempFilters.tags || []), tag];
+    setTempFilters({ ...tempFilters, tags: updatedTags });
+  };
+
+  // Modified fetchItems to accept filters as parameter
+  const fetchItems = async (p, filters, force = false) => {
     if (fetchedPagesRef.current.has(p) && !force) return;
     if (isFetchingRef.current) return;
     if (!hasMore && !force) return;
@@ -173,24 +247,24 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
 
     const params = new URLSearchParams({
       category:
-        Array.isArray(sort?.category) && sort.category.length > 0
-          ? sort.category.join(",")
+        Array.isArray(filters?.category) && filters.category.length > 0
+          ? filters.category.join(",")
           : "",
-      gender: sort?.gender || "",
-      age: sort?.age || "",
-      q: sort?.search || "",
+      gender: filters?.gender || "",
+      age: filters?.age || "",
+      q: filters?.search || "",
       page: p,
-      condition: sort?.condition || "",
-      size: sort?.size || "",
-      minP: sort?.minP || "",
-      maxP: sort?.maxP || "",
-      priceSort: sort?.priceSort || "",
-      sizeSort: sort?.sizeSort || "",
-      brand: sort?.brand || "",
+      condition: filters?.condition || "",
+      size: filters?.size || "",
+      minP: filters?.minP || "",
+      maxP: filters?.maxP || "",
+      priceSort: filters?.priceSort || "",
+      sizeSort: filters?.sizeSort || "",
+      brand: filters?.brand || "",
     });
     
-    if (sort?.tags && sort.tags.length > 0) {
-      params.set("tags", sort.tags.join(","));
+    if (filters?.tags && filters.tags.length > 0) {
+      params.set("tags", filters.tags.join(","));
     } else {
       params.delete("tags");
     }
@@ -233,7 +307,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
     fetchedPagesRef.current = new Set();
 
     const timer = setTimeout(() => {
-      fetchItems(0, true);
+      fetchItems(0, sort, true);
     }, 300); // Reduced delay for better UX
     
     return () => clearTimeout(timer);
@@ -247,6 +321,9 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
 
   const handleFilterSubmit = (e) => {
     e.preventDefault();
+    // Apply the temporary filters to the actual sort state
+    setSort({ ...tempFilters });
+    
     setHasMore(true);
     setLoading(false);
     setPage(0);
@@ -256,11 +333,11 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
     fetchedPagesRef.current = new Set();
 
     const timer = setTimeout(() => {
-      fetchItems(0, true);
+      fetchItems(0, tempFilters, true);
     }, 300);
     
     if (!isDesktop) {
-      setSort({ ...sort, nav: false });
+      setSort({ ...tempFilters, nav: false });
     }
     
     return () => clearTimeout(timer);
@@ -282,8 +359,6 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
     handleClose();
     setAnchorEl(null);
   };
-
-  const handleSelectTag = (tags) => {};
 
   // Calculate grid columns based on screen size
   const getGridColumns = () => {
@@ -319,7 +394,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
     <div className="min-vh-100" style={{ backgroundColor: "#f8f9fa" }}>
       <div className="d-flex">
         {/* Sidebar Filters - Desktop/Tablet */}
-        {sort && sort.nav && (
+        {tempFilters && tempFilters.nav && (
           <div
             className={`${isDesktop ? 'col-lg-3' : 'col-12'} d-flex flex-column px-3 bg-white border-end`}
             style={{
@@ -337,7 +412,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                   <button
                     type="button"
                     className="btn btn-light"
-                    onClick={() => setSort({ ...sort, nav: false })}
+                    onClick={() => setTempFilters({ ...tempFilters, nav: false })}
                   >
                     <i className="bi bi-x-lg"></i>
                   </button>
@@ -358,17 +433,17 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                   className="mb-3 fw-bold"
                   style={{ cursor: "pointer", color: "#8356C0" }}
                   onClick={() => {
-                    setSort({
-                      ...sort,
-                      gender: typeof sort.gender === "string" ? false : !sort.gender,
+                    setTempFilters({
+                      ...tempFilters,
+                      gender: typeof tempFilters.gender === "string" ? false : !tempFilters.gender,
                     });
                   }}
                 >
                   Genre
                 </h6>
                 <RadioGroup
-                  value={sort && sort.gender}
-                  onChange={(e) => setSort({ ...sort, gender: e.target.value })}
+                  value={tempFilters && tempFilters.gender}
+                  onChange={handleGenderChange}
                   className="d-flex flex-column gap-1"
                 >
                   {genderOptions.map((option) => (
@@ -377,7 +452,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                       value={option}
                       control={
                         <Radio
-                          disabled={sort.gender === false}
+                          disabled={tempFilters.gender === false}
                           sx={{
                             "&.Mui-checked": { color: "#8356C0" },
                             padding: isMobile ? "8px" : "9px",
@@ -397,17 +472,17 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                   className="mb-3 fw-bold"
                   style={{ cursor: "pointer", color: "#8356C0" }}
                   onClick={() => {
-                    setSort({
-                      ...sort,
-                      age: typeof sort.age === "string" ? false : !sort.age,
+                    setTempFilters({
+                      ...tempFilters,
+                      age: typeof tempFilters.age === "string" ? false : !tempFilters.age,
                     });
                   }}
                 >
                   Âge
                 </h6>
                 <RadioGroup
-                  value={sort && sort.age}
-                  onChange={(e) => setSort({ ...sort, age: e.target.value })}
+                  value={tempFilters && tempFilters.age}
+                  onChange={handleAgeChange}
                   className="d-flex flex-column gap-1"
                 >
                   {ageOptions.map((option) => (
@@ -416,7 +491,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                       value={option}
                       control={
                         <Radio
-                          disabled={sort.age === false}
+                          disabled={tempFilters.age === false}
                           sx={{
                             "&.Mui-checked": { color: "#8356C0" },
                             padding: isMobile ? "8px" : "9px",
@@ -460,19 +535,19 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                             label={item}
                             size={isMobile ? "small" : "medium"}
                             color={
-                              Array.isArray(sort.category) && sort.category.includes(item)
+                              Array.isArray(tempFilters.category) && tempFilters.category.includes(item)
                                 ? "primary"
                                 : "default"
                             }
                             onClick={() => toggleCategory(item)}
                             sx={{
                               fontSize: isMobile ? "0.7rem" : "0.8rem",
-                              backgroundColor: Array.isArray(sort.category) && sort.category.includes(item) 
+                              backgroundColor: Array.isArray(tempFilters.category) && tempFilters.category.includes(item) 
                                 ? "#8356C0" : "#f5f5f5",
-                              color: Array.isArray(sort.category) && sort.category.includes(item) 
+                              color: Array.isArray(tempFilters.category) && tempFilters.category.includes(item) 
                                 ? "white" : "#666",
                               "&:hover": {
-                                backgroundColor: Array.isArray(sort.category) && sort.category.includes(item) 
+                                backgroundColor: Array.isArray(tempFilters.category) && tempFilters.category.includes(item) 
                                   ? "#7043a3" : "#e0e0e0",
                               }
                             }}
@@ -494,9 +569,9 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                     className="mb-0 fw-bold"
                     style={{ cursor: "pointer", color: "#8356C0" }}
                     onClick={() => {
-                      setSort({
-                        ...sort,
-                        size: typeof sort.size === "string" ? false : !sort.size,
+                      setTempFilters({
+                        ...tempFilters,
+                        size: typeof tempFilters.size === "string" ? false : !tempFilters.size,
                       });
                     }}
                   >
@@ -507,14 +582,14 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                       type="button"
                       className="btn btn-sm"
                       onClick={() => {
-                        setSort({
-                          ...sort,
+                        setTempFilters({
+                          ...tempFilters,
                           priceSort: "",
-                          sizeSort: sort.sizeSort === "ASC" ? "" : "ASC",
+                          sizeSort: tempFilters.sizeSort === "ASC" ? "" : "ASC",
                         });
                       }}
                       style={{
-                        color: sort?.sizeSort === "ASC" ? "#8356C0" : "#6c757d",
+                        color: tempFilters?.sizeSort === "ASC" ? "#8356C0" : "#6c757d",
                         backgroundColor: "transparent",
                         border: "none",
                         padding: "4px",
@@ -526,14 +601,14 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                       type="button"
                       className="btn btn-sm"
                       onClick={() => {
-                        setSort({
-                          ...sort,
+                        setTempFilters({
+                          ...tempFilters,
                           priceSort: "",
-                          sizeSort: sort.sizeSort === "DESC" ? "" : "DESC",
+                          sizeSort: tempFilters.sizeSort === "DESC" ? "" : "DESC",
                         });
                       }}
                       style={{
-                        color: sort?.sizeSort === "DESC" ? "#8356C0" : "#6c757d",
+                        color: tempFilters?.sizeSort === "DESC" ? "#8356C0" : "#6c757d",
                         backgroundColor: "transparent",
                         border: "none",
                         padding: "4px",
@@ -545,15 +620,15 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                 </div>
 
                 {/* Size input/selector based on category */}
-                {Array.isArray(sort.category) &&
-                sort.category.some((c) => footwearCategories.includes(c)) ? (
+                {Array.isArray(tempFilters.category) &&
+                tempFilters.category.some((c) => footwearCategories.includes(c)) ? (
                   <TextField
                     fullWidth
                     size={isMobile ? "small" : "medium"}
                     type="number"
-                    disabled={sort.size === false}
+                    disabled={tempFilters.size === false}
                     placeholder="Pointure (ex: 40)"
-                    onChange={(e) => setSort({ ...sort, size: e.target.value })}
+                    onChange={(e) => setTempFilters({ ...tempFilters, size: e.target.value })}
                     sx={{
                       "& label.Mui-focused": { color: "#8356C0" },
                       "& .MuiOutlinedInput-root": {
@@ -561,42 +636,38 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                       },
                     }}
                   />
-                ) : sort?.gender === "Kids" ||
-                  sort?.category?.includes("Babywear") ||
-                  sort?.category?.includes("Kidswear") ||
-                  sort?.category?.includes("Teenswear") ? (
+                ) : tempFilters?.gender === "Kids" ||
+                  tempFilters?.category?.includes("Babywear") ||
+                  tempFilters?.category?.includes("Kidswear") ||
+                  tempFilters?.category?.includes("Teenswear") ? (
                   <Select
                     fullWidth
                     size={isMobile ? "small" : "medium"}
-                    disabled={sort.size === false}
-                    value={sort && sort.size}
-                    onChange={(e) => setSort({ ...sort, size: e.target.value })}
+                    disabled={tempFilters.size === false}
+                    value={tempFilters && tempFilters.size}
+                    onChange={(e) => setTempFilters({ ...tempFilters, size: e.target.value })}
                     sx={{
                       "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                         borderColor: "#8356C0",
                       },
                     }}
                   >
-                    {(sort?.category?.includes("Babywear") ? babySizes :
-                      sort?.category?.includes("Kidswear") ? kidsSizes : teenSizes
+                    {(tempFilters?.category?.includes("Babywear") ? babySizes :
+                      tempFilters?.category?.includes("Kidswear") ? kidsSizes : teenSizes
                     ).map((s) => (
                       <MenuItem key={s} value={s}>{s}</MenuItem>
                     ))}
                   </Select>
                 ) : (
                   <Slider
-                    disabled={sort.size === false}
-                    value={sizeLabels.indexOf(sort.size) || 0}
-                    onChange={(e, newValue) => {
-                      setSort({ ...sort, size: sizeLabels[newValue] });
-                    }}
+                    disabled={tempFilters.size === false}
+                    value={sizeLabels.indexOf(tempFilters.size) || 0}
+                    onChange={handleSizeChange}
                     valueLabelDisplay="auto"
                     valueLabelFormat={(value) => sizeLabels[value]}
                     marks={sizeLabels.map((label, index) => ({
                       value: index,
-                      label:
-                      //  isMobile ? "" :
-                       label, // Hide labels on mobile for cleaner look
+                      label: label,
                     }))}
                     step={1}
                     min={0}
@@ -622,9 +693,9 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                   className="mb-3 fw-bold"
                   style={{ cursor: "pointer", color: "#8356C0" }}
                   onClick={() => {
-                    setSort({
-                      ...sort,
-                      brand: typeof sort.brand === "string" ? false : !sort.brand,
+                    setTempFilters({
+                      ...tempFilters,
+                      brand: typeof tempFilters.brand === "string" ? false : !tempFilters.brand,
                     });
                   }}
                 >
@@ -634,9 +705,9 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                   fullWidth
                   size={isMobile ? "small" : "medium"}
                   type="text"
-                  disabled={sort.brand === false}
+                  disabled={tempFilters.brand === false}
                   placeholder="Marque"
-                  onChange={(e) => setSort({ ...sort, brand: e.target.value })}
+                  onChange={handleBrandChange}
                   sx={{
                     "& label.Mui-focused": { color: "#8356C0" },
                     "& .MuiOutlinedInput-root": {
@@ -653,10 +724,10 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                     className="mb-0 fw-bold"
                     style={{ cursor: "pointer", color: "#8356C0" }}
                     onClick={() => {
-                      setSort({
-                        ...sort,
-                        minP: typeof sort.minP === "number" ? false : !sort.minP,
-                        maxP: typeof sort.maxP === "number" ? false : !sort.minP,
+                      setTempFilters({
+                        ...tempFilters,
+                        minP: typeof tempFilters.minP === "number" ? false : !tempFilters.minP,
+                        maxP: typeof tempFilters.maxP === "number" ? false : !tempFilters.minP,
                       });
                     }}
                   >
@@ -667,14 +738,14 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                       type="button"
                       className="btn btn-sm"
                       onClick={() => {
-                        setSort({
-                          ...sort,
+                        setTempFilters({
+                          ...tempFilters,
                           sizeSort: "",
-                          priceSort: sort.priceSort === "ASC" ? "" : "ASC",
+                          priceSort: tempFilters.priceSort === "ASC" ? "" : "ASC",
                         });
                       }}
                       style={{
-                        color: sort?.priceSort === "ASC" ? "#8356C0" : "#6c757d",
+                        color: tempFilters?.priceSort === "ASC" ? "#8356C0" : "#6c757d",
                         backgroundColor: "transparent",
                         border: "none",
                         padding: "4px",
@@ -686,14 +757,14 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                       type="button"
                       className="btn btn-sm"
                       onClick={() => {
-                        setSort({
-                          ...sort,
+                        setTempFilters({
+                          ...tempFilters,
                           sizeSort: "",
-                          priceSort: sort.priceSort === "DESC" ? "" : "DESC",
+                          priceSort: tempFilters.priceSort === "DESC" ? "" : "DESC",
                         });
                       }}
                       style={{
-                        color: sort?.priceSort === "DESC" ? "#8356C0" : "#6c757d",
+                        color: tempFilters?.priceSort === "DESC" ? "#8356C0" : "#6c757d",
                         backgroundColor: "transparent",
                         border: "none",
                         padding: "4px",
@@ -710,20 +781,10 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                     size={isMobile ? "small" : "medium"}
                     type="number"
                     placeholder="Min"
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value, 10);
-                      const max = sort?.maxP || 1000;
-                      const minLimit = 0;
-
-                      if (!isNaN(value) && value >= minLimit && value <= max) {
-                        setSort({ ...sort, minP: value });
-                      } else if (e.target.value === "") {
-                        setSort({ ...sort, minP: "" });
-                      }
-                    }}
-                    value={sort?.minP || ""}
-                    inputProps={{ min: 0, max: sort?.maxP || 1000 }}
-                    disabled={sort.minP === false}
+                    onChange={handleMinPriceChange}
+                    value={tempFilters?.minP || ""}
+                    inputProps={{ min: 0, max: tempFilters?.maxP || 1000 }}
+                    disabled={tempFilters.minP === false}
                     sx={{
                       "& label.Mui-focused": { color: "#8356C0" },
                       "& .MuiOutlinedInput-root": {
@@ -734,22 +795,12 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                   <TextField
                     label="Max"
                     size={isMobile ? "small" : "medium"}
-                    value={sort?.maxP || ""}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value, 10);
-                      const min = sort?.minP || 0;
-                      const max = 1000;
-
-                      if (!isNaN(value) && value >= min && value <= max) {
-                        setSort({ ...sort, maxP: value });
-                      } else if (e.target.value === "") {
-                        setSort({ ...sort, maxP: "" });
-                      }
-                    }}
-                    inputProps={{ min: sort?.minP || 0, max: 1000 }}
+                    value={tempFilters?.maxP || ""}
+                    onChange={handleMaxPriceChange}
+                    inputProps={{ min: tempFilters?.minP || 0, max: 1000 }}
                     type="number"
                     placeholder="Max"
-                    disabled={sort.minP === false}
+                    disabled={tempFilters.minP === false}
                     sx={{
                       "& label.Mui-focused": { color: "#8356C0" },
                       "& .MuiOutlinedInput-root": {
@@ -766,17 +817,17 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                   className="mb-3 fw-bold"
                   style={{ cursor: "pointer", color: "#8356C0" }}
                   onClick={() => {
-                    setSort({
-                      ...sort,
-                      condition: typeof sort.condition === "string" ? false : !sort.condition,
+                    setTempFilters({
+                      ...tempFilters,
+                      condition: typeof tempFilters.condition === "string" ? false : !tempFilters.condition,
                     });
                   }}
                 >
                   État
                 </h6>
                 <RadioGroup
-                  value={sort && sort.condition}
-                  onChange={(e) => setSort({ ...sort, condition: e.target.value })}
+                  value={tempFilters && tempFilters.condition}
+                  onChange={handleConditionChange}
                   className="d-flex flex-column gap-1"
                 >
                   {conditionOptions.map((option) => (
@@ -785,7 +836,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                       value={option}
                       control={
                         <Radio
-                          disabled={sort.condition === false}
+                          disabled={tempFilters.condition === false}
                           sx={{
                             "&.Mui-checked": { color: "#8356C0" },
                             padding: isMobile ? "8px" : "9px",
@@ -805,17 +856,17 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                   className="mb-3 fw-bold"
                   style={{ cursor: "pointer", color: "#8356C0" }}
                   onClick={() =>
-                    setSort({
-                      ...sort,
-                      showTags: !sort.showTags,
-                      tags: sort.showTags ? [] : sort.tags || [],
+                    setTempFilters({
+                      ...tempFilters,
+                      showTags: !tempFilters.showTags,
+                      tags: tempFilters.showTags ? [] : tempFilters.tags || [],
                     })
                   }
                 >
                   Tags
                 </h6>
 
-                {sort && sort.showTags && (
+                {tempFilters && tempFilters.showTags && (
                   <div
                     className="d-flex flex-wrap gap-1"
                     style={{
@@ -829,26 +880,19 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                         label={tag}
                         size={isMobile ? "small" : "medium"}
                         color={
-                          sort && sort.tags && sort.tags.includes(tag)
+                          tempFilters && tempFilters.tags && tempFilters.tags.includes(tag)
                             ? "primary"
                             : "default"
                         }
-                        onClick={() => {
-                          const isSelected = sort && sort.tags && sort.tags.includes(tag);
-                          const updatedTags = isSelected
-                            ? sort.tags.filter((t) => t !== tag)
-                            : [...(sort.tags || []), tag];
-                          setSort({ ...sort, tags: updatedTags });
-                          handleSelectTag(updatedTags);
-                        }}
+                        onClick={() => handleTagSelection(tag)}
                         sx={{
                           fontSize: isMobile ? "0.7rem" : "0.8rem",
-                          backgroundColor: sort && sort.tags && sort.tags.includes(tag) 
+                          backgroundColor: tempFilters && tempFilters.tags && tempFilters.tags.includes(tag) 
                             ? "#8356C0" : "#f5f5f5",
-                          color: sort && sort.tags && sort.tags.includes(tag) 
+                          color: tempFilters && tempFilters.tags && tempFilters.tags.includes(tag) 
                             ? "white" : "#666",
                           "&:hover": {
-                            backgroundColor: sort && sort.tags && sort.tags.includes(tag) 
+                            backgroundColor: tempFilters && tempFilters.tags && tempFilters.tags.includes(tag) 
                               ? "#7043a3" : "#e0e0e0",
                           }
                         }}
@@ -860,14 +904,15 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
             </form>
           </div>
         )}
-
+        
         {/* Main Content Area */}
         <div 
-          className={`${sort && sort.nav && isDesktop ? 'col-lg-9' : 'col-12'} ${
-            sort && sort.nav && !isDesktop ? 'd-none' : ''
+          className={`${tempFilters && tempFilters.nav && isDesktop ? 'col-lg-9' : 'col-12'} ${
+            tempFilters && tempFilters.nav && !isDesktop ? 'd-none' : ''
           }`}
           style={{ backgroundColor: "#f8f9fa" }}
         >
+          <div>
           <div className="container-fluid px-3 py-4">
             {/* Loading skeletons for initial load */}
             {initialLoading && (
@@ -882,7 +927,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
             {!initialLoading && (
               <InfiniteScroll
                 dataLength={items.length}
-                next={() => fetchItems(pageRef.current)}
+                next={() => fetchItems(pageRef.current, sort)}
                 hasMore={hasMore}
                 loader={<LoadingComponent />}
                 endMessage={<EndMessage />}
@@ -948,6 +993,19 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                             brand: "",
                             tags: [],
                           });
+                          setTempFilters({
+                            ...tempFilters,
+                            category: [],
+                            gender: "",
+                            age: "",
+                            search: "",
+                            condition: "",
+                            size: "",
+                            minP: "",
+                            maxP: "",
+                            brand: "",
+                            tags: [],
+                          });
                         }}
                       >
                         Réinitialiser les filtres
@@ -960,9 +1018,9 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
           </div>
         </div>
       </div>
-
+            
       {/* Mobile Filter Button - Fixed at bottom */}
-      {!isDesktop && !sort?.nav && (
+      {!isDesktop && !tempFilters?.nav && (
         <div 
           className="position-fixed bottom-0 start-0 end-0 p-3 bg-white border-top"
           style={{ zIndex: 1000 }}
@@ -975,7 +1033,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
               borderRadius: "12px",
               border: "none"
             }}
-            onClick={() => setSort({ ...sort, nav: true })}
+            onClick={() => setTempFilters({ ...tempFilters, nav: true })}
           >
             <i className="bi bi-funnel"></i>
             <span>Filtres</span>
@@ -1045,6 +1103,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
           ))}
         </Menu>
       )}
+    </div>
     </div>
   );
 };
