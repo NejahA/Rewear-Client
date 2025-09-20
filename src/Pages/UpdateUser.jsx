@@ -1,5 +1,5 @@
-import { FormControlLabel, Switch, TextField, Input, Typography, Collapse, IconButton } from "@mui/material";
-import { ExpandMore, ExpandLess } from "@mui/icons-material";
+import { FormControlLabel, Switch, TextField, Input, Typography, Collapse, IconButton, Alert, Button } from "@mui/material";
+import { ExpandMore, ExpandLess, Email, CheckCircle, Cancel } from "@mui/icons-material";
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -19,12 +19,15 @@ const UpdateUser = () => {
     showEmail: false,
     showPhone: false,
     showAdress: false,
+    pendingEmail: null, // New field for pending email changes
   });
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [errors, setErrors] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [showPasswordSection, setShowPasswordSection] = useState(false);
+  const [originalEmail, setOriginalEmail] = useState(""); // Track original email
+  const [emailChangeRequested, setEmailChangeRequested] = useState(false);
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -36,6 +39,8 @@ const UpdateUser = () => {
       })
       .then((res) => {
         setUser(res.data);
+        setOriginalEmail(res.data.email); // Store original email
+        
         // Set initial preview if user has existing profile pic
         if (res.data.profilePic && res.data.profilePic.url) {
           setPreviewUrl(res.data.profilePic.url);
@@ -114,6 +119,69 @@ const UpdateUser = () => {
     console.log("user after update ===>", JSON.stringify(user));
   };
 
+  // New function to cancel pending email change
+  const handleCancelEmailChange = async () => {
+    try {
+      const response = await axios.post(
+        "" + import.meta.env.VITE_VERCEL_URI + "/api/cancel-email-change",
+        {},
+        { withCredentials: true }
+      );
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Email change cancelled',
+        text: response.data.message,
+        timer: 3000,
+        showConfirmButton: false
+      });
+
+      // Update user state to remove pending email
+      setUser(prev => ({
+        ...prev,
+        pendingEmail: null
+      }));
+      setEmailChangeRequested(false);
+
+    } catch (error) {
+      console.error('Cancel email change error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: error.response?.data?.message || 'Erreur lors de l\'annulation du changement d\'email',
+      });
+    }
+  };
+
+  // New function to resend verification email for email change
+  const handleResendEmailVerification = async () => {
+    if (!user.pendingEmail) return;
+
+    try {
+      const response = await axios.post(
+        "" + import.meta.env.VITE_VERCEL_URI + "/api/resend-verification-email",
+        { email: user.pendingEmail },
+        { withCredentials: true }
+      );
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Email envoyé',
+        text: 'Un nouvel email de vérification a été envoyé à votre nouvelle adresse.',
+        timer: 3000,
+        showConfirmButton: false
+      });
+
+    } catch (error) {
+      console.error('Resend verification error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: error.response?.data?.message || 'Erreur lors de l\'envoi de l\'email de vérification',
+      });
+    }
+  };
+
   const handleUpload = async (e) => {
     e.preventDefault();
 
@@ -145,23 +213,53 @@ const UpdateUser = () => {
         { withCredentials: true }
       );
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Succès',
-        text: 'Profil mis à jour avec succès',
-      }).then(() => {
-        navigate(-1);
-      });
+      // Check if email change was requested
+      if (response.data.emailChangeRequested) {
+        setEmailChangeRequested(true);
+        setUser(prev => ({
+          ...prev,
+          pendingEmail: response.data.pendingEmail
+        }));
+
+        Swal.fire({
+          icon: 'info',
+          title: 'Profil mis à jour',
+          html: `
+            <p>Votre profil a été mis à jour avec succès.</p>
+            <p><strong>Vérification d'email requise:</strong> Un email de vérification a été envoyé à <strong>${response.data.pendingEmail}</strong>.</p>
+            <p>Veuillez vérifier votre nouvelle adresse email pour finaliser le changement.</p>
+          `,
+          confirmButtonText: 'Compris',
+          confirmButtonColor: '#8356C0'
+        });
+      } else {
+        Swal.fire({
+          icon: 'success',
+          title: 'Succès',
+          text: 'Profil mis à jour avec succès',
+        }).then(() => {
+          navigate(-1);
+        });
+      }
 
     } catch (err) {
       console.log(err);
-      setErrors(err.response?.data?.errors);
+      setErrors(err.response?.data);
 
-      Swal.fire({
-        icon: 'error',
-        title: 'Erreur',
-        text: err.response?.data?.message || 'Une erreur est survenue',
-      });
+      // Handle specific email validation errors
+      if (err.response?.data?.email) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur de validation email',
+          text: err.response.data.email.message,
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur',
+          text: err.response?.data?.message || 'Une erreur est survenue',
+        });
+      }
     }
   };
 
@@ -508,7 +606,7 @@ const UpdateUser = () => {
             <div className="card p-3">
               <h6 className="fw-bold mb-3">Informations de contact</h6>
 
-              {/* Email */}
+              {/* Email with Pending Verification Alert */}
               <div className="mb-4">
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <label className="fw-bold mb-0">Adresse e-mail</label>
@@ -538,6 +636,43 @@ const UpdateUser = () => {
                     labelPlacement="start"
                   />
                 </div>
+
+                {/* Show pending email verification alert */}
+                {user.pendingEmail && (
+                  <Alert 
+                    severity="info" 
+                    className="mb-3"
+                    action={
+                      <div className="d-flex gap-1">
+                        <Button
+                          size="small"
+                          startIcon={<Email />}
+                          onClick={handleResendEmailVerification}
+                          sx={{ color: '#1976d2' }}
+                        >
+                          Renvoyer
+                        </Button>
+                        <Button
+                          size="small"
+                          startIcon={<Cancel />}
+                          onClick={handleCancelEmailChange}
+                          sx={{ color: '#f44336' }}
+                        >
+                          Annuler
+                        </Button>
+                      </div>
+                    }
+                  >
+                    <div>
+                      <strong>Changement d'email en attente</strong>
+                      <br />
+                      Nouvel email: <strong>{user.pendingEmail}</strong>
+                      <br />
+                      <small>Vérifiez votre nouvelle adresse email pour confirmer le changement.</small>
+                    </div>
+                  </Alert>
+                )}
+
                 <TextField
                   fullWidth
                   variant="outlined"
@@ -545,6 +680,11 @@ const UpdateUser = () => {
                   placeholder="exemple@email.com"
                   value={user.email || ""}
                   onChange={(e) => setUser({ ...user, email: e.target.value })}
+                  helperText={
+                    user.email !== originalEmail && !user.pendingEmail 
+                      ? "Un email de vérification sera envoyé à la nouvelle adresse." 
+                      : undefined
+                  }
                   sx={{
                     "& label.Mui-focused": { color: "#8356C0" },
                     "& .MuiOutlinedInput-root": {
