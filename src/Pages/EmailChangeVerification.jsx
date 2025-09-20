@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { CircularProgress, Alert, Button } from '@mui/material';
+import { CircularProgress, Alert } from '@mui/material';
 import { CheckCircle, Error, Email } from '@mui/icons-material';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -21,6 +21,17 @@ const EmailChangeVerification = () => {
 
     verifyEmailChange();
   }, [token]);
+
+  useEffect(() => {
+    // Redirect to home when verification is complete (success or error)
+    if (verificationState !== 'loading') {
+      const timer = setTimeout(() => {
+        navigate('/');
+      }, 3000); // Redirect after 3 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [verificationState, navigate]);
 
   const verifyEmailChange = async () => {
     try {
@@ -63,14 +74,6 @@ const EmailChangeVerification = () => {
     }
   };
 
-  const handleGoToProfile = () => {
-    navigate('/profile');
-  };
-
-  const handleGoToLogin = () => {
-    navigate('/login');
-  };
-
   const renderLoadingState = () => (
     <div className="d-flex flex-column align-items-center text-center p-4">
       <CircularProgress 
@@ -80,6 +83,9 @@ const EmailChangeVerification = () => {
       <h5 className="fw-bold mb-2">Vérification en cours...</h5>
       <p className="text-muted">
         Nous vérifions votre nouvelle adresse email.
+      </p>
+      <p className="text-muted small mt-2">
+        Redirection vers l'accueil dans quelques secondes...
       </p>
     </div>
   );
@@ -118,36 +124,9 @@ const EmailChangeVerification = () => {
         </div>
       )}
       
-      <div className="d-flex gap-2 w-100" style={{ maxWidth: '300px' }}>
-        <Button
-          variant="outlined"
-          fullWidth
-          onClick={handleGoToLogin}
-          sx={{
-            borderColor: '#8356C0',
-            color: '#8356C0',
-            '&:hover': {
-              borderColor: '#6a4ba0',
-              backgroundColor: 'rgba(131, 86, 192, 0.04)'
-            }
-          }}
-        >
-          Se connecter
-        </Button>
-        <Button
-          variant="contained"
-          fullWidth
-          onClick={handleGoToProfile}
-          sx={{
-            backgroundColor: '#8356C0',
-            '&:hover': {
-              backgroundColor: '#6a4ba0'
-            }
-          }}
-        >
-          Mon profil
-        </Button>
-      </div>
+      <p className="text-muted small">
+        Redirection vers l'accueil dans quelques secondes...
+      </p>
     </div>
   );
 
@@ -167,42 +146,15 @@ const EmailChangeVerification = () => {
         {message}
       </Alert>
       
-      <div className="d-flex flex-column gap-3 w-100" style={{ maxWidth: '300px' }}>
+      <div className="d-flex flex-column gap-3 w-100" style={{ maxWidth: '400px' }}>
         <p className="text-muted small">
           Le lien peut avoir expiré ou être invalide. Vous pouvez demander un nouveau lien 
           depuis les paramètres de votre profil.
         </p>
         
-        <div className="d-flex gap-2">
-          <Button
-            variant="outlined"
-            fullWidth
-            onClick={() => navigate('/profile/edit')}
-            sx={{
-              borderColor: '#8356C0',
-              color: '#8356C0',
-              '&:hover': {
-                borderColor: '#6a4ba0',
-                backgroundColor: 'rgba(131, 86, 192, 0.04)'
-              }
-            }}
-          >
-            Paramètres
-          </Button>
-          <Button
-            variant="contained"
-            fullWidth
-            onClick={handleGoToLogin}
-            sx={{
-              backgroundColor: '#8356C0',
-              '&:hover': {
-                backgroundColor: '#6a4ba0'
-              }
-            }}
-          >
-            Se connecter
-          </Button>
-        </div>
+        <p className="text-muted small">
+          Redirection vers l'accueil dans quelques secondes...
+        </p>
       </div>
     </div>
   );
