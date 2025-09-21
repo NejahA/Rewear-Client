@@ -16,11 +16,11 @@ export default function OpenApp() {
 
     switch (action) {
       case "verify-email":
-        appLink = `reweard://verify-email?token=${token}`;
+        appLink = `reweard://verify-email-change/${token}`;
         webFallback = `/verify-email/${token}`;
         break;
       case "reset-password":
-        appLink = `reweard://reset-password?token=${token}`;
+        appLink = `reweard://reset-password/${token}`;
         webFallback = `/reset-password/${token}`;
         break;
       case "product":
