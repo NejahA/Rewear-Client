@@ -1,13 +1,15 @@
 import { useEffect } from "react";
-import { useRouter } from "next/router";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function OpenApp() {
-  const router = useRouter();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!router.isReady) return;
-
-    const { action, token, id } = router.query;
+    const params = new URLSearchParams(location.search);
+    const action = params.get("action");
+    const token = params.get("token");
+    const id = params.get("id");
 
     let appLink = "reweard://home";
     let webFallback = "/";
@@ -34,21 +36,26 @@ export default function OpenApp() {
         webFallback = "/";
     }
 
-    // Try app first
+    // Try opening the app
     window.location.href = appLink;
 
-    // Fallback
+    // Fallback after 2s
     const timer = setTimeout(() => {
-      window.location.href = webFallback;
+      navigate(webFallback);
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [router.isReady, router.query]);
+  }, [location, navigate]);
 
   return (
     <div style={{ padding: "40px", textAlign: "center", fontFamily: "Arial" }}>
       <h1>Opening ReWeard App...</h1>
-      <p>If nothing happens, <a href={router.asPath.replace("/open-app", "")}>click here</a>.</p>
+      <p>
+        If nothing happens,{" "}
+        <a href={location.search.replace("?action=", "").replace("&", "/")}>
+          click here
+        </a>.
+      </p>
     </div>
   );
 }
