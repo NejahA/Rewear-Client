@@ -9,6 +9,7 @@ import {
 import Home from "./Pages/Home";
 import LogReg from "./Pages/LogReg";
 import ShowOne from "./Pages/ShowOne";
+import OpenApp from "./Pages/OpenApp";
 import Edit from "./Pages/Edit";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -129,7 +130,7 @@ function App() {
               </>
             }
           />
-          
+          <Route path="/open-app" element={<OpenApp />} />
           <Route path="/scheme" element={<URISchemeTestPage  />} />
           <Route
             path="/items/:id"
