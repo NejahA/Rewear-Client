@@ -106,8 +106,8 @@ const Navbar = ({
                   isDesktop ? "me-3" : ""
                 }`}
               >
-                <button
-                  className="btn filter-btn d-flex align-items-center"
+                <div
+                  className="px-3 filter-btn d-flex align-items-center"
                   onClick={() => {
                     setSort({
                       ...sort,
@@ -123,7 +123,7 @@ const Navbar = ({
                     }}
                   ></i>
                   <span>Filters</span>
-                </button>
+                </div>
               </div>
             )}
 
