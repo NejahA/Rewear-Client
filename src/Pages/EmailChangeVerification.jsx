@@ -26,7 +26,7 @@ const EmailChangeVerification = () => {
     // Redirect to home when verification is complete (success or error)
     if (verificationState !== 'loading') {
       const timer = setTimeout(() => {
-        navigate('/');
+        navigate('/'); // Navigate to home route
       }, 3000); // Redirect after 3 seconds
 
       return () => clearTimeout(timer);
