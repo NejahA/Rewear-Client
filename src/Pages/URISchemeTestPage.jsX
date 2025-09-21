@@ -36,7 +36,7 @@ const URISchemeTestPage  = () => {
     setShowManualFallback(false);
 
     try {
-      // Primary method: Direct window.location
+      // Primarfvfy method: Direct window.location
       window.location.href = customUri;
       addLog('📱 Attempting to open app...', 'info');
 
