@@ -46,7 +46,7 @@ import theme from "./Components/theme";
 import ResetPassword from "./Pages/ResetPassword";
 import VerifyEmail from "./Components/VerifyEmail/VerifyEmail";
 import EmailChangeVerification from "./Pages/EmailChangeVerification";
-import URISchemeTestPage from "./Pages/URISchemeTestPage.jsX";
+import URISchemeTestPage from "./Pages/URISchemeTestPage0";
 const violetBase = "#7745B9";
 const violetMain = alpha(violetBase, 0.7);
 
