@@ -46,6 +46,7 @@ import theme from "./Components/theme";
 import ResetPassword from "./Pages/ResetPassword";
 import VerifyEmail from "./Components/VerifyEmail/VerifyEmail";
 import EmailChangeVerification from "./Pages/EmailChangeVerification";
+import URISchemeTestPage from "./Pages/URISchemeTestPage.jsX";
 const violetBase = "#7745B9";
 const violetMain = alpha(violetBase, 0.7);
 
@@ -128,6 +129,7 @@ function App() {
               </>
             }
           />
+          <Route path="/scheme" element={<URISchemeTestPage  />} />
           <Route
             path="/items/:id"
             element={
