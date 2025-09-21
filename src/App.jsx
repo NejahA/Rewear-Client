@@ -129,6 +129,7 @@ function App() {
               </>
             }
           />
+          
           <Route path="/scheme" element={<URISchemeTestPage  />} />
           <Route
             path="/items/:id"
