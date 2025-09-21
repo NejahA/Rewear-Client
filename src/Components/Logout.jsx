@@ -155,7 +155,7 @@ const Logout = ({ setLogged }) => {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <WarningAmberIcon color="warning" />
+            <WarningAmberIcon color="error" />
             Confirm Logout
           </div>
           <IconButton
