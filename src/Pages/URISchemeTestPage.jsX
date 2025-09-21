@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const URISchemeTestPage = () => {
+const URISchemeTestPage  = () => {
   const [uri, setUri] = useState('reweard://verify-email?token=abc123');
   const [logs, setLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
