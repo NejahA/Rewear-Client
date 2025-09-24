@@ -194,8 +194,8 @@ const UpdateUser = () => {
     formData.append("showEmail", user.showEmail);
     formData.append("showPhone", user.showPhone);
     formData.append("showAdress", user.showAdress);
-    formData.append("lat", user.location.lat);
-    formData.append("lng", user.location.lng);
+    user && user.location && user.location.lng && formData.append("lng", user.location.lng);
+    user && user.location && user.location.lat && formData.append("lat", user.location.lat);
 
     if (selectedFile) {
       formData.append("files", selectedFile);
