@@ -94,7 +94,7 @@ const ShowOne = () => {
 
   const deleteItem = (itemId) => {
     axios
-      .delete(`${import.meta.env.VITE_VERCEL_URI}/api/items/${itemId}`, {
+      .delete(`${import.meta.env.VITE_LOCAL_URI}/api/items/${itemId}`, {
         withCredentials: true,
       })
       .then(() => {
@@ -197,7 +197,7 @@ const ShowOne = () => {
           setPaymentLoading(false);
           if (paymeeWindow && !paymeeWindow.closed) paymeeWindow.close();
           if (pollInterval) clearInterval(pollInterval);
-          
+
           // Refresh item data
           setTimeout(() => {
             axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/items/${id}`, {})
@@ -218,11 +218,9 @@ const ShowOne = () => {
         // Don't stop on individual errors, continue polling
       }
     };
-
     // Poll every 5 seconds
     pollInterval = setInterval(poll, 5000);
     setPollingInterval(pollInterval);
-    
     // Initial poll
     poll();
   };
@@ -405,17 +403,14 @@ const ShowOne = () => {
 
             <div className="d-flex justify-content-between align-items-center">
               <strong className="fs-3">{item.price} DT</strong>
-              <span className={`badge  statusbg-${item.status}
-                                  `
-                                }
-                                  >
+              <span className={`badge  statusbg-${item.status}`}>
                 {item.status === "0" ? "Pending" :
-                 item.status === "1" ? "For Sale" :
-                 item.status === "2" ? "Rejected" :
-                 item.status === "4" ? "Sold" : "Unknown"}
+                item.status === "1" ? "For Sale" :
+                item.status === "2" ? "Rejected" :
+                item.status === "4" ? "Sold" : "Unknown"
+                }
               </span>
             </div>
-
             {/* Buy Button - Only show if item is for sale and user is not the owner */}
             {item.status === "1" && loggedUser && item.user && item.user._id !== loggedUser._id && (
               <Button

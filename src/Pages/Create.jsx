@@ -23,7 +23,6 @@ const sizeMarks = [
   { value: 4, label: 'L' },
   { value: 5, label: 'XL' },
   { value: 6, label: 'XXL' },
-  { value: 7, label: 'XXXL' }
 ];
 
 const genderOptions = ["Male", "Female", "Unisex"];
