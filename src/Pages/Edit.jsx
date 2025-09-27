@@ -593,7 +593,7 @@ const Edit = () => {
                       type="number"
                       min="0"
                       placeholder="1"
-                      onChange={(e) => setItem({ ...item, previousOwners: e.target.value })}
+                      onChange={(e) => setItem({ ...item, previousOwners: e.target.value }  )}
                       value={item?.previousOwners || ""}
                     />
                   </div>
