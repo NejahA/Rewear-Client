@@ -488,7 +488,7 @@ const Edit = () => {
                       step={1}
                       marks={sizeMarks}
                       min={0}
-                      max={7}
+                      max={sizeMarks? sizeMarks && sizeMarks.length-1 : 6}
                     />
                   </div>
                 )}
