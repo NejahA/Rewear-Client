@@ -238,6 +238,45 @@ const Edit = () => {
   </div>
 </div>
 
+
+
+<div className="d-flex justify-content-center">
+      <button 
+        type="button"
+        className="btn p-3 d-flex align-items-center justify-content-center"
+        onClick={() => setShowCamera(true)}
+        disabled={totalImageCount >= 5}
+        title="Prendre une photo"
+        style={{
+          width: "60px", 
+          height: "60px",
+          borderRadius: "50%",
+          backgroundColor: totalImageCount >= 5 ? "#adb5bd" : "#8356C0",
+          color: "white",
+          border: "none",
+          transition: "background-color 0.3s ease",
+          cursor: totalImageCount >= 5 ? 'not-allowed' : 'pointer',
+          boxShadow: totalImageCount >= 5 ? 'none' : '0 4px 6px rgba(0, 0, 0, 0.1)',
+        }}
+      >
+        <i className="bi bi-camera-fill" style={{ fontSize: "1.5rem" }}></i>
+      </button>
+    </div>
+
+    
+{showCamera && (
+  <CameraCapture
+    onCapture={(file) => {
+      setSelectedFiles(prev => [...prev, file]);
+    }}
+    onClose={() => setShowCamera(false)}
+    maxPhotos={5}
+    currentCount={totalImageCount}
+  />
+)}
+
+
+
                 {/* Image preview grid - Mobile optimized */}
                 <div 
   className="d-flex flex-nowrap overflow-x-auto" 

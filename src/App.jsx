@@ -48,6 +48,7 @@ import ResetPassword from "./Pages/ResetPassword";
 import VerifyEmail from "./Components/VerifyEmail/VerifyEmail";
 import EmailChangeVerification from "./Pages/EmailChangeVerification";
 import URISchemeTestPage from "./Pages/URISchemeTestPage0";
+import PaymentReturn from "./Pages/PaymentReturn";
 const violetBase = "#7745B9";
 const violetMain = alpha(violetBase, 0.7);
 
@@ -116,7 +117,7 @@ function App() {
 
         <Routes>
           <Route path="/verify-email/:token" element={<VerifyEmail />} />
-<Route path="/verify-email-change/:token" element={<EmailChangeVerification />} />
+          <Route path="/verify-email-change/:token" element={<EmailChangeVerification />} />
 
           <Route path="/logreg" element={<LogReg />} />
           <Route path="/items/new" element={<Create logged={logged}
@@ -131,7 +132,7 @@ function App() {
             }
           />
           <Route path="/open-app" element={<OpenApp />} />
-          <Route path="/scheme" element={<URISchemeTestPage  />} />
+          <Route path="/scheme" element={<URISchemeTestPage />} />
           <Route
             path="/items/:id"
             element={
@@ -150,6 +151,8 @@ function App() {
               </>
             }
           />
+          <Route path="/payment-return" element={<PaymentReturn />} />
+
           <Route
             path="/edituser"
             element={
@@ -163,7 +166,7 @@ function App() {
           <Route
             path="/reset-password/:token"
             element={<ResetPassword />}
-  />
+          />
           <Route
             path="/"
             element={

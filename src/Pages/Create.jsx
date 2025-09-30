@@ -14,6 +14,7 @@ import {
   RadioGroup,
   FormControlLabel,
 } from '@mui/material';
+import CameraCapture from "../Components/CameraCapture ";
 
 const sizeMarks = [
   { value: 0, label: 'XXS' },
@@ -47,6 +48,8 @@ const Create = () => {
   const [errors, setErrors] = useState(null);
   const nav = useNavigate();
   const [totalImageCount, setTotalImageCount] = useState(0);
+const [showCamera, setShowCamera] = useState(false);
+
 
   const handleFileChange0 = (e) => {
     const files = e.target.files;
@@ -142,6 +145,11 @@ const Create = () => {
     if (found) {
       formData.append("size", found.label || null); // Append only if value is present
     }
+    else {
+      item && item.size  && 
+       formData.append("size", item.size) // Append only if value is present
+     
+    }
     if (selectedFiles) {
       for (let i = 0; i < selectedFiles.length; i++) {
         // newarr.push(selectedFiles[i]);
@@ -195,6 +203,13 @@ const Create = () => {
                   <small className="text-muted">({totalImageCount}/5)</small>
                 </div>
                 
+
+
+
+
+
+
+
                 {/* Mobile-friendly file upload button */}
                 <div className={`position-relative file-upload-container ${totalImageCount >= 5 ? 'upload-disabled' : ''}`}>
   <input
@@ -209,6 +224,7 @@ const Create = () => {
     disabled={totalImageCount >= 5}
     onChange={handleFileChange}
   />
+  
   <div 
     className="upload-area d-flex flex-column align-items-center justify-content-center gap-2 p-4 text-center"
     style={{ 
@@ -240,6 +256,42 @@ const Create = () => {
     )}
   </div>
 </div>
+
+<div className="d-flex justify-content-center">
+      <button 
+        type="button"
+        className="btn p-3 d-flex align-items-center justify-content-center"
+        onClick={() => setShowCamera(true)}
+        disabled={totalImageCount >= 5}
+        title="Prendre une photo"
+        style={{
+          width: "60px", 
+          height: "60px",
+          borderRadius: "50%",
+          backgroundColor: totalImageCount >= 5 ? "#adb5bd" : "#8356C0",
+          color: "white",
+          border: "none",
+          transition: "background-color 0.3s ease",
+          cursor: totalImageCount >= 5 ? 'not-allowed' : 'pointer',
+          boxShadow: totalImageCount >= 5 ? 'none' : '0 4px 6px rgba(0, 0, 0, 0.1)',
+        }}
+      >
+        <i className="bi bi-camera-fill" style={{ fontSize: "1.5rem" }}></i>
+      </button>
+    </div>
+
+    
+{showCamera && (
+  <CameraCapture
+    onCapture={(file) => {
+      setSelectedFiles(prev => [...prev, file]);
+    }}
+    onClose={() => setShowCamera(false)}
+    maxPhotos={5}
+    currentCount={totalImageCount}
+  />
+)}
+
 
                 {/* Image preview grid - Mobile optimized */}
                 {(item?.itemPics?.length > 0 || selectedFiles.length > 0) && (

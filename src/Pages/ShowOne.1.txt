@@ -35,7 +35,6 @@ const ShowOne = () => {
   const [paymentDialog, setPaymentDialog] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [pollingInterval, setPollingInterval] = useState(null);
-  const [paymentToken, setPaymentToken] = useState(null);
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -132,16 +131,22 @@ const ShowOne = () => {
         throw new Error('Invalid payment URL received');
       }
 
-      // Open payment URL in a new tab
-      window.open(paymentUrl, '_blank');
+      let paymeeWindow = null;
+      try {
+        paymeeWindow = window.open(paymentUrl, '_blank', 'width=600,height=700');
 
-      // Store the payment token
-      setPaymentToken(token);
+        if (!paymeeWindow || paymeeWindow.closed || typeof paymeeWindow.closed === 'undefined') {
+          window.location.href = paymentUrl;
+          return;
+        }
+      } catch (popupError) {
+        window.location.href = paymentUrl;
+        return;
+      }
 
-      // Start polling for payment status
       setPaymentDialog(true);
       setPaymentStatus('pending');
-      startPaymentPolling(token);
+      startPaymentPolling(token, paymeeWindow);
     } catch (error) {
       console.error('Payment initiation failed:', error);
       alert('Failed to initiate payment. Please try again.');
@@ -150,17 +155,17 @@ const ShowOne = () => {
     }
   };
 
-  const startPaymentPolling = (token) => {
+  const startPaymentPolling = (token, paymeeWindow) => {
     let attempts = 0;
     const maxAttempts = 30; // 2.5 minutes (5 seconds * 30)
     let pollInterval = null;
 
     const poll = async () => {
       if (attempts >= maxAttempts) {
-        // Timeout reached
         setPaymentStatus('timeout');
         setPaymentLoading(false);
         if (pollInterval) clearInterval(pollInterval);
+        if (paymeeWindow && !paymeeWindow.closed) paymeeWindow.close();
         return;
       }
 
@@ -177,6 +182,7 @@ const ShowOne = () => {
         if (status.status === 'PAID') {
           setPaymentStatus('success');
           setPaymentLoading(false);
+          if (paymeeWindow && !paymeeWindow.closed) paymeeWindow.close();
           if (pollInterval) clearInterval(pollInterval);
 
           // Refresh item data
@@ -187,6 +193,7 @@ const ShowOne = () => {
           setPaymentStatus('failed');
           setPaymentLoading(false);
           if (pollInterval) clearInterval(pollInterval);
+          if (paymeeWindow && !paymeeWindow.closed) paymeeWindow.close();
         }
       } catch (error) {
         console.error('Polling error:', error);
@@ -215,23 +222,6 @@ const ShowOne = () => {
   };
 
   const formattedTitle = capitalizeFirstLetter(item.title);
-
-  useEffect(() => {
-    // Check if the user is redirected back from the payment gateway
-    const searchParams = new URLSearchParams(window.location.search);
-    const success = searchParams.get('success');
-    const token = searchParams.get('token');
-
-    if (token && token === paymentToken) {
-      if (success === 'true') {
-        setPaymentStatus('success');
-        setPaymentLoading(false);
-      } else {
-        setPaymentStatus('failed');
-        setPaymentLoading(false);
-      }
-    }
-  }, [paymentToken]);
 
   return (
     <div className="container my-5">
@@ -268,26 +258,25 @@ const ShowOne = () => {
             </>
           )}
 
-          {paymentStatus === 'success' && (        <Alert severity="success">
-          <AlertTitle>Payment Successful!</AlertTitle>
-          Your purchase has been completed successfully. The item will be shipped soon.
-        </Alert>
-      )}
+          {paymentStatus === 'success' && (
+            <Alert severity="success">
+              <AlertTitle>Payment Successful!</AlertTitle>
+              Your purchase has been completed successfully. The item will be shipped soon.
+            </Alert>
+          )}
 
-      {paymentStatus === 'failed' && (
-        <Alert severity="error">
-          <AlertTitle>Payment Failed</AlertTitle>
-          The payment was cancelled or failed. Please try again.
-        </Alert>
-      )}
+          {paymentStatus === 'failed' && (
+            <Alert severity="error">
+              <AlertTitle>Payment Failed</AlertTitle>
+              The payment was cancelled or failed. Please try again.
+            </Alert>
+          )}
 
-      {paymentStatus === 'timeout' && (
-        <Alert severity="warning">
-          <AlertTitle>Payment Timeout</AlertTitle>
-          The payment confirmation took too long. Please check your email for confirmation or contact support.
-        </Alert>
-      )}
-
+          {paymentStatus === 'timeout' && (
+            <Alert severity="warning">
+              <AlertTitle>Payment Timeout</AlertTitle>
+              The paymentconfirmation took too long. Please check your email for confirmation or contact support.
+              </Alert>)}
       {paymentStatus === 'error' && (
         <Alert severity="error">
           <AlertTitle>Error</AlertTitle>
@@ -510,6 +499,8 @@ const ShowOne = () => {
       </button>
     </div>
   )}
-</div>);
+</div>
+);
 };
+
 export default ShowOne;

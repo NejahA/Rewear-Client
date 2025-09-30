@@ -31,7 +31,7 @@ import UserEdit from '../admin components/userEdit';
 //     options.headers.set('Authorization', `Bearer ${token}`);
 //     return fetchUtils.fetchJson(url, options);
 // }
-// const dataProvider = simpleRestProvider(""+import.meta.env.VITE_LOCAL_URL+'/api' );
+// const dataProvider = simpleRestProvider(""+import.meta.env.VITE_VERCEL_URL+'/api' );
 const adminTheme = {
   ...defaultTheme,
   palette: {
@@ -48,7 +48,7 @@ const AdminDash = () => {
   return (
     <div>
         <Admin basename="/admin" loginPage={LoginPage} theme={theme} authProvider={authProvider}  
-        // dataProvider= {simpleRestProvider(""+import.meta.env.VITE_LOCAL_URL+'/api' )} >
+        // dataProvider= {simpleRestProvider(""+import.meta.env.VITE_VERCEL_URL+'/api' )} >
         dataProvider= {dataProvider} >
     <Resource name="items" edit={itemEdit} list={ItemList}    />
     <Resource name="users" edit={UserEdit} list={UserList} />
