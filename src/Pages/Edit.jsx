@@ -14,6 +14,7 @@ import {
   RadioGroup,
   FormControlLabel,
 } from '@mui/material';
+import CameraCapture from "../Components/CameraCapture ";
 
 const sizeMarks = [
   { value: 0, label: 'XXS' },
