@@ -688,7 +688,7 @@ const [showCamera, setShowCamera] = useState(false);
                   minHeight: "56px", // Larger touch target
                 }}
               >
-                Modifier l'article
+                Présenter l'article
               </button>
             </div>
           </div>

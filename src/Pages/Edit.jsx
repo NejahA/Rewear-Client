@@ -46,6 +46,7 @@ const Edit = () => {
   const [totalImageCount, setTotalImageCount] = useState(0);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [errors, setErrors] = useState(null);
+  const [showCamera, setShowCamera] = useState(false);
   
   const handleSliderChange = (event, newValue) => {
     setItem({ ...item, size: newValue });
