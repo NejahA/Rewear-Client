@@ -133,23 +133,27 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
 
       {/* Camera View */}
       <div className="w-100 h-100 d-flex align-items-center justify-content-center position-relative">
-        {!capturedImage ? (
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            className="w-100 h-100"
-            style={{ objectFit: 'cover' }}
-          />
-        ) : (
+        {capturedImage ? 
+        (
           <img
             src={capturedImage}
             alt="Captured"
             className="w-100 h-100"
             style={{ objectFit: 'contain' }}
           />
-        )}
+        )
+         : 
+         (
+           <video
+             ref={videoRef}
+             autoPlay
+             playsInline
+             muted
+             className="w-100 h-100"
+             style={{ objectFit: 'cover' }}
+           />
+         )
+        }
         
         {/* Capture/Confirm/Retake Buttons */}
         <div className="position-absolute bottom-0 start-0 w-100 d-flex justify-content-center pb-5" 
