@@ -662,6 +662,10 @@ const Edit = () => {
             <div className="sticky-bottom bg-white p-3 border-top mt-4">
               <button
               onClick={handleUpload}
+<<<<<<< HEAD
+=======
+                // type="submit"
+>>>>>>> 633dee964a43b8cee9ce020891413ceed10e2b00
                 className="btn w-100 py-3 fw-bold text-white"
                 style={{
                   backgroundColor: "#8356C0",

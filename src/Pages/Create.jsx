@@ -686,7 +686,7 @@ const [showCamera, setShowCamera] = useState(false);
                   borderRadius: "12px",
                   fontSize: "1.1rem",
                   minHeight: "56px", // Larger touch target
-                }}
+                }} 
               >
                 Présenter l'article
               </button>
