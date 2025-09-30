@@ -126,7 +126,7 @@ const confirmPhoto = () => {
         {hasMultipleCameras && (
           <button className="btn btn-link text-white p-2" onClick={switchCamera}>
             {/* <RotateCw size={24} /> */}
-                    <MdOutlineCameraswitch style={{ fontSize: "2rem" }}/>
+                    <MdOutlineCameraswitch style={{ fontSize: "2rem", color:"white" }}/>
 
           </button>
         )}
