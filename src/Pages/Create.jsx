@@ -189,7 +189,7 @@ const [showCamera, setShowCamera] = useState(false);
   };
   return (
     <div className="min-vh-100" style={{ backgroundColor: "#f8f9fa" }}>
-      <form onSubmit={handleUpload} className="w-100">
+      <div  className="w-100">
         {/* Mobile-optimized container with proper padding */}
         <div className="container-fluid px-3 py-4" style={{ maxWidth: "100%" }}>
           <div className="d-flex flex-column gap-4">
@@ -678,7 +678,7 @@ const [showCamera, setShowCamera] = useState(false);
             {/* Submit Button - Mobile optimized */}
             <div className="sticky-bottom bg-white p-3 border-top mt-4">
               <button
-                type="submit"
+                onClick={handleUpload}
                 className="btn w-100 py-3 fw-bold text-white"
                 style={{
                   backgroundColor: "#8356C0",
@@ -693,7 +693,7 @@ const [showCamera, setShowCamera] = useState(false);
             </div>
           </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
