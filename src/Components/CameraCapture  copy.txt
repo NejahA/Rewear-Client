@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, X, Check } from 'lucide-react';
+import { Camera, X, RotateCw, Check } from 'lucide-react';
 import { MdOutlineCameraswitch } from 'react-icons/md';
 
 const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) => {
@@ -10,17 +10,14 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
   const [facingMode, setFacingMode] = useState('environment');
   const [error, setError] = useState(null);
   const [hasMultipleCameras, setHasMultipleCameras] = useState(false);
-  const [cameraActive, setCameraActive] = useState(true); // Track camera state
 
   useEffect(() => {
     checkCameras();
-    if (cameraActive) {
-      startCamera();
-    }
+    startCamera();
     return () => {
       stopCamera();
     };
-  }, [facingMode, cameraActive]);
+  }, [facingMode]);
 
   const checkCameras = async () => {
     try {
@@ -33,28 +30,28 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
   };
 
   const startCamera = async () => {
-    try {
-      setError(null);
-      const constraints = {
-        video: {
-          facingMode: facingMode,
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        },
-        audio: false
-      };
+  try {
+    setError(null);
+    const constraints = {
+      video: {
+        facingMode: facingMode,
+        width: { ideal: 1920 },
+        height: { ideal: 1080 }
+      },
+      audio: false
+    };
 
-      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      }
-      setStream(mediaStream);
-    } catch (err) {
-      console.error('Camera error:', err);
-      setError('Impossible d\'accéder à la caméra. Veuillez vérifier les permissions.');
+    const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+    
+    if (videoRef.current) {
+      videoRef.current.srcObject = mediaStream;
     }
-  };
+    setStream(mediaStream);
+  } catch (err) {
+    console.error('Camera error:', err);
+    setError('Impossible d\'accéder à la caméra. Veuillez vérifier les permissions.');
+  }
+};
 
   const stopCamera = () => {
     if (stream) {
@@ -77,27 +74,28 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
     }
   };
 
-  const confirmPhoto = () => {
-    if (capturedImage) {
-      fetch(capturedImage)
-        .then(res => res.blob())
-        .then(blob => {
-          const file = new File([blob], `camera-${Date.now()}.jpg`, { type: 'image/jpeg' });
-          onCapture(file);
-          setCapturedImage(null);
-          if (currentCount + 1 >= maxPhotos) {
-            setCameraActive(false); // Deactivate camera if max photos reached
-            onClose();
-          }
-        });
-    }
-  };
+const confirmPhoto = () => {
+  if (capturedImage) {
+    fetch(capturedImage)
+      .then(res => res.blob())
+      .then(blob => {
+        const file = new File([blob], `camera-${Date.now()}.jpg`, { type: 'image/jpeg' });
+        onCapture(file);
+        setCapturedImage(null);
+        if (currentCount + 1 >= maxPhotos) {
+          stopCamera();
+          onClose();
+        }
+      });
+  }
+};
 
   const retakePhoto = () => {
     setCapturedImage(null);
   };
 
   const switchCamera = () => {
+    stopCamera();
     setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
     setCapturedImage(null);
   };
@@ -127,7 +125,9 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
         <span className="text-white fw-bold">{currentCount}/{maxPhotos} photos</span>
         {hasMultipleCameras && (
           <button className="btn btn-link text-white p-2" onClick={switchCamera}>
-            <MdOutlineCameraswitch style={{ fontSize: "2rem", color:"white" }}/>
+            {/* <RotateCw size={24} /> */}
+                    <MdOutlineCameraswitch style={{ fontSize: "2rem", color:"white" }}/>
+
           </button>
         )}
         {!hasMultipleCameras && <div style={{ width: '52px' }}></div>}
@@ -136,36 +136,40 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
       {/* Camera View */}
       <div className="w-100 h-100 d-flex align-items-center justify-content-center position-relative">
         {!capturedImage ? (
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            className="w-100 h-100"
-            style={{ objectFit: 'cover' }}
-          />
+          <>
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-100 h-100"
+              style={{ objectFit: 'cover' }}
+            />
+            
+            {/* Capture Button */}
+            <div className="position-absolute bottom-0 start-0 w-100 d-flex justify-content-center pb-5" 
+                 style={{ zIndex: 10000 }}>
+              <button
+                className="rounded-circle border border-white border-4 bg-white"
+                style={{ width: '80px', height: '80px', boxShadow: '0 0 20px rgba(255,255,255,0.5)' }}
+                onClick={capturePhoto}
+              >
+                <Camera size={40} className="text-dark" />
+              </button>
+            </div>
+          </>
         ) : (
-          <img
-            src={capturedImage}
-            alt="Captured"
-            className="w-100 h-100"
-            style={{ objectFit: 'contain' }}
-          />
-        )}
-        
-        {/* Capture/Confirm/Retake Buttons */}
-        <div className="position-absolute bottom-0 start-0 w-100 d-flex justify-content-center pb-5" 
-             style={{ zIndex: 10000 }}>
-          {!capturedImage ? (
-            <button
-              className="rounded-circle border border-white border-4 bg-white"
-              style={{ width: '80px', height: '80px', boxShadow: '0 0 20px rgba(255,255,255,0.5)' }}
-              onClick={capturePhoto}
-            >
-              <Camera size={40} className="text-dark" />
-            </button>
-          ) : (
-            <div className="d-flex justify-content-around align-items-center px-4">
+          <>
+            <img
+              src={capturedImage}
+              alt="Captured"
+              className="w-100 h-100"
+              style={{ objectFit: 'contain' }}
+            />
+            
+            {/* Confirm/Retake Buttons */}
+            <div className="position-absolute bottom-0 start-0 w-100 d-flex justify-content-around align-items-center pb-5 px-4" 
+                 style={{ zIndex: 10000 }}>
               <button
                 className="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
                 style={{ width: '60px', height: '60px' }}
@@ -181,8 +185,8 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
                 <Check size={35} />
               </button>
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
 
       {/* Hidden canvas for capturing */}
@@ -190,5 +194,7 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
     </div>
   );
 };
+
+
 
 export default CameraCapture;
