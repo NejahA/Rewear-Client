@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera, X, RotateCw, Check } from 'lucide-react';
+import { MdOutlineCameraswitch } from 'react-icons/md';
 
 const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) => {
   const videoRef = useRef(null);
@@ -29,28 +30,28 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
   };
 
   const startCamera = async () => {
-    try {
-      setError(null);
-      const constraints = {
-        video: {
-          facingMode: facingMode,
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        },
-        audio: false
-      };
+  try {
+    setError(null);
+    const constraints = {
+      video: {
+        facingMode: facingMode,
+        width: { ideal: 1920 },
+        height: { ideal: 1080 }
+      },
+      audio: false
+    };
 
-      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      }
-      setStream(mediaStream);
-    } catch (err) {
-      console.error('Camera error:', err);
-      setError('Impossible d\'accéder à la caméra. Veuillez vérifier les permissions.');
+    const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+    
+    if (videoRef.current) {
+      videoRef.current.srcObject = mediaStream;
     }
-  };
+    setStream(mediaStream);
+  } catch (err) {
+    console.error('Camera error:', err);
+    setError('Impossible d\'accéder à la caméra. Veuillez vérifier les permissions.');
+  }
+};
 
   const stopCamera = () => {
     if (stream) {
@@ -73,21 +74,21 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
     }
   };
 
-  const confirmPhoto = () => {
-    if (capturedImage) {
-      fetch(capturedImage)
-        .then(res => res.blob())
-        .then(blob => {
-          const file = new File([blob], `camera-${Date.now()}.jpg`, { type: 'image/jpeg' });
-          onCapture(file);
-          setCapturedImage(null);
-          if (currentCount + 1 >= maxPhotos) {
-            stopCamera();
-            onClose();
-          }
-        });
-    }
-  };
+const confirmPhoto = () => {
+  if (capturedImage) {
+    fetch(capturedImage)
+      .then(res => res.blob())
+      .then(blob => {
+        const file = new File([blob], `camera-${Date.now()}.jpg`, { type: 'image/jpeg' });
+        onCapture(file);
+        setCapturedImage(null);
+        if (currentCount + 1 >= maxPhotos) {
+          stopCamera();
+          onClose();
+        }
+      });
+  }
+};
 
   const retakePhoto = () => {
     setCapturedImage(null);
@@ -124,7 +125,9 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
         <span className="text-white fw-bold">{currentCount}/{maxPhotos} photos</span>
         {hasMultipleCameras && (
           <button className="btn btn-link text-white p-2" onClick={switchCamera}>
-            <RotateCw size={24} />
+            {/* <RotateCw size={24} /> */}
+                    <MdOutlineCameraswitch style={{ fontSize: "2rem" }}/>
+
           </button>
         )}
         {!hasMultipleCameras && <div style={{ width: '52px' }}></div>}

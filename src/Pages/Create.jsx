@@ -4,7 +4,6 @@ import Logout from "../Components/Logout";
 import { Link, useNavigate, useParams } from "react-router-dom";
 // import Cookies from 'universal-cookies';
 import Swal from 'sweetalert2';
-
 import Box from '@mui/material/Box';
 import { Checkbox, ListItemText, Slider, Typography } from "@mui/material";
 import { Select, MenuItem, InputLabel, FormControl, Input, TextField } from '@mui/material';
