@@ -79,7 +79,7 @@ function App() {
   const [openModalReg, setOpenModalReg] = useState(false);
   const navigate = useNavigate();
 
-  return (
+  return (<>
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <div style={{ height: "100vh" }}>
@@ -102,7 +102,7 @@ function App() {
 
         {/* <Navbar /> */}
         {/* {hideNavbarOnRoutes.filter(element => element.includes("/admin/")) && <Navbar />} */}
-        {!location.pathname.includes("/admin/") && (
+        {!location.pathname.includes("/admin/") && !location.pathname.includes("/payment-return") && (
           <Navbar
             logged={logged}
             setLogged={setLogged}
@@ -151,7 +151,6 @@ function App() {
               </>
             }
           />
-          <Route path="/payment-return" element={<PaymentReturn />} />
 
           <Route
             path="/edituser"
@@ -198,7 +197,12 @@ function App() {
         /> */}
       </div>
     </ThemeProvider>
-  );
+    
+      <Routes>
+        <Route path="/payment-return" element={<PaymentReturn />} />
+      </Routes>
+    </>
+);
 }
 
 export default App;
