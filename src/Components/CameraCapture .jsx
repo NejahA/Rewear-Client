@@ -17,7 +17,7 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
     return () => {
       stopCamera();
     };
-  }, [facingMode]);
+  }, [facingMode,capturedImage]);
 
   const checkCameras = async () => {
     try {
