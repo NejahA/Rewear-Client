@@ -11,12 +11,13 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
   const [error, setError] = useState(null);
   const [hasMultipleCameras, setHasMultipleCameras] = useState(false);
 
+
   useEffect(() => {
     checkCameras();
     startCamera();
-    return () => {
-      stopCamera();
-    };
+    // return () => {
+    //   stopCamera();
+    // };
   }, [facingMode]);
 
   const checkCameras = async () => {
