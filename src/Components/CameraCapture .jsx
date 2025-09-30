@@ -10,14 +10,14 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
   const [facingMode, setFacingMode] = useState('environment');
   const [error, setError] = useState(null);
   const [hasMultipleCameras, setHasMultipleCameras] = useState(false);
-
+  const [refreshCapture, setRefreshCapture] = useState(false);
   useEffect(() => {
     checkCameras();
     startCamera();
     return () => {
       stopCamera();
     };
-  }, [facingMode,capturedImage]);
+  }, [facingMode,refreshCapture]);
 
   const checkCameras = async () => {
     try {
@@ -82,6 +82,7 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
           const file = new File([blob], `camera-${Date.now()}.jpg`, { type: 'image/jpeg' });
           onCapture(file);
           setCapturedImage(null);
+          setRefreshCapture(prev => !prev); // Trigger re-initialization of camera
           if (currentCount + 1 >= maxPhotos) {
             stopCamera();
             onClose();
@@ -92,6 +93,7 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
 
   const retakePhoto = () => {
     setCapturedImage(null);
+    setRefreshCapture(prev => !prev); // Trigger re-initialization of camera
   };
 
   const switchCamera = () => {
