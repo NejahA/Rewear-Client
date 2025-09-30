@@ -10,17 +10,14 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
   const [facingMode, setFacingMode] = useState('environment');
   const [error, setError] = useState(null);
   const [hasMultipleCameras, setHasMultipleCameras] = useState(false);
-  const [cameraActive, setCameraActive] = useState(true); // Track camera state
 
   useEffect(() => {
     checkCameras();
-    if (cameraActive) {
-      startCamera();
-    }
+    startCamera();
     return () => {
       stopCamera();
     };
-  }, [facingMode, cameraActive]);
+  }, [facingMode]);
 
   const checkCameras = async () => {
     try {
@@ -86,7 +83,7 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
           onCapture(file);
           setCapturedImage(null);
           if (currentCount + 1 >= maxPhotos) {
-            setCameraActive(false); // Deactivate camera if max photos reached
+            stopCamera();
             onClose();
           }
         });
@@ -98,6 +95,7 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
   };
 
   const switchCamera = () => {
+    stopCamera();
     setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
     setCapturedImage(null);
   };
@@ -168,7 +166,7 @@ const CameraCapture = ({ onCapture, onClose, maxPhotos = 5, currentCount = 0 }) 
             <div className="d-flex justify-content-around align-items-center px-4">
               <button
                 className="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                style={{ width: '60px', height: '60px' }}
+                style={{ width: '60px', height: '60px', marginRight: '20px' }} // Added margin-right for spacing
                 onClick={retakePhoto}
               >
                 <X size={30} />
