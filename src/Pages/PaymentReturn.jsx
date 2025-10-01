@@ -9,6 +9,7 @@ const PaymentReturn = () => {
   const [redirecting, setRedirecting] = useState(true);
 
   useEffect(() => {
+
     const handleRedirect = async () => {
       // Check if opened from the mobile app
       const fromApp = searchParams.get('from') === 'app';
@@ -19,7 +20,7 @@ const PaymentReturn = () => {
 
       if (isMobile || fromApp) {
         // Try to redirect to the native app
-        const appScheme = 'rewear://'; // Your app's custom scheme
+        const appScheme = 'reweard://'; // Your app's custom scheme
         const expoScheme = 'exp://'; // Expo Go scheme
         
         // Construct the deep link with payment result
