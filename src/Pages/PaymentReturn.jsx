@@ -137,7 +137,7 @@ const PaymentReturn = () => {
         ) : (
           <>
             <h1 className="mb-4">Payment Result</h1>
-            {success === 'true' ? (
+            {success === 'True' ? (
               <div className="alert alert-success" role="alert" style={{ maxWidth: '500px', width: '100%' }}>
                 <h4 className="alert-heading">Success!</h4>
                 <p>Your payment was successful! Thank you for your purchase.</p>

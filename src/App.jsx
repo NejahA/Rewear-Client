@@ -166,6 +166,8 @@ function App() {
             path="/reset-password/:token"
             element={<ResetPassword />}
           />
+        <Route path="/payment-return" element={<PaymentReturn />} />
+
           <Route
             path="/"
             element={
@@ -198,9 +200,6 @@ function App() {
       </div>
     </ThemeProvider>
     
-      <Routes>
-        <Route path="/payment-return" element={<PaymentReturn />} />
-      </Routes>
     </>
 );
 }
