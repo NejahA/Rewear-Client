@@ -152,12 +152,12 @@ const PaymentReturn = () => {
                 <p className="mb-0">Redirecting to homepage...</p>
               </div>
             )}
-            <button 
+            {/* <button 
               className="btn btn-primary mt-3"
               onClick={() => navigate('/')}
             >
               Go to Homepage Now
-            </button>
+            </button> */}
           </>
         )}
       </div>
