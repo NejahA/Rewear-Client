@@ -23,7 +23,8 @@ const PaymentReturn = () => {
         const expoScheme = 'exp://'; // Expo Go scheme
         
         // Construct the deep link with payment result
-        const deepLinkPath = success === 'true' ? 'payment-success' : 'payment-failed';
+        // const deepLinkPath = success === 'True' ? 'payment-success' : 'payment-failed';
+        const deepLinkPath = "home";
         
         // Try app deep link first
         const rewearDeepLink = `${appScheme}${deepLinkPath}`;
