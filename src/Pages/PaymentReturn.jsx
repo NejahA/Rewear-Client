@@ -73,14 +73,22 @@ const PaymentReturn = () => {
           window.location.href = rewearDeepLink;
           await new Promise(resolve => setTimeout(resolve, 1500));
           
-          // Check if still on the page (app didn't open)
-          if (document.hasFocus()) {
-            // Try Expo Go as fallback
-            window.location.href = expoDeepLink;
-            await new Promise(resolve => setTimeout(resolve, 1500));
-          } else {
-            appOpened = true;
-          }
+
+
+
+
+          // Check if still on the page (app didn't open) expo part
+          // if (document.hasFocus()) {
+          //   // Try Expo Go as fallback
+          //   window.location.href = expoDeepLink;
+          //   await new Promise(resolve => setTimeout(resolve, 1500));
+          // } else {
+          //   appOpened = true;
+          // }
+
+
+
+
         } catch (error) {
           console.log('Error opening app:', error);
         }
