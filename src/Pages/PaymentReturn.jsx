@@ -24,7 +24,7 @@ const PaymentReturn = () => {
         const expoScheme = 'exp://'; // Expo Go scheme
         
         // Construct the deep link with payment result
-        // const deepLinkPath = success === 'True' ? 'payment-success' : 'payment-failed';
+        // const deepLinkPath = success === 'true' ? 'payment-success' : 'payment-failed';
         const deepLinkPath = "home";
         
         // Try app deep link first
@@ -139,7 +139,7 @@ const PaymentReturn = () => {
         ) : (
           <>
             <h1 className="mb-4">Payment Result</h1>
-            {success === 'True' ? (
+            {success === 'true' ? (
               <div className="alert alert-success" role="alert" style={{ maxWidth: '500px', width: '100%' }}>
                 <h4 className="alert-heading">Success!</h4>
                 <p>Your payment was successful! Thank you for your purchase.</p>
