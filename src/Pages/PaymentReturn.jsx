@@ -14,18 +14,40 @@ import ErrorIcon from '@mui/icons-material/Error';
 import { MoonLoader } from 'react-spinners';
 
 const PaymentReturn = () => {
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const success = searchParams.get('success');
-  const token = searchParams.get('token');
+
   
+
+const location = useLocation();
+  const navigate = useNavigate();
+  const searchParams = new URLSearchParams(location.search);
+  
+  // Fix: PayMee returns URL like ?success=true?payment_token=xxx
+  // We need to handle this malformed URL
+  let success = searchParams.get('success');
+  let token = searchParams.get('payment_token');
+  
+  // If success contains a question mark, it means PayMee concatenated params incorrectly
+  if (success && success.includes('?')) {
+    const parts = success.split('?');
+    success = parts[0]; // 'true' or 'false'
+    
+    // Parse the rest as query params
+    const additionalParams = new URLSearchParams(parts[1]);
+    token = additionalParams.get('payment_token');
+  }
+  
+  console.log('PaymentReturn - success:', success, 'token:', token);
+
+
+
+
+
   const [loading, setLoading] = useState(true);
   const [orderDetails, setOrderDetails] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
-      console.log("success:", success, "token:", token);
       if (success === 'true' && token) {
         try {
           console.log('Fetching payment details for token:', token);
