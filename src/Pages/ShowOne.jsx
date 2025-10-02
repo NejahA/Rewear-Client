@@ -36,6 +36,7 @@ const ShowOne = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [pollingInterval, setPollingInterval] = useState(null);
   const [paymentToken, setPaymentToken] = useState(null);
+  const [iframeUrl, setIframeUrl] = useState(null);
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -132,10 +133,8 @@ const ShowOne = () => {
         throw new Error('Invalid payment URL received');
       }
 
-      // Open payment URL in a new tab
-      window.open(paymentUrl, '_blank');
-
-      // Store the payment token
+      // Set the payment URL to the iframe
+      setIframeUrl(paymentUrl);
       setPaymentToken(token);
 
       // Start polling for payment status
@@ -201,6 +200,7 @@ const ShowOne = () => {
   const closePaymentDialog = () => {
     setPaymentDialog(false);
     setPaymentStatus(null);
+    setIframeUrl(null);
     if (pollingInterval) {
       clearInterval(pollingInterval);
       setPollingInterval(null);
@@ -216,300 +216,335 @@ const ShowOne = () => {
 
   const formattedTitle = capitalizeFirstLetter(item.title);
 
+  // Listen for messages from iframe
   useEffect(() => {
-    // Check if the user is redirected back from the payment gateway
-    const searchParams = new URLSearchParams(window.location.search);
-    const success = searchParams.get('success');
-    const token = searchParams.get('token');
+    const handleMessage = (event) => {
+      console.log('Message received in parent:', event.data);
+      
+      // Don't check origin to allow all messages (for debugging)
+      // In production, you should validate: if (event.origin !== 'https://your-domain.com') return;
 
-    if (token && token === paymentToken) {
-      if (success === 'true') {
+      const { type } = event.data;
+
+      if (type === 'PAYMENT_SUCCESS') {
+        console.log('Payment success detected, redirecting...');
+        
+        // Stop polling
+        if (pollingInterval) {
+          clearInterval(pollingInterval);
+          setPollingInterval(null);
+        }
+        
+        // Update payment status
         setPaymentStatus('success');
         setPaymentLoading(false);
-      } else {
+        
+        // Close dialog and redirect after brief delay
+        setTimeout(() => {
+          setPaymentDialog(false);
+          
+          // Detect mobile
+          const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+          const isMobile = /android|iphone|ipad|ipod/i.test(userAgent.toLowerCase());
+
+          // Redirect entire page
+          if (isMobile) {
+            window.location.href = 'reweard://home';
+          } else {
+            // Use window.location instead of navigate for full page redirect
+            window.location.href = '/';
+          }
+        }, 1500);
+        
+      } else if (type === 'PAYMENT_FAILURE') {
+        console.log('Payment failure detected');
+        
+        // Stop polling
+        if (pollingInterval) {
+          clearInterval(pollingInterval);
+          setPollingInterval(null);
+        }
+        
         setPaymentStatus('failed');
         setPaymentLoading(false);
       }
-    }
-  }, [paymentToken]);
+    };
+
+    // Add event listener
+    window.addEventListener('message', handleMessage);
+    console.log('Message listener added to parent window');
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('message', handleMessage);
+      console.log('Message listener removed');
+    };
+  }, [pollingInterval, navigate]);
 
   return (
     <div className="container my-5">
-      <Dialog open={paymentDialog} onClose={closePaymentDialog}>
+      <Dialog 
+        open={paymentDialog} 
+        onClose={closePaymentDialog}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
           {paymentStatus === 'pending' ? 'Processing Payment' :
-          paymentStatus === 'success' ? 'Payment Successful' :
-          paymentStatus === 'failed' ? 'Payment Failed' :
-          paymentStatus === 'timeout' ? 'Payment Timeout' : 'Payment Status'}
+            paymentStatus === 'success' ? 'Payment Successful' :
+              paymentStatus === 'failed' ? 'Payment Failed' :
+                paymentStatus === 'timeout' ? 'Payment Timeout' : 'Payment Status'}
         </DialogTitle>
         <DialogContent>
-          {paymentStatus === 'pending' && (
-            <>
-              <MoonLoader size={30} color="#8356C0" />
-              <Typography variant="body1" className="mt-2">
-                Waiting for payment confirmation...
-              </Typography>
-              <Typography variant="body2" color="textSecondary" className="mt-1">
-                Please complete the payment in the opened window
-              </Typography>
-              <Typography variant="caption" display="block" className="mt-2">
-                If the payment window didn't open,{" "}
-                <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.location.reload();
-                  }}
-                  style={{ color: '#713CC5', textDecoration: 'underline' }}
-                >
-                  click here to try again
-                </a>
-              </Typography>
-            </>
+          {paymentStatus === 'pending' && iframeUrl && (
+            <iframe
+              src={iframeUrl}
+              width="100%"
+              height="500px"
+              title="Payment Gateway"
+              style={{ border: 'none' }}
+              allow="payment"
+            />
           )}
 
-          {paymentStatus === 'success' && (        <Alert severity="success">
-          <AlertTitle>Payment Successful!</AlertTitle>
-          Your purchase has been completed successfully. The item will be shipped soon.
-        </Alert>
-      )}
+          {paymentStatus === 'success' && (
+            <Alert severity="success">
+              <AlertTitle>Payment Successful!</AlertTitle>
+              Your purchase has been completed successfully. Redirecting...
+            </Alert>
+          )}
 
-      {paymentStatus === 'failed' && (
-        <Alert severity="error">
-          <AlertTitle>Payment Failed</AlertTitle>
-          The payment was cancelled or failed. Please try again.
-        </Alert>
-      )}
+          {paymentStatus === 'failed' && (
+            <Alert severity="error">
+              <AlertTitle>Payment Failed</AlertTitle>
+              The payment was cancelled or failed. Please try again.
+            </Alert>
+          )}
 
-      {paymentStatus === 'timeout' && (
-        <Alert severity="warning">
-          <AlertTitle>Payment Timeout</AlertTitle>
-          The payment confirmation took too long. Please check your email for confirmation or contact support.
-        </Alert>
-      )}
+          {paymentStatus === 'timeout' && (
+            <Alert severity="warning">
+              <AlertTitle>Payment Timeout</AlertTitle>
+              The payment confirmation took too long. Please check your email for confirmation or contact support.
+            </Alert>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={closePaymentDialog}
+            variant="contained"
+            style={{ backgroundColor: '#713CC5' }}
+          >
+            {paymentStatus === 'success' ? 'Continue Shopping' : 'Close'}
+          </Button>
 
-      {paymentStatus === 'error' && (
-        <Alert severity="error">
-          <AlertTitle>Error</AlertTitle>
-          Something went wrong with the payment processing. Please try again later.
-        </Alert>
-      )}
-    </DialogContent>
-    <DialogActions>
-      <Button
-        onClick={closePaymentDialog}
-        variant="contained"
-        style={{ backgroundColor: '#713CC5' }}
-      >
-        {paymentStatus === 'success' ? 'Continue Shopping' : 'Close'}
-      </Button>
+          {paymentStatus === 'failed' && (
+            <Button
+              onClick={() => {
+                closePaymentDialog();
+                handleBuyItem();
+              }}
+              variant="outlined"
+              style={{ borderColor: '#713CC5', color: '#713CC5' }}
+            >
+              Try Again
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
 
-      {paymentStatus === 'failed' && (
-        <Button
-          onClick={() => {
-            closePaymentDialog();
-            handleBuyItem();
-          }}
-          variant="outlined"
-          style={{ borderColor: '#713CC5', color: '#713CC5' }}
-        >
-          Try Again
-        </Button>
-      )}
-    </DialogActions>
-  </Dialog>
-
-  <div className="row p-5 border">
-    <div className="col-md-7">
-      {activeImage ? (
-        <img
-          src={activeImage.url ? activeImage.url : activeImage}
-          alt={item.title || "Product image"}
-          style={{
-            width: "100%",
-            maxWidth: "688px",
-            height: "auto",
-            maxHeight: "673px",
-            cursor: "pointer",
-            objectFit: "cover",
-          }}
-          className="mb-3 img-fluid"
-        />
-      ) : (
-        <div className="d-flex justify-content-center">
-          <MoonLoader size={200} color="#8356C0" />
-        </div>
-      )}
-
-      {item.itemPics && item.itemPics.length > 1 && (
-        <div className="d-flex flex-wrap gap-2 mt-3">
-          {item.itemPics.map((image, idx) => (
+      <div className="row p-5 border">
+        <div className="col-md-7">
+          {activeImage ? (
             <img
-              key={idx}
-              src={image.url ? image.url : image}
+              src={activeImage.url ? activeImage.url : activeImage}
+              alt={item.title || "Product image"}
               style={{
-                width: "100px",
-                height: "70px",
+                width: "100%",
+                maxWidth: "688px",
+                height: "auto",
+                maxHeight: "673px",
                 cursor: "pointer",
                 objectFit: "cover",
               }}
-              alt={`Thumbnail ${idx + 1}`}
-              className="rounded cursor-pointer"
-              onClick={() => setActiveImage(image)}
+              className="mb-3 img-fluid"
             />
-          ))}
-        </div>
-      )}
-    </div>
+          ) : (
+            <div className="d-flex justify-content-center">
+              <MoonLoader size={200} color="#8356C0" />
+            </div>
+          )}
 
-    <div className="col-md-5 ps-md-5 mt-4 mt-md-0">
-      <div className="d-flex flex-column gap-3">
-        <div
-          className="d-flex align-items-center gap-2 mb-3"
-          onClick={() => item?.user?._id && navigate("/user/" + item.user._id)}
-          style={{ cursor: item?.user?._id ? "pointer" : "default" }}
-        >
-          <img
-            style={{ borderRadius: "50%", width: "50px", height: "50px", objectFit: "cover" }}
-            src={item?.user?.profilePic?.url || ""}
-            alt="Profile"
-          />
-          <p style={{ color: "grey", margin: 0 }}>
-            {item?.user?.fName || "Unknown User"}
-          </p>
-        </div>
-
-        <div>
-          <h1 className="text">
-            <strong>{formattedTitle}</strong>
-          </h1>
-        </div>
-
-        <div className="d-flex justify-content-between align-items-center">
-          <strong className="fs-3">{item.price} DT</strong>
-          <span className={`badge  statusbg-${item.status}`}>
-            {item.status === "0" ? "Pending" :
-            item.status === "1" ? "For Sale" :
-            item.status === "2" ? "Rejected" :
-            item.status === "4" ? "Sold" : "Unknown"}
-          </span>
+          {item.itemPics && item.itemPics.length > 1 && (
+            <div className="d-flex flex-wrap gap-2 mt-3">
+              {item.itemPics.map((image, idx) => (
+                <img
+                  key={idx}
+                  src={image.url ? image.url : image}
+                  style={{
+                    width: "100px",
+                    height: "70px",
+                    cursor: "pointer",
+                    objectFit: "cover",
+                  }}
+                  alt={`Thumbnail ${idx + 1}`}
+                  className="rounded cursor-pointer"
+                  onClick={() => setActiveImage(image)}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
-        {item.status === "1" && loggedUser && item.user && item.user._id !== loggedUser._id && (
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            onClick={handleBuyItem}
-            disabled={paymentLoading}
-            style={{ backgroundColor: "#713CC5", padding: "12px 24px" }}
-            className="mt-3"
-          >
-            {paymentLoading ? (
-              <div className="d-flex align-items-center justify-content-center">
-                <MoonLoader size={20} color="#fff" />
-                <span className="ms-2">Processing...</span>
-              </div>
-            ) : (
-              `Buy Now - ${item.price} DT`
-            )}
-          </Button>
-        )}
-
-        {item.status === "4" && (
-          <Alert severity="info" className="mt-3">
-            <AlertTitle>Item Sold</AlertTitle>
-            This item has already been sold.
-          </Alert>
-        )}
-
-        <div className="row mt-4">
-          <div className="col-md-6">
-            <h5 className="text">
-              <strong>Brand: </strong>
-              {item.brand || "-"}
-            </h5>
-            <h5 className="text">
-              <strong>Category: </strong>
-              {item.category || "-"}
-            </h5>
-            <h5 className="text">
-              <strong>Gender: </strong>
-              {item.gender || "-"}
-            </h5>
-            <h5 className="text">
-              <strong>Condition: </strong>
-              {item.condition || "-"}
-            </h5>
-          </div>
-
-          <div className="col-md-6">
-            <h5 className="text">
-              <strong>Age: </strong>
-              {item.age || "-"}
-            </h5>
-            <h5 className="text">
-              <strong>Size: </strong>
-              {item.size || "-"}
-            </h5>
-            <h5 className="text">
-              <strong>Previous Owners: </strong>
-              {item.previousOwners || "-"}
-            </h5>
-          </div>
-        </div>
-
-        {item.tags && item.tags.length > 0 && (
-          <div className="d-flex flex-wrap mt-3">
-            {item.tags.map((tag, index) => (
-              <Chip
-                key={index}
-                label={tag}
-                color="default"
-                sx={{ margin: 0.5 }}
+        <div className="col-md-5 ps-md-5 mt-4 mt-md-0">
+          <div className="d-flex flex-column gap-3">
+            <div
+              className="d-flex align-items-center gap-2 mb-3"
+              onClick={() => item?.user?._id && navigate("/user/" + item.user._id)}
+              style={{ cursor: item?.user?._id ? "pointer" : "default" }}
+            >
+              <img
+                style={{ borderRadius: "50%", width: "50px", height: "50px", objectFit: "cover" }}
+                src={item?.user?.profilePic?.url || ""}
+                alt="Profile"
               />
-            ))}
-          </div>
-        )}
+              <p style={{ color: "grey", margin: 0 }}>
+                {item?.user?.fName || "Unknown User"}
+              </p>
+            </div>
 
-        {item.description && (
-          <div className="mt-3">
-            <h5><strong>Description:</strong></h5>
-            <p className="text">{item.description}</p>
+            <div>
+              <h1 className="text">
+                <strong>{formattedTitle}</strong>
+              </h1>
+            </div>
+
+            <div className="d-flex justify-content-between align-items-center">
+              <strong className="fs-3">{item.price} DT</strong>
+              <span className={`badge statusbg-${item.status}`}>
+                {item.status === "0" ? "Pending" :
+                  item.status === "1" ? "For Sale" :
+                    item.status === "2" ? "Rejected" :
+                      item.status === "4" ? "Sold" : "Unknown"}
+              </span>
+            </div>
+
+            {item.status === "1" && loggedUser && item.user && item.user._id !== loggedUser._id && (
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                onClick={handleBuyItem}
+                disabled={paymentLoading}
+                style={{ backgroundColor: "#713CC5", padding: "12px 24px" }}
+                className="mt-3"
+              >
+                {paymentLoading ? (
+                  <div className="d-flex align-items-center justify-content-center">
+                    <MoonLoader size={20} color="#fff" />
+                    <span className="ms-2">Processing...</span>
+                  </div>
+                ) : (
+                  `Buy Now - ${item.price} DT`
+                )}
+              </Button>
+            )}
+
+            {item.status === "4" && (
+              <Alert severity="info" className="mt-3">
+                <AlertTitle>Item Sold</AlertTitle>
+                This item has already been sold.
+              </Alert>
+            )}
+
+            <div className="row mt-4">
+              <div className="col-md-6">
+                <h5 className="text">
+                  <strong>Brand: </strong>
+                  {item.brand || "-"}
+                </h5>
+                <h5 className="text">
+                  <strong>Category: </strong>
+                  {item.category || "-"}
+                </h5>
+                <h5 className="text">
+                  <strong>Gender: </strong>
+                  {item.gender || "-"}
+                </h5>
+                <h5 className="text">
+                  <strong>Condition: </strong>
+                  {item.condition || "-"}
+                </h5>
+              </div>
+
+              <div className="col-md-6">
+                <h5 className="text">
+                  <strong>Age: </strong>
+                  {item.age || "-"}
+                </h5>
+                <h5 className="text">
+                  <strong>Size: </strong>
+                  {item.size || "-"}
+                </h5>
+                <h5 className="text">
+                  <strong>Previous Owners: </strong>
+                  {item.previousOwners || "-"}
+                </h5>
+              </div>
+            </div>
+
+            {item.tags && item.tags.length > 0 && (
+              <div className="d-flex flex-wrap mt-3">
+                {item.tags.map((tag, index) => (
+                  <Chip
+                    key={index}
+                    label={tag}
+                    color="default"
+                    sx={{ margin: 0.5 }}
+                  />
+                ))}
+              </div>
+            )}
+
+            {item.description && (
+              <div className="mt-3">
+                <h5><strong>Description:</strong></h5>
+                <p className="text">{item.description}</p>
+              </div>
+            )}
+
+            {item && item.adminComment && (
+              <Alert severity="error" className="mt-3">
+                <strong>Admin Comment:</strong> {item.adminComment}
+              </Alert>
+            )}
+          </div>
+        </div>
+
+        {loggedUser && item.user && item.user._id === loggedUser._id && (
+          <div className="d-flex justify-content-center gap-3 p-5">
+            <button
+              className="btn btn-danger rounded"
+              style={{ width: "120px" }}
+              onClick={() => {
+                if (window.confirm("Are you sure you want to delete this item?")) {
+                  deleteItem(item._id);
+                }
+              }}
+            >
+              Delete
+            </button>
+            <button
+              className="btn text-light rounded"
+              style={{ backgroundColor: "#713CC5", width: "120px" }}
+              onClick={() => navigate("/items/edit/" + item._id)}
+            >
+              Edit
+            </button>
           </div>
         )}
       </div>
-
-      {item?.adminComment && (
-        <Alert severity="error" className="mt-3">
-          <strong>Admin Comment:</strong> {item.adminComment}
-        </Alert>
-      )}
     </div>
-  </div>
-
-  {loggedUser && item.user && item.user._id === loggedUser._id && (
-    <div className="d-flex justify-content-center gap-3 p-5">
-      <button
-        className="btn btn-danger rounded"
-        style={{ width: "120px" }}
-        onClick={() => {
-          if (window.confirm("Are you sure you want to delete this item?")) {
-            deleteItem(item._id);
-          }
-        }}
-      >
-        Delete
-      </button>
-      <button
-        className="btn text-light rounded"
-        style={{ backgroundColor: "#713CC5", width: "120px" }}
-        onClick={() => navigate("/items/edit/" + item._id)}
-      >
-        Edit
-      </button>
-    </div>
-  )}
-</div>);
+  );
 };
+
 export default ShowOne;

@@ -9,29 +9,16 @@ const PaymentReturn = () => {
 
   useEffect(() => {
     const handleRedirect = () => {
-      console.log('PaymentReturn loaded with success:', success);
-      
-      // Check if we're in an iframe
-      const isInIframe = window.self !== window.top;
-      console.log('Is in iframe:', isInIframe);
-
-      if (isInIframe) {
-        // We're in an iframe, send message to parent
-        if (success === true) {
-          console.log('Sending PAYMENT_SUCCESS to parent');
-          window.parent.postMessage({ type: 'PAYMENT_SUCCESS' }, '*');
-        } else {
-          console.log('Sending PAYMENT_FAILURE to parent');
-          window.parent.postMessage({ type: 'PAYMENT_FAILURE' }, '*');
-        }
-      } else if (window.self === window.top) {
-        // Not in iframe, redirect directly
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 2000);
+      // Check if the payment was successful
+      if (success === 'true') {
+        // Send a message to the parent window to redirect
+        window.parent.postMessage({ type: 'PAYMENT_SUCCESS' }, '*');
+      } else {
+        // Send a message to the parent window to redirect on failure
+        window.parent.postMessage({ type: 'PAYMENT_FAILURE' }, '*');
       }
 
-      // Set a timeout to ensure the message is sent
+      // Set a timeout to ensure the message is sent before the component unmounts
       setTimeout(() => {
         setRedirecting(false);
       }, 2000);
@@ -49,24 +36,24 @@ const PaymentReturn = () => {
               <span className="visually-hidden">Loading...</span>
             </div>
             <h2 className="mb-3">Processing Payment Result...</h2>
-            <p className="text-muted">Please wait, communicating with parent window...</p>
+            <p className="text-muted">Redirecting you back to the app...</p>
           </>
         ) : (
           <>
             <h1 className="mb-4">Payment Result</h1>
-            {success === true ? (
+            {success === 'true' ? (
               <div className="alert alert-success" role="alert" style={{ maxWidth: '500px', width: '100%' }}>
                 <h4 className="alert-heading">Success!</h4>
                 <p>Your payment was successful! Thank you for your purchase.</p>
                 <hr />
-                <p className="mb-0">If you're not redirected, please close this window.</p>
+                <p className="mb-0">Redirecting to homepage...</p>
               </div>
             ) : (
               <div className="alert alert-danger" role="alert" style={{ maxWidth: '500px', width: '100%' }}>
                 <h4 className="alert-heading">Payment Failed</h4>
                 <p>Your payment was cancelled or failed. Please try again.</p>
                 <hr />
-                <p className="mb-0">If you're not redirected, please close this window.</p>
+                <p className="mb-0">Redirecting to homepage...</p>
               </div>
             )}
           </>
