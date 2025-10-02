@@ -25,6 +25,7 @@ const PaymentReturn = () => {
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
+      console.log("success:", success, "token:", token);
       if (success === 'true' && token) {
         try {
           console.log('Fetching payment details for token:', token);
