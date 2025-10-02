@@ -227,7 +227,7 @@ const ShowOne = () => {
       const { type } = event.data;
 
       if (type === 'PAYMENT_SUCCESS') {
-        console.log('Payment success detected!');
+        console.log('Payment success detected, redirecting...');
         
         // Stop polling
         if (pollingInterval) {
@@ -235,14 +235,26 @@ const ShowOne = () => {
           setPollingInterval(null);
         }
         
-        // Update payment status to show success in iframe
+        // Update payment status
         setPaymentStatus('success');
         setPaymentLoading(false);
         
-        // Refresh item data to update status
-        axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/items/${id}`)
-          .then((res) => setItem(res.data))
-          .catch(err => console.error('Error refreshing item:', err));
+        // Close dialog and redirect after brief delay
+        setTimeout(() => {
+          setPaymentDialog(false);
+          
+          // Detect mobile
+          const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+          const isMobile = /android|iphone|ipad|ipod/i.test(userAgent.toLowerCase());
+
+          // Redirect entire page
+          if (isMobile) {
+            window.location.href = 'reweard://home';
+          } else {
+            // Use window.location instead of navigate for full page redirect
+            window.location.href = '/';
+          }
+        }, 1500);
         
       } else if (type === 'PAYMENT_FAILURE') {
         console.log('Payment failure detected');
@@ -267,7 +279,7 @@ const ShowOne = () => {
       window.removeEventListener('message', handleMessage);
       console.log('Message listener removed');
     };
-  }, [pollingInterval, id]);
+  }, [pollingInterval, navigate]);
 
   return (
     <div className="container my-5">
