@@ -1,44 +1,139 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const PaymentReturn = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
-  const success = searchParams.get('success');
+  
+  // Fix: PayMee returns URL like ?success=true?payment_token=xxx
+  // We need to handle this malformed URL
+  let success = searchParams.get('success');
+  let paymentToken = searchParams.get('payment_token');
+  
+  // If success contains a question mark, it means PayMee concatenated params incorrectly
+  if (success && success.includes('?')) {
+    const parts = success.split('?');
+    success = parts[0]; // 'true' or 'false'
+    
+    // Parse the rest as query params
+    const additionalParams = new URLSearchParams(parts[1]);
+    paymentToken = additionalParams.get('payment_token');
+  }
+  
+  console.log('PaymentReturn - success:', success, 'token:', paymentToken);
+  
   const [redirecting, setRedirecting] = useState(true);
 
   useEffect(() => {
-    const handleRedirect = () => {
-      console.log('PaymentReturn loaded with success:', success);
+    const handleRedirect = async () => {
+      // Check if opened from the mobile app
+      const fromApp = searchParams.get('from') === 'app';
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
       
-      // Check if we're in an iframe
-      const isInIframe = window.self !== window.top;
-      console.log('Is in iframe:', isInIframe);
+      // Detect if it's a mobile device
+      const isMobile = /android|iphone|ipad|ipod/i.test(userAgent.toLowerCase());
 
-      if (isInIframe) {
-        // We're in an iframe, send message to parent
-        if (success === true) {
-          console.log('Sending PAYMENT_SUCCESS to parent');
-          window.parent.postMessage({ type: 'PAYMENT_SUCCESS' }, '*');
-        } else {
-          console.log('Sending PAYMENT_FAILURE to parent');
-          window.parent.postMessage({ type: 'PAYMENT_FAILURE' }, '*');
+      if (isMobile || fromApp) {
+        // Try to redirect to the native app
+        const appScheme = 'rewear://'; // Your app's custom scheme
+        const expoScheme = 'exp://'; // Expo Go scheme
+        
+        // Construct the deep link with payment result
+        const deepLinkPath = success === 'true' ? 'payment-success' : 'payment-failed';
+        const tokenParam = paymentToken ? `?token=${paymentToken}` : '';
+        
+        // Try app deep link first
+        const rewearDeepLink = `${appScheme}${deepLinkPath}${tokenParam}`;
+        const expoDeepLink = `${expoScheme}${deepLinkPath}${tokenParam}`;
+        
+        console.log('Attempting deep links:', rewearDeepLink, expoDeepLink);
+        
+        // Function to attempt app opening
+        const tryOpenApp = (url, timeout = 2000) => {
+          return new Promise((resolve) => {
+            const start = Date.now();
+            
+            // Create a hidden iframe to trigger the deep link
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = url;
+            document.body.appendChild(iframe);
+            
+            // Set a timeout to check if app opened
+            const timer = setTimeout(() => {
+              const elapsed = Date.now() - start;
+              document.body.removeChild(iframe);
+              
+              // If we're still here after timeout, app probably didn't open
+              if (elapsed < timeout + 100) {
+                resolve(false);
+              } else {
+                resolve(true);
+              }
+            }, timeout);
+
+            // Listen for blur event (app might have opened)
+            const onBlur = () => {
+              clearTimeout(timer);
+              document.body.removeChild(iframe);
+              window.removeEventListener('blur', onBlur);
+              resolve(true);
+            };
+            
+            window.addEventListener('blur', onBlur);
+          });
+        };
+
+        // Try to open the app
+        let appOpened = false;
+
+        // Try Rewear app first
+        try {
+          window.location.href = rewearDeepLink;
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          
+          // Check if still on the page (app didn't open)
+          if (document.hasFocus()) {
+            // Try Expo Go as fallback
+            window.location.href = expoDeepLink;
+            await new Promise(resolve => setTimeout(resolve, 1500));
+          } else {
+            appOpened = true;
+          }
+        } catch (error) {
+          console.log('Error opening app:', error);
         }
-      } else if (window.self === window.top) {
-        // Not in iframe, redirect directly
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 2000);
-      }
 
-      // Set a timeout to ensure the message is sent
-      setTimeout(() => {
-        setRedirecting(false);
-      }, 2000);
+        // If app didn't open and we're in a popup, close it
+        if (!appOpened && window.opener) {
+          window.close();
+          return;
+        }
+
+        // If app didn't open and not a popup, fallback to web navigation
+        if (!appOpened) {
+          setRedirecting(false);
+          setTimeout(() => {
+            navigate('/');
+          }, 3000);
+        }
+      } else {
+        // Desktop or web browser - use normal navigation
+        if (window.opener) {
+          // If opened in popup, close it
+          window.close();
+        } else {
+          // Otherwise redirect to home
+          setTimeout(() => {
+            navigate('/');
+          }, 2000);
+        }
+      }
     };
 
     handleRedirect();
-  }, [success]);
+  }, [navigate, success, searchParams]);
 
   return (
     <div className="container my-5">
@@ -49,26 +144,32 @@ const PaymentReturn = () => {
               <span className="visually-hidden">Loading...</span>
             </div>
             <h2 className="mb-3">Processing Payment Result...</h2>
-            <p className="text-muted">Please wait, communicating with parent window...</p>
+            <p className="text-muted">Redirecting you back to the app...</p>
           </>
         ) : (
           <>
             <h1 className="mb-4">Payment Result</h1>
-            {success === true ? (
+            {success === 'true' ? (
               <div className="alert alert-success" role="alert" style={{ maxWidth: '500px', width: '100%' }}>
                 <h4 className="alert-heading">Success!</h4>
                 <p>Your payment was successful! Thank you for your purchase.</p>
                 <hr />
-                <p className="mb-0">If you're not redirected, please close this window.</p>
+                <p className="mb-0">Redirecting to homepage...</p>
               </div>
             ) : (
               <div className="alert alert-danger" role="alert" style={{ maxWidth: '500px', width: '100%' }}>
                 <h4 className="alert-heading">Payment Failed</h4>
                 <p>Your payment was cancelled or failed. Please try again.</p>
                 <hr />
-                <p className="mb-0">If you're not redirected, please close this window.</p>
+                <p className="mb-0">Redirecting to homepage...</p>
               </div>
             )}
+            <button 
+              className="btn btn-primary mt-3"
+              onClick={() => navigate('/')}
+            >
+              Go to Homepage Now
+            </button>
           </>
         )}
       </div>
