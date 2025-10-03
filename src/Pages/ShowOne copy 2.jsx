@@ -271,65 +271,75 @@ const ShowOne = () => {
 
   return (
     <div className="container my-5">
-      
-
-<Dialog 
-  open={paymentDialog} 
-  onClose={closePaymentDialog}
-  maxWidth="md"
-  fullWidth
->
-  <DialogTitle>
-    {paymentStatus === 'pending' ? 'Processing Payment' :
-      paymentStatus === 'success' ? 'Payment Successful' :
-        paymentStatus === 'failed' ? 'Payment Failed' :
-          paymentStatus === 'timeout' ? 'Payment Timeout' : 'Payment'}
-  </DialogTitle>
-  <DialogContent>
-    {/* Always show iframe if URL exists, even after status changes */}
-    {iframeUrl && (
-      <iframe
-        src={iframeUrl}
-        width="100%"
-        height="600px"
-        title="Payment Gateway"
-        style={{ border: 'none' }}
-        allow="payment"
-      />
-    )}
-
-    {/* Show timeout alert as overlay/additional info */}
-    {paymentStatus === 'timeout' && (
-      <Alert severity="warning" sx={{ mt: 2 }}>
-        <AlertTitle>Payment Timeout</AlertTitle>
-        The payment confirmation took too long. The payment page is still shown above - 
-        please check if your payment was processed, or contact support.
-      </Alert>
-    )}
-  </DialogContent>
-  <DialogActions>
-    <Button
-      onClick={closePaymentDialog}
-      variant="contained"
-      style={{ backgroundColor: '#713CC5' }}
-    >
-      Close
-    </Button>
-
-    {paymentStatus === 'failed' && (
-      <Button
-        onClick={() => {
-          closePaymentDialog();
-          handleBuyItem();
-        }}
-        variant="outlined"
-        style={{ borderColor: '#713CC5', color: '#713CC5' }}
+      <Dialog 
+        open={paymentDialog} 
+        onClose={closePaymentDialog}
+        maxWidth="md"
+        fullWidth
       >
-        Try Again
-      </Button>
-    )}
-  </DialogActions>
-</Dialog>
+        <DialogTitle>
+          {paymentStatus === 'pending' ? 'Processing Payment' :
+            paymentStatus === 'success' ? 'Payment Successful' :
+              paymentStatus === 'failed' ? 'Payment Failed' :
+                paymentStatus === 'timeout' ? 'Payment Timeout' : 'Payment Status'}
+        </DialogTitle>
+        <DialogContent>
+          {paymentStatus === 'pending' && iframeUrl && (
+            <iframe
+              src={iframeUrl}
+              width="100%"
+              height="500px"
+              title="Payment Gateway"
+              style={{ border: 'none' }}
+              allow="payment"
+            />
+          )}
+
+          {paymentStatus === 'success' && (
+            <Alert severity="success">
+              <AlertTitle>Payment Successful!</AlertTitle>
+              Your purchase has been completed successfully. Redirecting...
+            </Alert>
+          )}
+
+          {paymentStatus === 'failed' && (
+            <Alert severity="error">
+              <AlertTitle>Payment Failed</AlertTitle>
+              The payment was cancelled or failed. Please try again.
+            </Alert>
+          )}
+
+          {paymentStatus === 'timeout' && (
+            <Alert severity="warning">
+              <AlertTitle>Payment Timeout</AlertTitle>
+              The payment confirmation took too long. Please check your email for confirmation or contact support.
+            </Alert>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={closePaymentDialog}
+            variant="contained"
+            style={{ backgroundColor: '#713CC5' }}
+          >
+            {paymentStatus === 'success' ? 'Continue Shopping' : 'Close'}
+          </Button>
+
+          {paymentStatus === 'failed' && (
+            <Button
+              onClick={() => {
+                closePaymentDialog();
+                handleBuyItem();
+              }}
+              variant="outlined"
+              style={{ borderColor: '#713CC5', color: '#713CC5' }}
+            >
+              Try Again
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
+
       <div className="row p-5 border">
         <div className="col-md-7">
           {activeImage ? (
