@@ -14,10 +14,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import { MoonLoader } from 'react-spinners';
 
 const PaymentReturn = () => {
-
-  
-
-const location = useLocation();
+  const location = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
   
@@ -26,6 +23,7 @@ const location = useLocation();
   let success = searchParams.get('success');
   let token = searchParams.get('payment_token');
   console.log("success before fix:", success, "token before fix:", token);
+  
   // If success contains a question mark, it means PayMee concatenated params incorrectly
   if (success && success.includes('?')) {
     const parts = success.split('?');
@@ -37,10 +35,6 @@ const location = useLocation();
   }
   
   console.log('PaymentReturn - success:', success, 'token:', token);
-
-
-
-
 
   const [loading, setLoading] = useState(true);
   const [orderDetails, setOrderDetails] = useState(null);
@@ -133,6 +127,9 @@ const location = useLocation();
     );
   }
 
+  // Calculate total amount from items
+  const totalAmount = orderDetails.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
   return (
     <Box p={3}>
       {/* Success Header */}
@@ -208,7 +205,7 @@ const location = useLocation();
         </CardContent>
       </Card>
 
-      {/* Item Details Card */}
+      {/* Items Details Card */}
       <Card>
         <CardContent>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: '#713CC5' }}>
@@ -217,59 +214,94 @@ const location = useLocation();
           
           <Divider sx={{ my: 2 }} />
           
-          <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
-            {/* Item Image */}
-            {orderDetails.item.itemPics && orderDetails.item.itemPics.length > 0 && (
-              <CardMedia
-                component="img"
-                sx={{
-                  width: { xs: '100%', sm: 150 },
-                  height: { xs: 200, sm: 150 },
-                  objectFit: 'cover',
-                  borderRadius: 1
-                }}
-                image={orderDetails.item.itemPics[0].url || orderDetails.item.itemPics[0]}
-                alt={orderDetails.item.title}
-              />
-            )}
-            
-            {/* Item Info */}
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="h6" gutterBottom fontWeight="bold">
-                {orderDetails.item.title}
-              </Typography>
-              
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="textSecondary">
-                    Brand:
-                  </Typography>
-                  <Typography variant="body2" fontWeight="medium">
-                    {orderDetails.item.brand}
-                  </Typography>
-                </Box>
+          {/* Loop through all items */}
+          {orderDetails.items.map((item, index) => (
+            <Box key={index} sx={{ mb: index < orderDetails.items.length - 1 ? 3 : 0 }}>
+              <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+                {/* Item Image */}
+                {/* {item.itemPics && item.itemPics.length > 0 && (
+                  <CardMedia
+                    component="img"
+                    sx={{
+                      width: { xs: '100%', sm: 150 },
+                      height: { xs: 200, sm: 150 },
+                      objectFit: 'cover',
+                      borderRadius: 1
+                    }}
+                    image={item.itemPics[0].url || item.itemPics[0]}
+                    alt={item.title}
+                  />
+                )} */}
                 
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="textSecondary">
-                    Category:
+                {/* Item Info */}
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="h6" gutterBottom fontWeight="bold">
+                    {item.title}
                   </Typography>
-                  <Typography variant="body2" fontWeight="medium">
-                    {orderDetails.item.category}
-                  </Typography>
-                </Box>
-                
-                <Divider sx={{ my: 1 }} />
-                
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant="h6" color="textSecondary">
-                    Total Amount:
-                  </Typography>
-                  <Typography variant="h5" fontWeight="bold" sx={{ color: '#713CC5' }}>
-                    {orderDetails.amount} DT
-                  </Typography>
+                  
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="textSecondary">
+                        Brand:
+                      </Typography>
+                      <Typography variant="body2" fontWeight="medium">
+                        {item.brand}
+                      </Typography>
+                    </Box>
+                    
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="textSecondary">
+                        Category:
+                      </Typography>
+                      <Typography variant="body2" fontWeight="medium">
+                        {item.category}
+                      </Typography>
+                    </Box>
+                    
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="textSecondary">
+                        Quantity:
+                      </Typography>
+                      <Typography variant="body2" fontWeight="medium">
+                        {item.quantity}
+                      </Typography>
+                    </Box>
+                    
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="textSecondary">
+                        Unit Price:
+                      </Typography>
+                      <Typography variant="body2" fontWeight="medium">
+                        {item.price} DT
+                      </Typography>
+                    </Box>
+                    
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="textSecondary" fontWeight="bold">
+                        Subtotal:
+                      </Typography>
+                      <Typography variant="body2" fontWeight="bold">
+                        {item.price * item.quantity} DT
+                      </Typography>
+                    </Box>
+                  </Box>
                 </Box>
               </Box>
+              
+              {/* Divider between items */}
+              {index < orderDetails.items.length - 1 && <Divider sx={{ my: 2 }} />}
             </Box>
+          ))}
+          
+          {/* Total Amount */}
+          <Divider sx={{ my: 2 }} />
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+            <Typography variant="h6" color="textSecondary">
+              Total Amount:
+            </Typography>
+            <Typography variant="h5" fontWeight="bold" sx={{ color: '#713CC5' }}>
+              {orderDetails.amount} DT
+            </Typography>
           </Box>
         </CardContent>
       </Card>
