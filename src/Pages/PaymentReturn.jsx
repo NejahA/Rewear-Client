@@ -62,7 +62,7 @@ const location = useLocation();
           // Notify parent window of success
           window.parent.postMessage({ type: 'PAYMENT_SUCCESS' }, '*');
         } catch (err) {
-          console.error('Error fetching order details:', err);
+          console.log('Error fetching order details:', err);
           setError('Unable to load purchase details');
           window.parent.postMessage({ type: 'PAYMENT_FAILURE' }, '*');
         }
