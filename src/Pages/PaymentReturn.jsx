@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
@@ -25,7 +25,7 @@ const location = useLocation();
   // We need to handle this malformed URL
   let success = searchParams.get('success');
   let token = searchParams.get('payment_token');
-  
+  console.log("success before fix:", success, "token before fix:", token);
   // If success contains a question mark, it means PayMee concatenated params incorrectly
   if (success && success.includes('?')) {
     const parts = success.split('?');
