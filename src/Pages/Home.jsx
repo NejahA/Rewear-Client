@@ -291,6 +291,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
     } catch (err) {
       console.error("Fetching error:", err);
     } finally {
+      // console.log("items ===>", items);
       isFetchingRef.current = false;
       setLoading(false);
       setInitialLoading(false);
@@ -951,10 +952,11 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                       }}
                     >
                       <ItemCard
-                        userId={user?.id}
-                        fName={user?.fName}
-                        lName={user?.lName}
-                        profilePic={user?.profilePic}
+                        logged={logged}
+                        // userId={user?.id}
+                        // fName={user?.fName}
+                        // lName={user?.lName}
+                        // profilePic={user?.profilePic}
                         item={item}
                         setOpenModalLog={setOpenModalLog}
                         setOpenModalReg={setOpenModalReg}

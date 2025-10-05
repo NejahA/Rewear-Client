@@ -1,10 +1,13 @@
-import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-// import Cookies from 'universal-cookies';
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { CartContext } from '../context/CartContext'; // Import CartContext
 
 const ItemCard = ({ item, setOpenModalLog, setOpenModalReg, userId, fName, lName, profilePic }) => {
-    // const cookies = new Cookies()
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const { addToCart } = React.useContext(CartContext); // Use addToCart function from CartContext
+
+    // State to track hover
+    const [isHovered, setIsHovered] = React.useState(false);
 
     return (
         <div className="card h-100 shadow-sm">
@@ -16,6 +19,29 @@ const ItemCard = ({ item, setOpenModalLog, setOpenModalReg, userId, fName, lName
                     alt="itemPic"
                     loading="lazy"
                 />
+                {/* Add to Cart Icon on Top Left Corner */}
+                <button 
+                    onClick={(e) => { 
+                        // if (fName || lName || userId || profilePic?.url) {
+                            addToCart(item._id); // Add item to cart
+                        // } else {
+                            // setOpenModalLog(true);
+                            // setOpenModalReg(false);
+                        // }
+                    }
+                } 
+                    className="btn position-absolute top-0 start-0 m-2"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    style={{
+                        backgroundColor: isHovered ? 'transparent' : '#5C2D9A',
+                        borderColor: '#5C2D9A',
+                        color: isHovered ? '#5C2D9A' : '#fff',
+                        transition: 'background-color 0.3s, border-color 0.3s, color 0.3s'
+                    }}
+                >
+                    <i className="bi bi-cart-plus-fill"></i>
+                </button>
             </div>
             
             {/* Card Body */}
@@ -50,16 +76,17 @@ const ItemCard = ({ item, setOpenModalLog, setOpenModalReg, userId, fName, lName
                     </div>
                 </div>
                 
-                {/* Button - Always at bottom */}
+                {/* Show Product Button */}
                 <button 
                     onClick={(e) => { 
-                        if (fName || lName || userId || profilePic?.url) {
-                            navigate(`/items/${item._id}`)
-                        } else {
-                            setOpenModalLog(true);
+                        // if (fName || lName || userId || profilePic?.url) {
+                            navigate(`/items/${item._id}`);
+                        // } else {
+                            // setOpenModalLog(true);
                             setOpenModalReg(false);
                         }
-                    }} 
+                    // }
+                } 
                     className="btn btn-primary w-100 mt-auto"
                     style={{ backgroundColor: '#5C2D9A', borderColor: '#5C2D9A' }}
                 >
@@ -70,4 +97,4 @@ const ItemCard = ({ item, setOpenModalLog, setOpenModalReg, userId, fName, lName
     )
 }
 
-export default ItemCard
+export default ItemCard;

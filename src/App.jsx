@@ -34,7 +34,6 @@ import adminAuth from "./admin components/adminAuth";
 import ShowUser from "./Pages/ShowUser";
 import UpdateUser from "./Pages/UpdateUser";
 import Footer from "./Components/Footer";
-
 // import Upload from './Pages/Upload';
 import {
   alpha,
@@ -49,6 +48,8 @@ import VerifyEmail from "./Components/VerifyEmail/VerifyEmail";
 import EmailChangeVerification from "./Pages/EmailChangeVerification";
 import URISchemeTestPage from "./Pages/URISchemeTestPage0";
 import PaymentReturn from "./Pages/PaymentReturn";
+import Cart from "./Pages/Cart";
+import { CartProvider } from "./context/CartContext";
 const violetBase = "#7745B9";
 const violetMain = alpha(violetBase, 0.7);
 
@@ -80,6 +81,7 @@ function App() {
   const navigate = useNavigate();
 
   return (<>
+  <CartProvider>
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <div style={{ height: "100vh" }}>
@@ -183,9 +185,11 @@ function App() {
               </>
             }
           />
+                <Route path="/cart" element={<Cart />} /> 
           {/* <Route path='/thing/:id' element={<ShowOne />} /> */}
           {/* <Route path='/thing/edit/:id' element={<Edit />} /> */}
         </Routes>
+
         <Routes>
           <Route path="/admin/*" element={<AdminDash logged={logged}
             setLogged={setLogged} />} />
@@ -199,7 +203,7 @@ function App() {
         /> */}
       </div>
     </ThemeProvider>
-    
+    </CartProvider>
     </>
 );
 }

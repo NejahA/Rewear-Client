@@ -11,6 +11,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Typography from "@mui/material/Typography";
+import { CartContext } from "../context/CartContext";
 
 const ShowOne = () => {
   const [item, setItem] = useState({
@@ -40,7 +41,7 @@ const ShowOne = () => {
 
   const navigate = useNavigate();
   const { id } = useParams();
-
+const { addToCart } = React.useContext(CartContext);
   useEffect(() => {
     setItem({
       title: "-",
