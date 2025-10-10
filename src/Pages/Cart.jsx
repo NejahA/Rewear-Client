@@ -28,7 +28,7 @@ const Cart = () => {
     // Fetch cart items on component mount
     const fetchCartItems = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_LOCAL_URI}/api/cart`, {
+        const response = await axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/cart`, {
           withCredentials: true,
         });
         
@@ -61,7 +61,7 @@ const Cart = () => {
   const handleRemoveItem = async (itemId) => {
     try {
       await removeFromCart(itemId);
-      const response = await axios.get(`${import.meta.env.VITE_LOCAL_URI}/api/cart`, {
+      const response = await axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/cart`, {
         withCredentials: true,
       });
       if (response.data && response.data.items) {
@@ -83,7 +83,7 @@ const Cart = () => {
       }));
 
       const response = await axios.post(
-        `${import.meta.env.VITE_LOCAL_URI}/api/paymee/create-cart-payment`,
+        `${import.meta.env.VITE_VERCEL_URI}/api/paymee/create-cart-payment`,
         { items: cartItemsForPayment },
         { withCredentials: true }
       );
@@ -133,7 +133,7 @@ const Cart = () => {
 
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_LOCAL_URI}/api/paymee/check-status/${token}`,
+          `${import.meta.env.VITE_VERCEL_URI}/api/paymee/check-status/${token}`,
           { withCredentials: true, timeout: 10000 }
         );
 
@@ -145,7 +145,7 @@ const Cart = () => {
           if (pollInterval) clearInterval(pollInterval);
 
           // Clear cart after successful payment
-          await axios.post(`${import.meta.env.VITE_LOCAL_URI}/api/cart/checkout`, {}, { withCredentials: true });
+          await axios.post(`${import.meta.env.VITE_VERCEL_URI}/api/cart/checkout`, {}, { withCredentials: true });
           setCartItems([]);
           setTotalAmount(0);
         } else if (status.status === 'CANCELED' || status.status === 'FAILED') {
@@ -192,7 +192,7 @@ const Cart = () => {
         setPaymentLoading(false);
         
         // Clear cart after successful payment
-        axios.post(`${import.meta.env.VITE_LOCAL_URI}/api/cart/checkout`, {}, { withCredentials: true })
+        axios.post(`${import.meta.env.VITE_VERCEL_URI}/api/cart/checkout`, {}, { withCredentials: true })
           .then(() => {
             setCartItems([]);
             setTotalAmount(0);
