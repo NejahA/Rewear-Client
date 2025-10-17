@@ -180,7 +180,7 @@ if (item.tags && item.tags.length) {
       })
       .catch((err) => {
         console.log(err);
-        setErrors(err.response.data.errors);
+        setErrors(err && err.response && err.response.data && err.response.data.errors);
       });
   };
 
