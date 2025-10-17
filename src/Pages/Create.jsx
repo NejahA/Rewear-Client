@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
 import Box from '@mui/material/Box';
-import { Checkbox, ListItemText, Slider, Typography } from "@mui/material";
+import { Alert, AlertTitle, Checkbox, ListItemText, Slider, Typography } from "@mui/material";
 import { Select, MenuItem, InputLabel, FormControl, Input, TextField } from '@mui/material';
 import { Radio, FormLabel, RadioGroup, FormControlLabel } from '@mui/material';
 import CameraCapture from "../Components/CameraCapture ";
