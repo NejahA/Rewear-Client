@@ -2,7 +2,6 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import Logout from "../Components/Logout";
 import { Link, useNavigate, useParams } from "react-router-dom";
-
 import Box from "@mui/material/Box";
 import { Checkbox, ListItemText, Slider, Typography } from "@mui/material";
 import {
@@ -104,7 +103,7 @@ const Edit = () => {
   const [item, setItem] = useState({});
 
   // const [item, setItem] = useState({
-  //   title: "",
+  //   title: ",
   //   category: "",
   //   brand: "",
   //   size: "",

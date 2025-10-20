@@ -112,7 +112,14 @@ const dataProvider = {
     // }).then(({ json }) => ({ data: json }));
   // },
   
-
+deleteMany: (resource, params) => {
+    const { ids } = params;
+    return httpClient(`${apiUrl}/${resource}/delete-many`, {
+      method: "POST",
+      body: JSON.stringify({ ids }),
+      credentials: "include",
+    }).then(() => ({ data: ids })); // Return the IDs as per react-admin expectation for soft deletes
+  },
 
   update: (resource, params) =>
     httpClient(`${apiUrl}/${resource}/${params.id}`, {
