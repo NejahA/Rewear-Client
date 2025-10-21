@@ -12,13 +12,16 @@ const LocationPicker = ({ onLocationSelect, initialPosition, initialAddress }) =
   const [googleMapsUrl, setGoogleMapsUrl] = useState('');
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [isMapReady, setIsMapReady] = useState(false);
-  const [selectionMode, setSelectionMode] = useState('click'); // 'click' or 'button'
+  const [selectionMode, setSelectionMode] = useState('click'); // 'click' or 'gps'
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
+  const [locationAccuracy, setLocationAccuracy] = useState(null);
   const mapRef = useRef();
   const mapInstance = useRef();
   const markerRef = useRef();
   const geocoderRef = useRef();
   const LRef = useRef();
   const geocoderControlRef = useRef();
+  const watchIdRef = useRef(null);
 
   // Function to generate Google Maps URL
   const generateGoogleMapsUrl = useCallback((lat, lng, addressText) => {
@@ -89,7 +92,119 @@ const LocationPicker = ({ onLocationSelect, initialPosition, initialAddress }) =
     }
   }, []);
 
-  const handleLocationSelectComplete = useCallback((newPosition, addressName) => {
+  // **HIGHLY PRECISE GPS LOCATION FUNCTION**
+  const getPreciseDeviceLocation = useCallback(async () => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error('Geolocation is not supported by this browser.'));
+        return;
+      }
+
+      setIsGettingLocation(true);
+      
+      // Clear any existing watch
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+        watchIdRef.current = null;
+      }
+
+      let bestPosition = null;
+      let bestAccuracy = Infinity;
+
+      const onSuccess = (position) => {
+        const { latitude, longitude, accuracy } = position.coords;
+        
+        // Only accept positions with accuracy < 20 meters
+        if (accuracy < 20) {
+          // Stop watching if we have a good position
+          if (watchIdRef.current !== null) {
+            navigator.geolocation.clearWatch(watchIdRef.current);
+            watchIdRef.current = null;
+          }
+          
+          setIsGettingLocation(false);
+          setLocationAccuracy(accuracy);
+          resolve({ 
+            lat: latitude, 
+            lng: longitude, 
+            accuracy: accuracy 
+          });
+          return;
+        }
+
+        // Keep the best position so far
+        if (accuracy < bestAccuracy) {
+          bestAccuracy = accuracy;
+          bestPosition = { lat: latitude, lng: longitude, accuracy };
+        }
+
+        console.log(`GPS Update: Accuracy = ${accuracy.toFixed(1)}m`);
+      };
+
+      const onError = (error) => {
+        setIsGettingLocation(false);
+        
+        // If we have a best position (even if not perfect), use it
+        if (bestPosition) {
+          setLocationAccuracy(bestPosition.accuracy);
+          resolve(bestPosition);
+          return;
+        }
+
+        let errorMessage = 'Unable to get precise location';
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Location access denied. Please enable location permissions and try again.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Location information is unavailable. Please check your GPS signal.';
+            break;
+          case error.TIMEOUT:
+            errorMessage = bestPosition 
+              ? `Using position with ${bestPosition.accuracy.toFixed(1)}m accuracy`
+              : 'Location request timed out. Please try again.';
+            break;
+          default:
+            errorMessage = 'An unknown error occurred.';
+            break;
+        }
+        
+        if (bestPosition) {
+          setLocationAccuracy(bestPosition.accuracy);
+          resolve(bestPosition);
+        } else {
+          reject(new Error(errorMessage));
+        }
+      };
+
+      // Start HIGH PRECISION WATCH
+      watchIdRef.current = navigator.geolocation.watchPosition(
+        onSuccess,
+        onError,
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,        // 15 seconds timeout
+          maximumAge: 0          // Always get fresh location, no cache
+        }
+      );
+
+      // Fallback timeout after 15 seconds
+      setTimeout(() => {
+        if (watchIdRef.current !== null) {
+          navigator.geolocation.clearWatch(watchIdRef.current);
+          watchIdRef.current = null;
+          
+          if (bestPosition) {
+            setIsGettingLocation(false);
+            setLocationAccuracy(bestPosition.accuracy);
+            resolve(bestPosition);
+          }
+        }
+      }, 15000);
+    });
+  }, []);
+
+  const handleLocationSelectComplete = useCallback((newPosition, addressName, accuracy = null) => {
     setPosition(newPosition);
     setAddress(addressName);
     setEditableAddress(addressName);
@@ -109,6 +224,7 @@ const LocationPicker = ({ onLocationSelect, initialPosition, initialAddress }) =
     setEditableAddress('');
     setPosition(null);
     setGoogleMapsUrl('');
+    setLocationAccuracy(null);
     removeMarker();
     
     // Reset map view to default position
@@ -183,41 +299,58 @@ const LocationPicker = ({ onLocationSelect, initialPosition, initialAddress }) =
     handleLocationSelectComplete(newPosition, addressName);
   }, [zoomLevel, updateMarker, reverseGeocode, getAddressFromCoordinates, handleLocationSelectComplete, selectionMode]);
 
-  // Function to handle selection via button
-  const handleSelectButtonClick = useCallback(async () => {
-    if (!mapInstance.current) return;
-    
-    const center = mapInstance.current.getCenter();
-    const newPosition = [center.lat, center.lng];
-    
-    // Update marker position
-    updateMarker(newPosition);
-    
-    // Reverse geocode to get address from coordinates
-    let addressName = null;
-    
+  // **ENHANCED GPS LOCATION HANDLER**
+  const handleGPSLocationClick = useCallback(async () => {
     try {
-      // Try using the leaflet geocoder first
-      const results = await reverseGeocode(center, zoomLevel);
+      const deviceLocation = await getPreciseDeviceLocation();
+      const newPosition = [deviceLocation.lat, deviceLocation.lng];
       
-      if (results && results.length > 0 && results[0]) {
-        addressName = results[0].name;
-      } else {
-        // Fallback to direct API call
-        addressName = await getAddressFromCoordinates(center.lat, center.lng);
+      // Update marker position
+      updateMarker(newPosition);
+      
+      // Center map on GPS location with HIGH ZOOM (18)
+      if (mapInstance.current) {
+        // Dynamic zoom based on accuracy
+        let dynamicZoom = 18;
+        if (deviceLocation.accuracy > 50) dynamicZoom = 16;
+        else if (deviceLocation.accuracy > 20) dynamicZoom = 17;
+        
+        mapInstance.current.setView(newPosition, dynamicZoom);
+        setZoomLevel(dynamicZoom);
       }
+      
+      // Reverse geocode to get address from coordinates
+      let addressName = null;
+      
+      try {
+        // Try using the leaflet geocoder first
+        const results = await reverseGeocode(
+          LRef.current.latLng(deviceLocation.lat, deviceLocation.lng), 
+          18
+        );
+        
+        if (results && results.length > 0 && results[0]) {
+          addressName = results[0].name;
+        } else {
+          // Fallback to direct API call
+          addressName = await getAddressFromCoordinates(deviceLocation.lat, deviceLocation.lng);
+        }
+      } catch (error) {
+        console.error("Reverse geocoding error:", error);
+      }
+      
+      // If we still don't have an address, create a coordinate-based one WITH ACCURACY
+      if (!addressName) {
+        addressName = `GPS Location (${deviceLocation.accuracy.toFixed(1)}m accuracy) at ${newPosition[0].toFixed(7)}, ${newPosition[1].toFixed(7)}`;
+      }
+      
+      // Complete the location selection
+      handleLocationSelectComplete(newPosition, addressName, deviceLocation.accuracy);
     } catch (error) {
-      console.error("Reverse geocoding error:", error);
+      console.error("GPS location error:", error);
+      alert(error.message);
     }
-    
-    // If we still don't have an address, create a coordinate-based one
-    if (!addressName) {
-      addressName = `Location at ${newPosition[0].toFixed(6)}, ${newPosition[1].toFixed(6)}`;
-    }
-    
-    // Complete the location selection
-    handleLocationSelectComplete(newPosition, addressName);
-  }, [zoomLevel, updateMarker, reverseGeocode, getAddressFromCoordinates, handleLocationSelectComplete]);
+  }, [getPreciseDeviceLocation, updateMarker, reverseGeocode, getAddressFromCoordinates, handleLocationSelectComplete, LRef]);
 
   // Function to handle double-click for zooming only
   const handleDoubleClick = useCallback((e) => {
@@ -225,7 +358,7 @@ const LocationPicker = ({ onLocationSelect, initialPosition, initialAddress }) =
     
     // Zoom in on double-click without changing selection
     const currentZoom = mapInstance.current.getZoom();
-    const newZoom = Math.min(currentZoom + 1, 18);
+    const newZoom = Math.min(currentZoom + 1, 19);
     mapInstance.current.setView(e.latlng, newZoom);
     setZoomLevel(newZoom);
   }, []);
@@ -241,6 +374,15 @@ const LocationPicker = ({ onLocationSelect, initialPosition, initialAddress }) =
       setGoogleMapsUrl(mapsUrl);
     }
   }, [initialAddress, initialPosition, generateGoogleMapsUrl]);
+
+  // Cleanup watch on unmount
+  useEffect(() => {
+    return () => {
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     // Import leaflet and geocoder dynamically
@@ -441,24 +583,37 @@ const LocationPicker = ({ onLocationSelect, initialPosition, initialAddress }) =
         </button>
         <button
           type="button"
-          className={`btn ${selectionMode === 'button' ? 'btn-danger' : 'btn-outline-danger'}`}
-          onClick={() => setSelectionMode('button')}
+          className={`btn ${selectionMode === 'gps' ? 'btn-danger' : 'btn-outline-danger'}`}
+          onClick={() => setSelectionMode('gps')}
         >
-          Use Center Position
+          📍 Precise GPS Location
         </button>
       </div>
 
-      {/* Selection Button (only shown in button mode) */}
-      {selectionMode === 'button' && (
+      {/* GPS Button (only shown in GPS mode) */}
+      {selectionMode === 'gps' && (
         <div className="d-grid mb-3">
           <button
             type="button"
-            className="btn btn-success"
-            onClick={handleSelectButtonClick}
+            className={`btn btn-success ${isGettingLocation ? 'disabled' : ''}`}
+            onClick={handleGPSLocationClick}
+            disabled={isGettingLocation}
           >
-            <i className="bi bi-geo-alt me-2"></i>
-            Select Current Map Center
+            {isGettingLocation ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Getting Precise Location...
+              </>
+            ) : (
+              <>
+                <i className="bi bi-geo-alt-fill me-2"></i>
+                Use My Exact Location
+              </>
+            )}
           </button>
+          <small className="text-muted text-center d-block mt-1">
+            Requires GPS permission • High accuracy mode
+          </small>
         </div>
       )}
 
@@ -467,7 +622,7 @@ const LocationPicker = ({ onLocationSelect, initialPosition, initialAddress }) =
         <small className="text-muted">
           {selectionMode === 'click' 
             ? "Click on the map to set your precise location, or use the search box to find an address."
-            : "Pan the map to position the center on your desired location, then click the button above to select it."}
+            : "Click button above for <strong>ultra-precise GPS location</strong> (within 5-20 meters)."}
         </small>
       </div>
 
@@ -538,8 +693,10 @@ const LocationPicker = ({ onLocationSelect, initialPosition, initialAddress }) =
             </div>
             
             <p className="card-text">
-              <strong>Coordinates:</strong> {position ? `${position[0]?.toFixed(6)}, ${position[1]?.toFixed(6)}` : 'Not set'}
+              <strong>Coordinates:</strong> {position ? `${position[0]?.toFixed(7)}, ${position[1]?.toFixed(7)}` : 'Not set'}
             </p>
+            
+            
             <p className="card-text">
               <strong>Zoom Level:</strong> {zoomLevel}
             </p>

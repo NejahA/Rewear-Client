@@ -1,8 +1,8 @@
 import { fetchUtils } from "react-admin";
 
-const apiUrl = ""+import.meta.env.VITE_VERCEL_URI+"/api/mod";
+// const apiUrl = ""+import.meta.env.VITE_VERCEL_URI+"/api/mod";
+const apiUrl = "http://localhost:10000/api/mod"; // Replace with your actual API URL
 // const apiUrl = "https://fantastic-engine-ww965p6rpv4c994-10000.app.github.dev/api/mod"; // Replace with your actual API URL
-// const apiUrl = "http://localhost:10000/api/mod"; // Replace with your actual API URL
 const httpClient = (url, options = {}) => {
   options.credentials = "include"; // Ensures cookies are sent with requests
   options.headers = new Headers({ Accept: "application/json" });
@@ -115,7 +115,7 @@ const dataProvider = {
 deleteMany: (resource, params) => {
     const { ids } = params;
     return httpClient(`${apiUrl}/${resource}/delete-many`, {
-      method: "POST",
+      method: "DELETE",
       body: JSON.stringify({ ids }),
       credentials: "include",
     }).then(() => ({ data: ids })); // Return the IDs as per react-admin expectation for soft deletes
