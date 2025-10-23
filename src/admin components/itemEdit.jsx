@@ -86,6 +86,7 @@ const itemEdit = (props) => {
             <DateInput source="created_at" disabled fullWidth />
             <DateInput source="updated_at" disabled fullWidth />
             <TextInput source="condition" fullWidth />
+            <TextInput source="stock" fullWidth />
             <TextInput
               source="adminComment"
               multiline 
