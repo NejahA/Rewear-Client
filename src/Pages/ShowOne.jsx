@@ -236,13 +236,12 @@ const ShowOne = () => {
             
             {/* UPDATED: Stock display with live indicator */}
             <div className="mt-2">
-              <sma>
               <small className={`text-${item.stock <= 0 ? 'danger' : item.stock <= 5 ? 'warning' : 'muted'}`}>
                 📦 Stock: <strong>{item.stock || 0}</strong> available 
                 {item.stock <= 5 && item.stock > 0 && <span className="text-warning">(Low Stock!)</span>}
                 {item.stock === 0 && <span className="text-danger">(Out of Stock)</span>}
                 <br />
-                {/* <small className="text-muted">Updates every 30s ↻</small> */}
+                <small className="text-muted">Updates every 30s ↻</small>
               </small>
             </div>
             
