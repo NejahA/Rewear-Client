@@ -60,7 +60,7 @@ const ShowOne = () => {
     fetchItem(); // Initial load
 
     // Poll stock every 30 seconds
-    const stockInterval = setInterval(fetchItem, 30000);
+    const stockInterval = setInterval(fetchItem, 1000);
     setStockPollingInterval(stockInterval);
 
     return () => {
@@ -237,7 +237,7 @@ const ShowOne = () => {
               {item.stock <= 2 && item.stock > 0 && <span className="text-warning"> (Low Stock!)</span>}
               {item.stock === 0 && <span className="text-danger"> (Out of Stock)</span>}
               <br />
-              <small className="text-muted">Updates every 30s ↻</small>
+              {/* <small className="text-muted">Updates every 30s ↻</small> */}
             </small>
           </div>
           
