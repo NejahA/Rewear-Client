@@ -1,7 +1,7 @@
 import { fetchUtils } from "react-admin";
 
-// const apiUrl = ""+import.meta.env.VITE_VERCEL_URI+"/api/mod";
-const apiUrl = "http://localhost:10000/api/mod"; // Replace with your actual API URL
+const apiUrl = ""+import.meta.env.VITE_VERCEL_URI+"/api/mod";
+// const apiUrl = "http://localhost:10000/api/mod"; // Replace with your actual API URL
 // const apiUrl = "https://fantastic-engine-ww965p6rpv4c994-10000.app.github.dev/api/mod"; // Replace with your actual API URL
 const httpClient = (url, options = {}) => {
   options.credentials = "include"; // Ensures cookies are sent with requests
