@@ -1,3 +1,4 @@
+// ShowOne.jsx - STOCK POLLING ADDED
 import axios from "axios";
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -7,21 +8,9 @@ import { CartContext } from "../context/CartContext";
 
 const ShowOne = () => {
   const [item, setItem] = useState({
-    title: "",
-    category: "",
-    brand: "",
-    size: "",
-    description: "",
-    price: "",
-    previousOwners: "",
-    gender: "",
-    condition: "",
-    age: "",
-    status: "",
-    stock: 1,
-    tags: [],
-    itemPics: [],
-    user: { fName: "loading", profilePic: { url: "/logo/load-violet.gif" } }
+    title: "", category: "", brand: "", size: "", description: "", price: "",
+    previousOwners: "", gender: "", condition: "", age: "", status: "", stock: 1,
+    tags: [], itemPics: [], user: { fName: "loading", profilePic: { url: "/logo/load-violet.gif" } }
   });
   const [activeImage, setActiveImage] = useState("");
   const [loggedUser, setLoggedUser] = useState(null);
@@ -29,8 +18,8 @@ const ShowOne = () => {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentDialog, setPaymentDialog] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
-  const [pollingInterval, setPollingInterval] = useState(null);
-  const [stockPollingInterval, setStockPollingInterval] = useState(null);
+  const [pollingInterval, setPollingInterval] = useState(null); // Payment polling
+  const [stockPollingInterval, setStockPollingInterval] = useState(null); // NEW: Stock polling
   const [paymentToken, setPaymentToken] = useState(null);
   const [iframeUrl, setIframeUrl] = useState(null);
   const navigate = useNavigate();
@@ -40,7 +29,7 @@ const ShowOne = () => {
   // NEW: Fetch item function (extracted for reuse)
   const fetchItem = useCallback(async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_LOCAL_URI}/api/items/${id}`);
+      const res = await axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/items/${id}`);
       const fetchedItem = res.data;
       console.log("🔄 Stock refresh:", fetchedItem.stock);
       setItem(fetchedItem);
@@ -59,10 +48,9 @@ const ShowOne = () => {
     }
   }, [id, quantity, activeImage]);
 
-  // Fetch logged user
+  // ORIGINAL: Fetch user
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_LOCAL_URI}/api/users/logged`, { withCredentials: true })
+    axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/users/logged`, { withCredentials: true })
       .then((res) => setLoggedUser(res.data))
       .catch((err) => console.error("Error fetching logged user:", err));
   }, []);
@@ -71,7 +59,7 @@ const ShowOne = () => {
   useEffect(() => {
     fetchItem(); // Initial load
 
-    // 🔥 Poll stock every 30 seconds
+    // NEW: Poll stock every 30 seconds
     const stockInterval = setInterval(fetchItem, 30000);
     setStockPollingInterval(stockInterval);
 
@@ -81,9 +69,9 @@ const ShowOne = () => {
     };
   }, [fetchItem, pollingInterval]);
 
+  // ... (keep all your existing functions: deleteItem, handleBuyItem, startPaymentPolling, closePaymentDialog, etc.)
   const deleteItem = (itemId) => {
-    axios
-      .delete(`${import.meta.env.VITE_LOCAL_URI}/api/items/${itemId}`, { withCredentials: true })
+    axios.delete(`${import.meta.env.VITE_VERCEL_URI}/api/items/${itemId}`, { withCredentials: true })
       .then(() => navigate("/"))
       .catch((error) => console.error("Error deleting item:", error));
   };
@@ -101,7 +89,7 @@ const ShowOne = () => {
     setPaymentLoading(true);
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_LOCAL_URI}/api/paymee/create-payment`,
+        `${import.meta.env.VITE_VERCEL_URI}/api/paymee/create-payment`,
         { itemId: item._id, quantity },
         { withCredentials: true }
       );
@@ -113,10 +101,6 @@ const ShowOne = () => {
       }
 
       const { paymentUrl, token } = response.data;
-      if (!paymentUrl || !paymentUrl.startsWith('http')) {
-        throw new Error('Invalid payment URL received');
-      }
-
       setIframeUrl(paymentUrl);
       setPaymentToken(token);
       setPaymentDialog(true);
@@ -146,7 +130,7 @@ const ShowOne = () => {
       attempts++;
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_LOCAL_URI}/api/paymee/check-status/${token}`,
+          `${import.meta.env.VITE_VERCEL_URI}/api/paymee/check-status/${token}`,
           { withCredentials: true, timeout: 10000 }
         );
 
@@ -156,10 +140,11 @@ const ShowOne = () => {
           setPaymentLoading(false);
           clearInterval(pollingInterval);
           setPollingInterval(null);
-          fetchItem(); // 🔥 Refresh stock
+          // NEW: Refresh stock immediately after success
+          fetchItem();
         } else if (status.status === 'FAILED' || status.status === 'CANCELLED') {
           setPaymentStatus('failed');
-          setPaymentLoading(false); // 🔥 STOP LOADING!
+          setPaymentLoading(false);
           clearInterval(pollingInterval);
           setPollingInterval(null);
         }
@@ -167,7 +152,7 @@ const ShowOne = () => {
         console.error('Polling error:', error);
         if (attempts >= maxAttempts) {
           setPaymentStatus('timeout');
-          setPaymentLoading(false); // 🔥 STOP LOADING!
+          setPaymentLoading(false);
           clearInterval(pollingInterval);
           setPollingInterval(null);
         }
@@ -178,22 +163,18 @@ const ShowOne = () => {
     setPollingInterval(interval);
   };
 
-  // 🔥 FIXED: STOP LOADING WHEN CLOSING DIALOG
   const closePaymentDialog = () => {
     setPaymentDialog(false);
     setIframeUrl(null);
     setPaymentToken(null);
     setPaymentStatus(null);
-    setPaymentLoading(false); // 🔥 FIXED: ALWAYS STOP LOADING!
     if (pollingInterval) {
       clearInterval(pollingInterval);
       setPollingInterval(null);
     }
-    if (stockPollingInterval) {
-      clearInterval(stockPollingInterval);
-      setStockPollingInterval(null);
+    if (paymentStatus === 'success') {
+      navigate('/');
     }
-    // 🔥 FIXED: STAY ON PAGE - DON'T NAVIGATE!
   };
 
   // Keep your existing message handler
@@ -205,7 +186,7 @@ const ShowOne = () => {
         fetchItem(); // NEW: Refresh stock
       } else if (event.data === 'payment_failed' || event.data === 'payment_cancelled') {
         setPaymentStatus('failed');
-        setPaymentLoading(false); // 🔥 STOP LOADING!
+        setPaymentLoading(false);
       }
       if (pollingInterval) {
         clearInterval(pollingInterval);
@@ -217,25 +198,24 @@ const ShowOne = () => {
     return () => window.removeEventListener('message', handleMessage);
   }, [pollingInterval]);
 
+  // ... (keep ALL your existing JSX return - just update the stock display)
+
   return (
     <div className="container my-5">
       <div className="row">
         <div className="col-12 col-md-6">
+          {/* Images - unchanged */}
           <div className="card mb-3">
-            <img
-              src={activeImage}
-              className="card-img-top"
-              alt={item.title}
-              style={{ maxHeight: '500px', objectFit: 'contain' }}
-            />
+            <img src={activeImage} className="card-img-top" alt={item.title} style={{ maxHeight: '500px', objectFit: 'contain' }} />
             <div className="card-body">
               <div className="d-flex flex-wrap gap-2">
                 {item.itemPics.map((pic, index) => (
                   <img
                     key={index}
                     src={pic.url || pic}
+                    alt={`thumbnail-${index}`}
                     className="img-thumbnail"
-                    style={{ width: '60px', height: '60px', cursor: 'pointer' }}
+                    style={{ width: '60px', height: '60px', cursor: 'pointer', objectFit: 'cover' }}
                     onClick={() => setActiveImage(pic.url || pic)}
                   />
                 ))}
@@ -256,12 +236,13 @@ const ShowOne = () => {
             
             {/* UPDATED: Stock display with live indicator */}
             <div className="mt-2">
+              <sma>
               <small className={`text-${item.stock <= 0 ? 'danger' : item.stock <= 5 ? 'warning' : 'muted'}`}>
                 📦 Stock: <strong>{item.stock || 0}</strong> available 
                 {item.stock <= 5 && item.stock > 0 && <span className="text-warning">(Low Stock!)</span>}
                 {item.stock === 0 && <span className="text-danger">(Out of Stock)</span>}
                 <br />
-                <small className="text-muted">Updates every 30s ↻</small>
+                {/* <small className="text-muted">Updates every 30s ↻</small> */}
               </small>
             </div>
             
@@ -414,21 +395,12 @@ const ShowOne = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={closePaymentDialog}
-            variant="contained"
-            style={{ backgroundColor: '#713CC5' }}
-          >
+          <Button onClick={closePaymentDialog} variant="contained" style={{ backgroundColor: '#713CC5' }}>
             Close
           </Button>
           {paymentStatus === 'failed' && (
-            <Button
-              onClick={() => {
-                closePaymentDialog();
-                handleBuyItem();
-              }}
-              variant="outlined"
-              style={{ borderColor: '#713CC5', color: '#713CC5' }}
+            <Button onClick={() => { closePaymentDialog(); handleBuyItem(); }}
+              variant="outlined" style={{ borderColor: '#713CC5', color: '#713CC5' }}
             >
               Try Again
             </Button>
