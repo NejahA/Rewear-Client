@@ -3,8 +3,9 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import Logout from "./Logout";
 import axios from "axios";
 import Button from "@mui/material/Button";
+import { IconButton } from "@mui/material";
 // import Cookies from "universal-cookies";
-
+import {MdAddShoppingCart}  from "react-icons/md"
 // A hook to detect screen width
 const useIsDesktop = () => {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 992);
@@ -224,11 +225,17 @@ const Navbar = ({
                         style={{ width: "24px", height: "24px" }}
                       />
                     </Link>
-
+                      <Link
+                      className="nav-link d-flex align-items-center"
+                      to={"/cart"}
+                    >
+                      
+                    <MdAddShoppingCart fontSize="large"  color="#8356C0"/>
+                    </Link>
                     <Logout setLogged={setLogged} />
                   </>
                 ) : (
-                  <>
+                  <div className="d-flex  gap-4">
                     <Button
                       variant="outlined"
                       sx={{
@@ -276,7 +283,7 @@ const Navbar = ({
                       <i className="bi bi-person-fill"></i>
                       Log in
                     </Button>
-                  </>
+                  </div>
                 )}
               </div>
             </div>

@@ -15,6 +15,7 @@ import { ThemeProvider } from '@mui/material/styles'
 import LogoutIcon from '@mui/icons-material/Logout'
 import CloseIcon from '@mui/icons-material/Close'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
+import { useAuth } from '../context/AuthContex'
 
 const violetBase = '#7745B9'
 const violetMain = alpha(violetBase, 0.8)
@@ -75,7 +76,7 @@ const Logout = ({ setLogged }) => {
   const navigate = useNavigate()
   const [openDialog, setOpenDialog] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-
+  const {logout} = useAuth()
   const handleLogoutClick = () => {
     setOpenDialog(true)
   }
@@ -90,14 +91,17 @@ const Logout = ({ setLogged }) => {
   }
 
   const performLogout = () => {
-    axios
-      .post(
-        `${import.meta.env.VITE_VERCEL_URI}/api/logout`,
-        {},
-        {
-          withCredentials: true,
-        }
-      )
+
+
+    logout()
+    // axios
+    //   .post(
+    //     `${import.meta.env.VITE_VERCEL_URI}/api/logout`,
+    //     {},
+    //     {
+    //       withCredentials: true,
+    //     }
+    //   )
       .then((res) => {
         console.log('User logged out successfully')
         setLogged(false)
@@ -124,16 +128,14 @@ const Logout = ({ setLogged }) => {
         color="violet"
         startIcon={<LogoutIcon />}
         onClick={handleLogoutClick}
-        sx={{
-          minWidth: '120px',
-          transition: 'all 0.2s ease-in-out',
-          '&:hover': {
-            transform: 'translateY(-1px)',
-          },
-        }}
-      >
-        Logout
-      </Button>
+        // sx={{
+        //   // minWidth: '120px',
+        //   transition: 'all 0.2s ease-in-out',
+        //   '&:hover': {
+        //     transform: 'translateY(-1px)',
+        //   },
+        // }}
+      >{/* Logout */}</Button>
 
       <Dialog
         open={openDialog}

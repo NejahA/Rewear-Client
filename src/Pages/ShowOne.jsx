@@ -203,7 +203,7 @@ const ShowOne = () => {
     <div className="container my-5">
       <div className="row">
         <div className="col-12 col-md-6">
-          <div className="card mb-3">
+          <div className=" align-items-center mb-3">
             <img
               src={activeImage}
               className="card-img-top"

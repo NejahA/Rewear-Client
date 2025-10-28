@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./ModalLog.css";
-import { useAuth } from "../../context/AuthContex";
+import { useAuth } from "@/context/AuthContext";
+
 const ModalLog = ({ open, setOpenModalLog, setOpenModalReg }) => {
   const { login, resendVerification, forgotPassword, loading } = useAuth();
 

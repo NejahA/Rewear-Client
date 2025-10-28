@@ -50,6 +50,7 @@ import URISchemeTestPage from "./Pages/URISchemeTestPage0";
 import PaymentReturn from "./Pages/PaymentReturn";
 import Cart from "./Pages/Cart";
 import { CartProvider } from "./context/CartContext";
+import { AuthProvider } from "./context/AuthContex";
 const violetBase = "#7745B9";
 const violetMain = alpha(violetBase, 0.7);
 
@@ -79,11 +80,12 @@ function App() {
   const [openModalLog, setOpenModalLog] = useState(false);
   const [openModalReg, setOpenModalReg] = useState(false);
   const navigate = useNavigate();
-
   return (<>
-  <CartProvider>
     <ThemeProvider theme={theme}>
       <CssBaseline />
+    <AuthProvider>
+
+  <CartProvider>
       <div style={{ height: "100vh" }}>
         {/* <Admin authProvider={adminAuth} loginPage={<><Navbar setOpenModalReg={setOpenModalReg}  setOpenModalLog={setOpenModalLog} /><Home setOpenModalReg={setOpenModalReg} setOpenModalLog={setOpenModalLog} /></> }  dataProvider= {simpleRestProvider(''+import.meta.env.VITE_VERCEL_URI+'/api' )} >
     <Resource name="items" edit={itemEdit} list={ItemList} />
@@ -202,8 +204,9 @@ function App() {
           setOpenModalLog={setOpenModalLog}
         /> */}
       </div>
-    </ThemeProvider>
     </CartProvider>
+    </AuthProvider>
+    </ThemeProvider>
     </>
 );
 }

@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext'; // Import CartContext
+import { useAuth } from '../context/AuthContex';
 
 const ItemCard = ({ item, setOpenModalLog, setOpenModalReg, userId, fName, lName, profilePic }) => {
     const navigate = useNavigate();
     const { addToCart } = React.useContext(CartContext); // Use addToCart function from CartContext
-
+    const {isLoggedIn}= useAuth();
     // State to track hover
     const [isHovered, setIsHovered] = React.useState(false);
 
@@ -22,12 +23,12 @@ const ItemCard = ({ item, setOpenModalLog, setOpenModalReg, userId, fName, lName
                 {/* Add to Cart Icon on Top Left Corner */}
                 <button 
                     onClick={(e) => { 
-                        // if (fName || lName || userId || profilePic?.url) {
+                        if (isLoggedIn) {
                             addToCart(item._id); // Add item to cart
-                        // } else {
-                            // setOpenModalLog(true);
-                            // setOpenModalReg(false);
-                        // }
+                        } else {
+                            setOpenModalLog(true);
+                            setOpenModalReg(false);
+                        }
                     }
                 } 
                     className="btn position-absolute top-0 start-0 m-2"
@@ -79,13 +80,13 @@ const ItemCard = ({ item, setOpenModalLog, setOpenModalReg, userId, fName, lName
                 {/* Show Product Button */}
                 <button 
                     onClick={(e) => { 
-                        // if (fName || lName || userId || profilePic?.url) {
+                        if (isLoggedIn) {
                             navigate(`/items/${item._id}`);
-                        // } else {
-                            // setOpenModalLog(true);
+                        } else {
+                            setOpenModalLog(true);
                             setOpenModalReg(false);
                         }
-                    // }
+                    }
                 } 
                     className="btn btn-primary w-100 mt-auto"
                     style={{ backgroundColor: '#5C2D9A', borderColor: '#5C2D9A' }}
