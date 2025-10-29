@@ -8,7 +8,7 @@ const API_URL = import.meta.env.VITE_VERCEL_URI;
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [loggedId, setLoggedId] = useState(null);
   const axiosInstance = axios.create({
     baseURL: API_URL,
     withCredentials: true,
@@ -19,8 +19,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const { data } = await axiosInstance.get("/api/users/logged");
       setUser(data);
+      setLoggedId(data._id);
     } catch (err) {
       setUser(null);
+      loggedId(null);
     } finally {
       setLoading(false);
     }
@@ -93,6 +95,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
+        loggedId,
         isLoggedIn: !!user,
         loading,
         login,

@@ -952,7 +952,7 @@ const Home = ({ setOpenModalLog, setOpenModalReg, sort, setSort, logged }) => {
                       }}
                     >
                       <ItemCard
-                        logged={logged}
+                        // logged={logged}
                         // userId={user?.id}
                         // fName={user?.fName}
                         // lName={user?.lName}

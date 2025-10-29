@@ -6,14 +6,16 @@ import { useAuth } from '../context/AuthContex';
 const ItemCard = ({ item, setOpenModalLog, setOpenModalReg, userId, fName, lName, profilePic }) => {
     const navigate = useNavigate();
     const { addToCart } = React.useContext(CartContext); // Use addToCart function from CartContext
-    const {isLoggedIn}= useAuth();
+    const {isLoggedIn,loggedId}= useAuth();
     // State to track hover
     const [isHovered, setIsHovered] = React.useState(false);
 
     return (
         <div className="card h-100 shadow-sm">
             {/* Image Container with Aspect Ratio */}
-            <div className="position-relative overflow-hidden" style={{ paddingTop: '75%' }}>
+            { isLoggedIn && loggedId !== item.user &&
+                
+                <div className="position-relative overflow-hidden" style={{ paddingTop: '75%' }}>
                 <img 
                     src={item && item.itemPics && item.itemPics[0] && item.itemPics[0].url ? item.itemPics[0].url : ""} 
                     className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" 
@@ -44,6 +46,7 @@ const ItemCard = ({ item, setOpenModalLog, setOpenModalReg, userId, fName, lName
                     <i className="bi bi-cart-plus-fill"></i>
                 </button>
             </div>
+                    }
             
             {/* Card Body */}
             <div className="card-body d-flex flex-column p-3">
