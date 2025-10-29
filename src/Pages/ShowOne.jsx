@@ -199,6 +199,12 @@ const ShowOne = () => {
     return () => window.removeEventListener('message', handleMessage);
   }, [pollingInterval]);
 
+  // ---- NEW: Navigate to owner profile --------------------
+const goToOwnerProfile = () => {
+  if (item?.user?._id) {
+    navigate(`/user/${item.user._id}`);
+  }
+};
   return (
     <div className="container my-5">
       <div className="row">
@@ -229,6 +235,33 @@ const ShowOne = () => {
         <div className="col-12 col-md-6">
           <h1 className="mb-3">{item.title}</h1>
           
+
+{/* ----------- NEW: Owner profile link ----------- */}
+<div className="d-flex align-items-center gap-2 mb-3">
+  {/* <strong>Seller:</strong> */}
+  <div
+    className="d-flex align-items-center gap-2"
+    style={{ cursor: "pointer" }}
+    onClick={goToOwnerProfile}
+  >
+    {/* Profile picture */}
+    <img
+      src={item.user?.profilePic?.url || "/logo/load-violet.gif"}
+      alt={`${item.user?.fName || ""} ${item.user?.lName || ""}`}
+      style={{
+        width: "40px",
+        height: "40px",
+        borderRadius: "50%",
+        objectFit: "cover",
+      }}
+    />
+    {/* Full name */}
+    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+      {item.user?.fName || ""} {item.user?.lName || ""}
+    </Typography>
+  </div>
+</div>
+
           <div className="mb-3">
             <small className="text-muted">
               <strong>Price:</strong> {item.price} DT
