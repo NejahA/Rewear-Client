@@ -13,7 +13,6 @@ const ItemCard = ({ item, setOpenModalLog, setOpenModalReg, userId, fName, lName
     return (
         <div className="card h-100 shadow-sm">
             {/* Image Container with Aspect Ratio */}
-            { isLoggedIn && loggedId !== item.user &&
                 
                 <div className="position-relative overflow-hidden" style={{ paddingTop: '75%' }}>
                 <img 
@@ -21,8 +20,9 @@ const ItemCard = ({ item, setOpenModalLog, setOpenModalReg, userId, fName, lName
                     className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" 
                     alt="itemPic"
                     loading="lazy"
-                />
+                    />
                 {/* Add to Cart Icon on Top Left Corner */}
+                    { isLoggedIn && loggedId !== item.user &&
                 <button 
                     onClick={(e) => { 
                         if (isLoggedIn) {
