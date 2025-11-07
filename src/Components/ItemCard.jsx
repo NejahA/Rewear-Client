@@ -45,8 +45,8 @@ const ItemCard = ({ item, setOpenModalLog, setOpenModalReg, userId, fName, lName
                 >
                     <i className="bi bi-cart-plus-fill"></i>
                 </button>
-            </div>
                     }
+                    </div>
             
             {/* Card Body */}
             <div className="card-body d-flex flex-column p-3">
