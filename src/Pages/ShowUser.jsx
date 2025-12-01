@@ -243,10 +243,10 @@ const ShowUser = ({ logged }) => {
               {/* Email Section */}
               <div className="d-flex justify-content-center align-items-center">
                 <i 
-                  className={`bi bi-envelope me-2 ${(profile.showEmail !== false || profile._id === loggedUser._id) ? 'clickable-icon' : ''}`}
+                  className={`bi bi-envelope me-2 ${(profile.showEmail !== false || profile._id === loggedUser._id) ? 'clickable-icon' : 'd-none'}`}
                   style={{ 
                     color: "#8356C0", 
-                    cursor: (profile.showEmail !== false || profile._id === loggedUser._id) ? 'pointer' : 'default',
+                    cursor: (profile.showEmail  && profile.email &&  profile.email.length>0 ) ? 'pointer' : 'default',
                   }}
                   onClick={handleEmailClick}
                   title={profile.showEmail !== false || profile._id === loggedUser._id ? `Send email to ${profile.email}` : 'Email hidden'}
@@ -273,7 +273,7 @@ const ShowUser = ({ logged }) => {
               {/* Phone Section */}
               <div className="d-flex justify-content-center align-items-center">
                 <i 
-                  className={`bi bi-telephone me-2 ${(profile.showPhone !== false || profile._id === loggedUser._id) ? 'clickable-icon' : ''}`}
+                  className={`bi bi-telephone me-2 ${(profile.showPhone && profile.phone && profile.phone.length > 0 ) ? 'clickable-icon' : 'd-none'}`}
                   style={{ 
                     color: "#8356C0", 
                     cursor: (profile.showPhone !== false || profile._id === loggedUser._id) ? 'pointer' : 'default',
@@ -302,7 +302,7 @@ const ShowUser = ({ logged }) => {
               {/* Address Section */}
               <div className="d-flex justify-content-center align-items-center">
                 <i 
-                  className={`bi bi-geo-alt-fill me-2 ${(profile.showAdress !== false || profile._id === loggedUser._id) ? 'clickable-icon' : ''}`}
+                  className={`bi bi-geo-alt-fill me-2 ${(profile.showAdress && profile.adress && profile.adress.length > 0 ) ? 'clickable-icon' : 'd-none'}`}
                   style={{ 
                     color: "#8356C0", 
                     cursor: (profile.showAdress !== false || profile._id === loggedUser._id) ? 'pointer' : 'default',
@@ -348,7 +348,7 @@ const ShowUser = ({ logged }) => {
           // category="Electronics"
           // price="027 DT"
           // imageUrl="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80"
- />
+ /> 
           {profile.itemsHistory.map((item) => (
             <div key={item._id} className="col">
                 <div className="card h-100 w-100 shadow-sm">
