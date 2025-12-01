@@ -45,12 +45,12 @@ const Navbar = ({
   const hasActiveSearch = search.trim().length > 0;
 
   useEffect(() => {
-    axios
-      .get(import.meta.env.VITE_VERCEL_URI + "/api/users/logged", {
-        withCredentials: true,
-      })
-      .then((res) => setUserNav(res.data))
-      .catch(() => setUserNav(null));
+    // axios
+      // .get(import.meta.env.VITE_VERCEL_URI + "/api/users/logged", {
+      //   withCredentials: true,
+      // })
+      // .then((res) => setUserNav(res.data))
+      // .catch(() => setUserNav(null));
   }, [
     // JSON.stringify(cookies.get("userToken")),
     location.pathname, isLoggedIn,

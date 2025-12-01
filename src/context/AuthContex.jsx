@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   // Fetch logged-in user from /api/users/logged
   const fetchMe = async () => {
     try {
-       const res  = await axiosInstance.get("/api/users/logged");
+      const res  = await axiosInstance.get("/api/users/logged");
       setUser(res.data);
       setLoggedId(res.data._id);
     } catch (err) {
@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await axiosInstance.post("/api/login", { email, password });
       await fetchMe();
+      
     } finally {
       setLoading(false);
     }
