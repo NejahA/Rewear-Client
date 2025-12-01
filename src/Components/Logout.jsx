@@ -104,7 +104,7 @@ const Logout = ({ setLogged }) => {
     //   )
       .then((res) => {
         console.log('User logged out successfully')
-        setLogged(false)
+        // setLogged(false)
         navigate('/')
       })
       .catch((err) => {

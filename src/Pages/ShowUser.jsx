@@ -2,6 +2,97 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { MoonLoader } from "react-spinners";
+// import ProductCard from "../../Test_Card/ProductCard";
+// import ProductCard from "../../haroun card/components/ProductCard";
+// import TestH from "../../haroun card/testH";
+// import NewCard from "../Components/NewCard.jsx";
+
+import {  useRef } from "react";
+import NewCard from "../../Test_Card/NewCard";
+
+const StaticLocationMap = ({ lat, lng }) => {
+  const mapRef = useRef(null);
+  const mapInstance = useRef(null);
+
+  useEffect(() => {
+    // Prevent double initialization in Strict Mode
+    if (mapInstance.current) return;
+
+    // Dynamically load Leaflet CSS + JS only once
+    const cssLink = document.createElement("link");
+    cssLink.rel = "stylesheet";
+    cssLink.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+    document.head.appendChild(cssLink);
+
+    const script = document.createElement("script");
+    script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    script.async = false;
+    script.onload = () => initializeMap();
+    document.body.appendChild(script);
+
+    const initializeMap = () => {
+      if (!mapRef.current || mapInstance.current) return;
+
+      const L = window.L;
+
+      // Create map
+      const map = L.map(mapRef.current, {
+        dragging: false,           // Disable drag
+        touchZoom: false,
+        doubleClickZoom: false,
+        scrollWheelZoom: true ,
+        boxZoom: false,
+        keyboard: false,
+        zoomControl: true,         // Keep + / - buttons
+        attributionControl: false  // Remove all attribution links
+      }).setView([lat, lng], 15);
+
+      // Add tiles (no attribution)
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "", // completely removed
+        maxZoom: 19,
+      }).addTo(map);
+
+      // Add marker
+      L.marker([lat, lng])
+        .addTo(map)
+        // .bindPopup("User Location")
+        // .openPopup();
+map.on("zoomend", () => {
+        map.setView([lat, lng], map.getZoom(), { animate: true });
+      });
+      mapInstance.current = map;
+    };
+
+    return () => {
+      if (mapInstance.current) {
+        mapInstance.current.remove();
+        mapInstance.current = null;
+      }
+    };
+  }, [lat, lng]);
+
+  return (
+    <div className="mt-5">
+      <h4 className="text-center mb-3">Location</h4>
+      <div
+        ref={mapRef}
+        style={{
+          height: "400px",
+          width: "100%",
+          borderRadius: "12px",
+          overflow: "hidden",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+          background: "#f0f0f0",
+        }}
+      />
+      <p className="text-center text-muted small mt-2">
+        Use +/− buttons to zoom
+      </p>
+    </div>
+  );
+};
+
 
 const ShowUser = ({ logged }) => {
   const navigate = useNavigate();
@@ -237,6 +328,10 @@ const ShowUser = ({ logged }) => {
                   <span className="text-muted">Hidden for privacy</span>
                 )}
               </div>
+              {(profile.location?.lat && profile.location?.lng) &&
+  (profile.showAdress !== false || profile._id === loggedUser._id) && (
+    <StaticLocationMap lat={profile.location.lat} lng={profile.location.lng} />
+)}
             </div>
           </div>
         </div>
@@ -247,6 +342,13 @@ const ShowUser = ({ logged }) => {
       
       {profile.itemsHistory && profile.itemsHistory.length > 0 ? (
         <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            {/* <TestH /> */}
+          <NewCard  
+          //           name="Premium Product"
+          // category="Electronics"
+          // price="027 DT"
+          // imageUrl="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80"
+ />
           {profile.itemsHistory.map((item) => (
             <div key={item._id} className="col">
                 <div className="card h-100 w-100 shadow-sm">

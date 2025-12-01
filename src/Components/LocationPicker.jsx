@@ -401,11 +401,17 @@ const LocationPicker = ({ onLocationSelect, initialPosition, initialAddress }) =
       });
 
       // Initialize map
-      mapInstance.current = L.map(mapRef.current).setView([36.8065, 10.1815], zoomLevel);
+      mapInstance.current = L.map(mapRef.current, {
+  attributionControl: false,
+  zoomControl: false
+}).setView([36.8065, 10.1815], zoomLevel);
 
       // Add tile layer
       L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attributions">CARTO</a>',
+        
+        // attribution: "",  
+
+        // '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attributions">CARTO</a>',
         maxZoom: 19,
       }).addTo(mapInstance.current);
 

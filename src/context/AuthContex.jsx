@@ -17,9 +17,9 @@ export const AuthProvider = ({ children }) => {
   // Fetch logged-in user from /api/users/logged
   const fetchMe = async () => {
     try {
-      const { data } = await axiosInstance.get("/api/users/logged");
-      setUser(data);
-      setLoggedId(data._id);
+       const res  = await axiosInstance.get("/api/users/logged");
+      setUser(res.data);
+      setLoggedId(res.data._id);
     } catch (err) {
       setUser(null);
       loggedId(null);
@@ -52,10 +52,11 @@ export const AuthProvider = ({ children }) => {
         password,
         confirmPW,
       });
-      await fetchMe(); // optional: auto-login after register
-      return res.data;
+      // await fetchMe(); // optional: auto-login after register
+      return res.data;  
     } catch (err) {
       const msg = err.response?.data?.message || "Registration failed";
+      console.log("err=>",err)
       throw new Error(msg);
     } finally {
       setLoading(false);

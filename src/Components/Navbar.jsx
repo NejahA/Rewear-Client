@@ -6,6 +6,7 @@ import Button from "@mui/material/Button";
 import { IconButton } from "@mui/material";
 // import Cookies from "universal-cookies";
 import {MdAddShoppingCart}  from "react-icons/md"
+import { useAuth } from "../context/AuthContex";
 // A hook to detect screen width
 const useIsDesktop = () => {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 992);
@@ -20,8 +21,8 @@ const useIsDesktop = () => {
 };
 
 const Navbar = ({
-  logged,
-  setLogged,
+  // logged,
+  // setLogged,
   setOpenModalReg,
   setOpenModalLog,
   openLog,
@@ -29,6 +30,8 @@ const Navbar = ({
   setSort,
   sort,
 }) => {
+    const { isLoggedIn, user } = useAuth();
+  
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [userNav, setUserNav] = useState(null);
@@ -50,7 +53,7 @@ const Navbar = ({
       .catch(() => setUserNav(null));
   }, [
     // JSON.stringify(cookies.get("userToken")),
-    location.pathname, logged,
+    location.pathname, isLoggedIn,
   ]);
 
   // Close menu when route changes
@@ -195,11 +198,11 @@ const Navbar = ({
                     : "flex-row justify-content-around gap-2 mt-3 flex-wrap"
                 }`}
               >
-                {userNav && userNav.fName ? (
+                {isLoggedIn && user && user.fName ? (
                   <>
                     <Link
                       className="nav-link d-flex align-items-center"
-                      to={"/user/" + userNav._id}
+                      to={"/user/" + user._id}
                     >
                       <img
                         className="user-avatar"
@@ -209,7 +212,7 @@ const Navbar = ({
                           borderRadius: "50%",
                           objectFit: "cover",
                         }}
-                        src={userNav?.profilePic?.url}
+                        src={user?.profilePic?.url}
                         alt="Profile"
                       />
                     </Link>
@@ -232,7 +235,7 @@ const Navbar = ({
                       
                     <MdAddShoppingCart fontSize="large"  color="#8356C0"/>
                     </Link>
-                    <Logout setLogged={setLogged} />
+                    <Logout  />
                   </>
                 ) : (
                   <div className="d-flex  gap-4">

@@ -319,3 +319,90 @@ body::-webkit-scrollbar {
 .statuscl-4 {
   color: #20c660; /* light blue */
 }
+
+
+
+
+.group-1-0 {
+  height: 426px;
+  width: 336px;
+}
+.rectangle-2-1 {
+  border-radius: 8px;
+  height: 426px;
+  width: 336px;
+  background-color: #ffffff;
+}
+.rectangle-2-6 {
+  border-radius: 4px;
+  height: 320px;
+  width: 320px;
+  background-color: #dfdfdf;
+}
+.rectangle-2-3 {
+  border-radius: 2px;
+  height: 32px;
+  width: 230px;
+  background-color: #715fa6;
+}
+.rectangle-2-4 {
+  border-radius: 2px;
+  height: 32px;
+  width: 32px;
+  background-color: #715fa6;
+}
+.rectangle-2-5 {
+  border-radius: 2px;
+  height: 32px;
+  width: 32px;
+  background-color: #715fa6;
+}
+.star-1 {
+  height: 28px;
+  width: 28px;
+}
+.group-9 {
+  height: 17px;
+  width: 21px;
+}
+.ellipse-5 {
+  height: 4px;
+  width: 4px;
+}
+.ellipse-6 {
+  height: 4px;
+  width: 4px;
+}
+.text-1 {
+  text-align: center;
+  vertical-align: middle;
+  font-size: 16px;
+  font-family: Roboto;
+  line-height: auto;
+  color: #ffffff;
+}
+.text-2 {
+  text-align: center;
+  vertical-align: middle;
+  font-size: 24px;
+  font-family: Roboto;
+  line-height: auto;
+  color: #000000;
+}
+.text-3 {
+  text-align: center;
+  vertical-align: middle;
+  font-size: 12px;
+  font-family: Roboto;
+  line-height: auto;
+  color: #000000;
+}
+.text-4 {
+  text-align: center;
+  vertical-align: middle;
+  font-size: 16px;
+  font-family: Roboto;
+  line-height: auto;
+  color: #715fa6;
+}
+
