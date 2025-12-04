@@ -44,18 +44,20 @@ const Navbar = ({
   // Check if there's an active search query
   const hasActiveSearch = search.trim().length > 0;
 
-  useEffect(() => {
+  // useEffect(() => {
     // axios
       // .get(import.meta.env.VITE_VERCEL_URI + "/api/users/logged", {
       //   withCredentials: true,
       // })
       // .then((res) => setUserNav(res.data))
       // .catch(() => setUserNav(null));
-  }, [
+  // }, [
     // JSON.stringify(cookies.get("userToken")),
-    location.pathname, isLoggedIn,
-  ]);
-
+  //   location.pathname, isLoggedIn,
+  // ]);
+ useEffect(() => {
+  
+  }, [isLoggedIn]);
   // Close menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
