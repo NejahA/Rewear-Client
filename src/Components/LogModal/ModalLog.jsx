@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import "./ModalLog.css";
 import { useAuth } from "../../context/AuthContex";
+
 const ModalLog = ({ open, setOpenModalLog, setOpenModalReg }) => {
   const { login, resendVerification, forgotPassword, loading } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
 
   const [forgotMode, setForgotMode] = useState(false);
@@ -39,7 +41,7 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg }) => {
       if (data) {
         for (const key of Object.keys(data)) {
           if (key !== "message") {
-            temp[key] = data[key].message;
+            temp[key] = data[key].message || data[key];
           }
         }
       }
@@ -104,7 +106,7 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg }) => {
                   type="submit"
                   disabled={loading}
                 >
-                  {loading ? "Sending…" : "Send Reset"}
+                  {loading ? "Sending…" : "Send Reset Link"}
                 </button>
 
                 <button
@@ -122,16 +124,14 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg }) => {
             </div>
           </form>
         ) : emailNotVerified ? (
-          <div className="d-flex flex-column gap-3 p-5 align-items-center">
-            <div className="text-center">
-              <i className="bi bi-envelope-exclamation-fill text-warning" style={{ fontSize: "3rem" }}></i>
-              <h3 className="mt-3">Email Not Verified</h3>
-              <p className="text-muted">
-                Please verify <strong>{unverifiedEmail}</strong> before logging in.
-              </p>
-            </div>
+          <div className="d-flex flex-column gap-4 p-5 align-items-center text-center">
+            <i className="bi bi-envelope-exclamation-fill text-warning" style={{ fontSize: "3.5rem" }}></i>
+            <h3>Email Not Verified</h3>
+            <p className="text-muted">
+              Please verify <strong>{unverifiedEmail}</strong> before logging in.
+            </p>
 
-            <div className="d-flex gap-4 w-100">
+            <div className="d-flex gap-3 w-100">
               <button
                 className="btn text-light w-100"
                 style={{ backgroundColor: "#5C2D9A" }}
@@ -140,7 +140,6 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg }) => {
               >
                 {loading ? "Sending…" : "Resend Verification"}
               </button>
-
               <button
                 className="btn border w-100"
                 onClick={() => setEmailNotVerified(false)}
@@ -155,9 +154,9 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg }) => {
             <div className="d-flex flex-column gap-3 p-5 align-items-center">
               <h3>Login</h3>
 
-              <div className="w-100">
+              <div className="w-100 position-relative">
                 <input
-                  className="form-control"
+                  className={`form-control ${errors.email ? "is-invalid" : ""}`}
                   placeholder="Email"
                   type="email"
                   value={email}
@@ -165,20 +164,35 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg }) => {
                   disabled={loading}
                   required
                 />
-                <span className="text-danger small">{errors.email}</span>
+                {errors.email && <div className="invalid-feedback d-block small">{errors.email}</div>}
               </div>
 
-              <div className="  w-100">
+              <div className="w-100 position-relative">
                 <input
-                  className="form-control"
+                  className={`form-control pe-5 ${errors.password ? "is-invalid" : ""}`}
                   placeholder="Password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}
                   required
                 />
-                <span className="text-danger small">{errors.password}</span>
+                <span
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: "absolute",
+                    right: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    cursor: "pointer",
+                    color: "#5C2D9A",
+                    fontSize: "1.2rem",
+                    zIndex: 10,
+                  }}
+                >
+                  {showPassword ? <i className="bi bi-eye-slash"></i> : <i className="bi bi-eye"></i>}
+                </span>
+                {errors.password && <div className="invalid-feedback d-block small">{errors.password}</div>}
               </div>
 
               <a
@@ -187,13 +201,8 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg }) => {
                   e.preventDefault();
                   setForgotMode(true);
                 }}
-                style={{
-                  display: "block",
-                  textAlign: "right",
-                  marginBottom: "10px",
-                  width: "100%",
-                }}
                 className="text-decoration-none"
+                style={{ width: "100%", textAlign: "right", color: "#5C2D9A", margin: "8px 0" }}
               >
                 Forgot Password?
               </a>
@@ -225,8 +234,15 @@ const ModalLog = ({ open, setOpenModalLog, setOpenModalReg }) => {
         )}
 
         <i
-          className="bi bi-arrow-left-circle-fill VioletCred mt-2 fw-bold"
-          style={{ cursor: "pointer", position: "absolute", top: "10px", right: "10px" }}
+          className="bi bi-x-circle-fill"
+          style={{
+            position: "absolute",
+            top: "15px",
+            right: "15px",
+            fontSize: "2rem",
+            color: "#5C2D9A",
+            cursor: "pointer",
+          }}
           onClick={() => {
             setOpenModalLog(false);
             setForgotMode(false);
