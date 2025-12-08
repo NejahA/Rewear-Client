@@ -8,7 +8,6 @@ import { MoonLoader } from "react-spinners";
 // import NewCard from "../Components/NewCard.jsx";
 
 import {  useRef } from "react";
-import NewCard from "../../Test_Card/NewCard";
 
 const StaticLocationMap = ({ lat, lng }) => {
   const mapRef = useRef(null);
@@ -342,13 +341,8 @@ const ShowUser = ({ logged }) => {
       
       {profile.itemsHistory && profile.itemsHistory.length > 0 ? (
         <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-            {/* <TestH /> */}
-          <NewCard  
-          //           name="Premium Product"
-          // category="Electronics"
-          // price="027 DT"
-          // imageUrl="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80"
- /> 
+         
+         
           {profile.itemsHistory.map((item) => (
             <div key={item._id} className="col">
                 <div className="card h-100 w-100 shadow-sm">
