@@ -272,7 +272,7 @@ const ShowUser = ({ logged }) => {
               {/* Phone Section */}
               <div className="d-flex justify-content-center align-items-center">
                 <i 
-                  className={`bi bi-telephone me-2 ${(profile.showPhone && profile.phone && profile.phone.length > 0 ) ? 'clickable-icon' : 'd-none'}`}
+                  className={`bi bi-telephone me-2 ${(profile.showPhone && profile.phone ) ? 'clickable-icon' : 'd-none'}`}
                   style={{ 
                     color: "#8356C0", 
                     cursor: (profile.showPhone !== false || profile._id === loggedUser._id) ? 'pointer' : 'default',
