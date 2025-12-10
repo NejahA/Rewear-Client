@@ -41,7 +41,7 @@ const RewardsScreen = () => {
     setClaimLoading(true);
     setClaimResult(null);
     try {
-      const res = await axios.post(`${import.meta.env.VITE_LOCAL_URI}/api/reward/daily`, {}, {
+      const res = await axios.post(`${import.meta.env.VITE_VERCEL_URI}/api/reward/daily`, {}, {
         withCredentials: true,
       });
       setClaimResult(res.data);
