@@ -26,7 +26,7 @@ const RewardsScreen = () => {
   const fetchRewards = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${import.meta.env.VITE_LOCAL_URI}/api/reward/me`, {
+      const res = await axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/reward/me`, {
         withCredentials: true,
       });
       setRewards(res.data);

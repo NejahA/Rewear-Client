@@ -1,0 +1,96 @@
+ The changes I made to your code are as follows:
+
+1. I added a new file named `Rewards.jsx` that contains the rewards and badges data for users. This file includes a mockup of user points, level, streak, referrals, and a list of recent activity. Here's the content of the `Rewards.jsx` file:
+
+```javascript
+import React from 'react';
+
+const RewardsData = {
+  points: 100,
+  level: 5,
+  streak: 30,
+  referrals: 2,
+  recentActivity: [
+    { action: "Checked In", points: 5, createdAt: new Date() },
+    { action: "Posted a Photo", points: 10, createdAt: new Date() },
+    { action: "Shared an Event", points: 15, createdAt: new Date() },
+  ],
+};
+
+export default RewardsData;
+```
+
+2. In `AuthContext.jsx`, I imported the `RewardsData` from the newly created `Rewards.jsx` file and added a state variable named `rewards` to store the rewards data for each authenticated user:
+
+```javascript
+import React, { useState } from 'react';
+import RewardsData from './Rewards.jsx';
+
+const AuthContext = React.createContext();
+
+export const AuthProvider = ({ children }) => {
+  // ... existing code ...
+
+  const [rewards, setRewards] = useState(null);
+
+  // ... existing code ...
+
+  return (
+    <AuthContext.Provider value={{ user, isAuthenticated, signIn, signOut, rewards }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => React.useContext(AuthContext);
+```
+
+3. In `UserProfile.jsx`, I added a new state variable named `rewards` to store the user's rewards data, and a function named `fetchRewards` to fetch the rewards data from the AuthProvider's `rewards` state:
+
+```javascript
+import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContex.jsx';
+import RewardsData from '../Rewards.jsx';
+
+const UserProfile = () => {
+  const auth = useAuth();
+  const [rewards, setRewards] = useState(null);
+
+  // ... existing code ...
+
+  const fetchRewards = async () => {
+    if (auth.isAuthenticated) {
+      setRewards(auth.rewards || RewardsData);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchRewards();
+  }, [auth.user]); // Fetch rewards when the user changes
+
+  // ... existing code ...
+};
+
+export default UserProfile;
+```
+
+4. In `UserProfile.jsx`, I added a new section to display the user's rewards data:
+
+```javascript
+// ... existing code ...
+
+{/* 🔥 NEW: Rewards Section */}
+<div className="mb-5">
+  <h3 className="text-center mb-4">Rewards & Badges</h3>
+
+  {/* Points & Level */}
+  <div className="d-flex justify-content-between align-items-center mb-3">
+    // ... existing code ...
+  </div>
+
+  // ... existing badge and recent activity code ...
+</div>
+
+// ... existing code ...
+```
+
