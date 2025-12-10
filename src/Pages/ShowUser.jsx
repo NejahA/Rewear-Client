@@ -1,13 +1,10 @@
+// Updated ShowUser.jsx - DISPLAY BADGES + REWARDS SECTION
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { MoonLoader } from "react-spinners";
-// import ProductCard from "../../Test_Card/ProductCard";
-// import ProductCard from "../../haroun card/components/ProductCard";
-// import TestH from "../../haroun card/testH";
-// import NewCard from "../Components/NewCard.jsx";
 
-import {  useRef } from "react";
+import { useRef } from "react";
 
 const StaticLocationMap = ({ lat, lng }) => {
   const mapRef = useRef(null);
@@ -55,8 +52,8 @@ const StaticLocationMap = ({ lat, lng }) => {
       // Add marker
       L.marker([lat, lng])
         .addTo(map)
-        // .bindPopup("User Location")
-        // .openPopup();
+      // .bindPopup("User Location")
+      // .openPopup();
 map.on("zoomend", () => {
         map.setView([lat, lng], map.getZoom(), { animate: true });
       });
@@ -78,7 +75,7 @@ map.on("zoomend", () => {
         ref={mapRef}
         style={{
           height: "400px",
-          width: "100%",
+          width: "400px",
           borderRadius: "12px",
           overflow: "hidden",
           boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
@@ -91,7 +88,6 @@ map.on("zoomend", () => {
     </div>
   );
 };
-
 
 const ShowUser = ({ logged }) => {
   const navigate = useNavigate();
@@ -108,6 +104,17 @@ const ShowUser = ({ logged }) => {
     showEmail: true,
     showPhone: true,
     showAdress: true
+  });
+  const [rewards, setRewards] = useState({
+    points: 0,
+    level: 1,
+    exp: 0,
+    nextLevelIn: 500,
+    streak: 0,
+    referralCode: "",
+    referrals: 0,
+    badges: [],
+    recent: [],
   });
   const [loggedUser, setLoggedUser] = useState({
     email: "",
@@ -142,10 +149,22 @@ const ShowUser = ({ logged }) => {
       })
       .then((res) => {
         setProfile(res.data);
-        setLoading(false);
       })
       .catch((err) => {
         console.log("Error fetching user:", err);
+      });
+
+    // Fetch rewards (using /api/reward/me)
+    axios
+      .get(`${import.meta.env.VITE_VERCEL_URI}/api/reward/me`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        setRewards(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log("Error fetching rewards:", err);
         setLoading(false);
       });
   }, [logged, id]);
@@ -215,124 +234,188 @@ const ShowUser = ({ logged }) => {
                 width: "150px", 
                 height: "150px", 
                 borderRadius: "50%",
-                display: (profile.profilePic && profile.profilePic.url) ? 'none' : 'flex'
+                border: "1px solid #dee2e6"
               }}
             >
-              <i className="bi bi-person fs-1 text-secondary"></i>
+              <i className="bi bi-person-circle text-secondary fs-1"></i>
             </div>
             }
           </div>
-          
-          {/* User Info - Centered */}
-          <div className="text-center ">
-            <div className="d-flex justify-content-center align-items-center  mb-4">
 
-              <h2 className="mb-0 me-2">
-                {profile.fName} {profile.lName}
-              </h2>
-              {profile._id === loggedUser._id && (
-                <Link to="/edituser" className="text-decoration-none">
-                  <i className="bi bi-gear-fill fs-5" style={{ color: "#8356C0" }}></i>
-                </Link>
+          {/* Name */}
+          <h4 className="text-center mb-2">{profile.fName} {profile.lName}</h4>
+
+          {/* Contact Info */}
+          <div className="d-flex flex-column align-items-center text-center mb-3">
+            {/* Email Section */}
+            <div className="d-flex justify-content-center align-items-center">
+              <i 
+                className={`bi bi-envelope me-2 ${(profile.showEmail && profile.email ) ? 'clickable-icon' : 'd-none'}`}
+                style={{ 
+                  color: "#8356C0", 
+                  cursor: (profile.showEmail !== false || profile._id === loggedUser._id) ? 'pointer' : 'default',
+                }}
+                onClick={handleEmailClick}
+                title={profile.showEmail !== false || profile._id === loggedUser._id ? `Email ${profile.email}` : 'Email hidden'}
+              ></i>
+              
+              {profile.showEmail === false && profile._id !== loggedUser._id && (
+                <i className="bi bi-eye-slash me-2" style={{ color: "#8356C0" }} title="Email hidden for privacy"></i>
+              )}
+              
+              {profile && (profile.showEmail !== false || profile._id === loggedUser._id) ? (
+                <span 
+                  onClick={handleEmailClick}
+                  style={{ cursor: 'pointer' }}
+                  title={`Email ${profile.email}`}
+                >
+                  {profile.email}
+                </span>
+              ) : (
+                <span className="text-muted">Hidden for privacy</span>
               )}
             </div>
-            
-            {/* Contact Info - Stacked vertically on mobile */}
-            <div className="d-flex flex-column gap-3">
-              {/* Email Section */}
-              <div className="d-flex justify-content-center align-items-center">
-                <i 
-                  className={`bi bi-envelope me-2 ${(profile.showEmail !== false || profile._id === loggedUser._id) ? 'clickable-icon' : 'd-none'}`}
-                  style={{ 
-                    color: "#8356C0", 
-                    cursor: (profile.showEmail  && profile.email &&  profile.email.length>0 ) ? 'pointer' : 'default',
-                  }}
-                  onClick={handleEmailClick}
-                  title={profile.showEmail !== false || profile._id === loggedUser._id ? `Send email to ${profile.email}` : 'Email hidden'}
-                ></i>
-                
-                {profile.showEmail === false && profile._id !== loggedUser._id && (
-                  <i className="bi bi-eye-slash me-2" style={{ color: "#8356C0" }} title="Email hidden for privacy"></i>
-                )}
-                
-                {profile && (profile.showEmail !== false || profile._id === loggedUser._id) ? (
-                  <span 
-                    onClick={handleEmailClick}
-                    style={{ cursor: 'pointer' }}
-                    title={`Send email to ${profile.email}`}
-                    className="text-break"
-                  >
-                    {profile.email}
-                  </span>
-                ) : (
-                  <span className="text-muted">Hidden for privacy</span>
-                )}
-              </div>
-              
-              {/* Phone Section */}
-              <div className="d-flex justify-content-center align-items-center">
-                <i 
-                  className={`bi bi-telephone me-2 ${(profile.showPhone && profile.phone ) ? 'clickable-icon' : 'd-none'}`}
-                  style={{ 
-                    color: "#8356C0", 
-                    cursor: (profile.showPhone !== false || profile._id === loggedUser._id) ? 'pointer' : 'default',
-                  }}
-                  onClick={handlePhoneClick}
-                  title={profile.showPhone !== false || profile._id === loggedUser._id ? `Call ${profile.phone}` : 'Phone hidden'}
-                ></i>
-                
-                {profile.showPhone === false && profile._id !== loggedUser._id && (
-                  <i className="bi bi-eye-slash me-2" style={{ color: "#8356C0" }} title="Phone hidden for privacy"></i>
-                )}
-                
-                {profile && (profile.showPhone !== false || profile._id === loggedUser._id) ? (
-                  <span 
-                    onClick={handlePhoneClick}
-                    style={{ cursor: 'pointer' }}
-                    title={`Call ${profile.phone}`}
-                  >
-                    {profile.phone}
-                  </span>
-                ) : (
-                  <span className="text-muted">Hidden for privacy</span>
-                )}
-              </div>
 
-              {/* Address Section */}
-              <div className="d-flex justify-content-center align-items-center">
-                <i 
-                  className={`bi bi-geo-alt-fill me-2 ${(profile.showAdress && profile.adress && profile.adress.length > 0 ) ? 'clickable-icon' : 'd-none'}`}
-                  style={{ 
-                    color: "#8356C0", 
-                    cursor: (profile.showAdress !== false || profile._id === loggedUser._id) ? 'pointer' : 'default',
-                  }}
+            {/* Phone Section */}
+            <div className="d-flex justify-content-center align-items-center">
+              <i 
+                className={`bi bi-telephone me-2 ${(profile.showPhone && profile.phone ) ? 'clickable-icon' : 'd-none'}`}
+                style={{ 
+                  color: "#8356C0", 
+                  cursor: (profile.showPhone !== false || profile._id === loggedUser._id) ? 'pointer' : 'default',
+                }}
+                onClick={handlePhoneClick}
+                title={profile.showPhone !== false || profile._id === loggedUser._id ? `Call ${profile.phone}` : 'Phone hidden'}
+              ></i>
+              
+              {profile.showPhone === false && profile._id !== loggedUser._id && (
+                <i className="bi bi-eye-slash me-2" style={{ color: "#8356C0" }} title="Phone hidden for privacy"></i>
+              )}
+              
+              {profile && (profile.showPhone !== false || profile._id === loggedUser._id) ? (
+                <span 
+                  onClick={handlePhoneClick}
+                  style={{ cursor: 'pointer' }}
+                  title={`Call ${profile.phone}`}
+                >
+                  {profile.phone}
+                </span>
+              ) : (
+                <span className="text-muted">Hidden for privacy</span>
+              )}
+            </div>
+
+            {/* Address Section */}
+            <div className="d-flex justify-content-center align-items-center">
+              <i 
+                className={`bi bi-geo-alt-fill me-2 ${(profile.showAdress && profile.adress && profile.adress.length > 0 ) ? 'clickable-icon' : 'd-none'}`}
+                style={{ 
+                  color: "#8356C0", 
+                  cursor: (profile.showAdress !== false || profile._id === loggedUser._id) ? 'pointer' : 'default',
+                }}
+                onClick={openInGoogleMaps}
+                title={profile.showAdress !== false || profile._id === loggedUser._id ? 'View on Google Maps' : 'Address hidden'}
+              ></i>
+              
+              {profile.showAdress === false && profile._id !== loggedUser._id && (
+                <i className="bi bi-eye-slash me-2" style={{ color: "#8356C0" }} title="Address hidden for privacy"></i>
+              )}
+              
+              {profile && (profile.showAdress !== false || profile._id === loggedUser._id) ? (
+                <span 
                   onClick={openInGoogleMaps}
-                  title={profile.showAdress !== false || profile._id === loggedUser._id ? 'View on Google Maps' : 'Address hidden'}
-                ></i>
-                
-                {profile.showAdress === false && profile._id !== loggedUser._id && (
-                  <i className="bi bi-eye-slash me-2" style={{ color: "#8356C0" }} title="Address hidden for privacy"></i>
-                )}
-                
-                {profile && (profile.showAdress !== false || profile._id === loggedUser._id) ? (
-                  <span 
-                    onClick={openInGoogleMaps}
-                    style={{ cursor: 'pointer' }}
-                    title="View on Google Maps"
-                    className="text-break"
-                  >
-                    {profile.adress}
-                  </span>
-                ) : (
-                  <span className="text-muted">Hidden for privacy</span>
-                )}
-              </div>
-              {(profile.location?.lat && profile.location?.lng) &&
-  (profile.showAdress !== false || profile._id === loggedUser._id) && (
-    <StaticLocationMap lat={profile.location.lat} lng={profile.location.lng} />
+                  style={{ cursor: 'pointer' }}
+                  title="View on Google Maps"
+                  className="text-break"
+                >
+                  {profile.adress}
+                </span>
+              ) : (
+                <span className="text-muted">Hidden for privacy</span>
+              )}
+            </div>
+            {(profile.location?.lat && profile.location?.lng) &&
+(profile.showAdress !== false || profile._id === loggedUser._id) && (
+  <StaticLocationMap lat={profile.location.lat} lng={profile.location.lng} />
 )}
+          </div>
+        </div>
+      </div>
+
+      {/* 🔥 NEW: Rewards Section */}
+      <div className="mb-5">
+        <h3 className="text-center mb-4">Rewards & Badges</h3>
+        
+        <div className="card shadow-sm p-4">
+          {/* Points & Level */}
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h5 className="mb-1">Points: {rewards.points}</h5>
+              <h5 className="mb-1">Level: {rewards.level}</h5>
+              <div className="progress" style={{ height: "8px" }}>
+                <div 
+                  className="progress-bar" 
+                  role="progressbar" 
+                  style={{ width: `${(rewards.exp / 500) * 100}%`, backgroundColor: "#8356C0" }}
+                ></div>
+              </div>
+              <small className="text-muted">Next level in: {rewards.nextLevelIn} exp</small>
+            </div>
+            
+            {/* Streak */}
+            <div className="text-center">
+              <h5 className="mb-1">Streak</h5>
+              <div className="badge bg-primary fs-4">{rewards.streak} days</div>
+            </div>
+            
+            {/* Referrals */}
+            <div className="text-end">
+              <h5 className="mb-1">Referrals: {rewards.referrals}</h5>
+              <small className="text-muted">Code: {rewards.referralCode}</small>
             </div>
           </div>
+
+          {/* Badges Grid */}
+          <h5 className="mb-3">Badges ({rewards.badges.length})</h5>
+          {rewards.badges.length > 0 ? (
+            <div className="d-flex flex-wrap gap-3 justify-content-center">
+              {rewards.badges.map((badge) => (
+                <div 
+                  key={badge._id} 
+                  className="text-center"
+                  style={{ width: "100px" }}
+                  title={badge.description}
+                >
+                  <i className={`${badge.icon} fs-1 text-${badge.rarity === 'legendary' ? 'warning' : badge.rarity === 'epic' ? 'purple' : badge.rarity === 'rare' ? 'primary' : 'secondary'}`}></i>
+                  <div className="small text-truncate">{badge.name}</div>
+                  <small className="text-muted text-capitalize">{badge.rarity}</small>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-3 text-muted">
+              <i className="bi bi-award fs-1"></i>
+              <p>No badges earned yet</p>
+            </div>
+          )}
+
+          {/* Recent Activity */}
+          <h5 className="mt-4 mb-3">Recent Activity</h5>
+          {rewards.recent.length > 0 ? (
+            <ul className="list-group">
+              {rewards.recent.map((log, idx) => (
+                <li key={idx} className="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong>{log.action.replace('_', ' ').toUpperCase()}</strong>
+                    <small className="text-muted ms-2">{new Date(log.createdAt).toLocaleString()}</small>
+                  </div>
+                  <span className="badge bg-success">+{log.points} pts</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-center text-muted">No recent activity</p>
+          )}
         </div>
       </div>
 

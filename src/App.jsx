@@ -51,6 +51,7 @@ import PaymentReturn from "./Pages/PaymentReturn";
 import Cart from "./Pages/Cart";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContex";
+import RewardsScreen from "./Pages/RewardsScreen";
 const violetBase = "#7745B9";
 const violetMain = alpha(violetBase, 0.7);
 
@@ -155,7 +156,7 @@ function App() {
               </>
             }
           />
-
+          <Route path="/rewards" element={<RewardsScreen />} />
           <Route
             path="/edituser"
             element={

@@ -18,7 +18,7 @@ const ModalLog0 = ({ open, setOpenModalLog, setOpenModalReg, setLogged }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            const response = await axios.post('' + import.meta.env.VITE_VERCEL_URI + '/api/login', user,
+            const response = await axios.post('' + import.meta.env.VITE_LOCAL_URI + '/api/login', user,
                 { withCredentials: true }
             )
             console.log('SERVER RESPONSE:', response.data)

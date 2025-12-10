@@ -3,7 +3,7 @@ import axios from "axios";
 
 const AuthContext = createContext();
 
-const API_URL = import.meta.env.VITE_VERCEL_URI;
+const API_URL = import.meta.env.VITE_LOCAL_URI;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);

@@ -10,7 +10,7 @@ const Login = (props) => {
         e.preventDefault()
         
             // const response = await axios.post(''+import.meta.env.VITE_VERCEL_URI+'/api/login', user, { withCredentials: true })
-              await axios.post(''+import.meta.env.VITE_VERCEL_URI+'/api/login', user, { withCredentials: true })
+              await axios.post(''+import.meta.env.VITE_LOCAL_URI+'/api/login', user, { withCredentials: true })
               .then(res=>{
                 // sessionStorage.setItem("token", res.data.token);
                 console.log("token from login" ,res.data);
