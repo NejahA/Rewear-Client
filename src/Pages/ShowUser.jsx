@@ -398,7 +398,34 @@ const ShowUser = ({ logged }) => {
               <p>No badges earned yet</p>
             </div>
           )}
-
+<div className="text-center">
+              <button
+                onClick={() => navigate("/rewards")}
+                className="btn btn-lg btn-warning fw-bold px-5 py-3 position-relative overflow-hidden"
+                style={{
+                  border: "none",
+                  borderRadius: "50px",
+                  boxShadow: "0 10px 30px rgba(255,193,7,0.4)",
+                  transition: "all 0.4s ease",
+                  fontSize: "1.2rem"
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = "translateY(-5px)";
+                  e.target.style.boxShadow = "0 20px 40px rgba(255,193,7,0.6)";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = "translateY(0)";
+                  e.target.style.boxShadow = "0 10px 30px rgba(255,193,7,0.4)";
+                }}
+              >
+                <span className="position-relative z-index-10">View All Rewards</span>
+                <span className="position-absolute top-0 start-0 w-100 h-100 bg-white opacity-25" 
+                      style={{ transform: "translateX(-100%)", transition: "transform 0.6s" }}
+                      onMouseEnter={(e) => e.target.style.transform = "translateX(100%)"}
+                      onMouseLeave={(e) => e.target.style.transform = "translateX(-100%)"}
+                ></span>
+              </button>
+            </div>
           {/* Recent Activity */}
           <h5 className="mt-4 mb-3">Recent Activity</h5>
           {rewards.recent.length > 0 ? (

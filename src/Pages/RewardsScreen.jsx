@@ -169,4 +169,4 @@ const RewardsScreen = () => {
   );
 };
 
-export default RewardsScreen;
+export default RewardsScreen;  
