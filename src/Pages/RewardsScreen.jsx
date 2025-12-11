@@ -18,6 +18,7 @@ const RewardsScreen = () => {
   const [loading, setLoading] = useState(true);
   const [claimLoading, setClaimLoading] = useState(false);
   const [claimResult, setClaimResult] = useState(null);
+  const { id } = useParams();
 
   useEffect(() => {
     fetchRewards();
@@ -26,7 +27,7 @@ const RewardsScreen = () => {
   const fetchRewards = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/reward/me`, {
+      const res = await axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/reward/`+id, {
         withCredentials: true,
       });
       setRewards(res.data);

@@ -156,7 +156,7 @@ function App() {
               </>
             }
           />
-          <Route path="/rewards" element={<RewardsScreen />} />
+          <Route path="/rewards:/:id" element={<RewardsScreen />} />
           <Route
             path="/edituser"
             element={

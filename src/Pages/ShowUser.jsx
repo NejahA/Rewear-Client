@@ -404,7 +404,7 @@ const ShowUser = ({ logged }) => {
           )}
 <div className="text-center">
               <button
-                onClick={() => navigate("/rewards")}
+                onClick={() => navigate("/rewards/"+profile._id)}
                 className="btn btn-lg btn-warning fw-bold px-5 py-3 position-relative overflow-hidden"
                 style={{
                   border: "none",
