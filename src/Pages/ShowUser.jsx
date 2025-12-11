@@ -156,7 +156,7 @@ const ShowUser = ({ logged }) => {
 
     // Fetch rewards (using /api/reward/me)
     axios
-      .get(`${import.meta.env.VITE_VERCEL_URI}/api/reward/me`, {
+      .get(`${import.meta.env.VITE_VERCEL_URI}/api/reward/${id}`, {
         withCredentials: true,
       })
       .then((res) => {
