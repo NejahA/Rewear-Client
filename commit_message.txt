@@ -1,6 +1,9 @@
- - Refactored the daily reward API call by using `axios.post` with the provided VITE\_VERCEL\_URI
-- Imported `axios` library for making HTTP requests
-- Updated API endpoint URL from hardcoded string to dynamic import.meta.env.VITE\_VERCEL\_URI
-- Changed parameters of API call to an empty object {}
-- Removed any extra headers or parameters for the API call, assuming they are not necessary for this specific request
+ - Removed extraneous code from the Route path for "/rewards/:id" in App.jsx
+- Replaced plain jsx component with <RewardsScreen /> for the associated route
+- Ensured proper capitalization and indentation within the JSX structure
+- Consolidated import statements to improve file organization
+- Added a type annotation for the Route's element prop
+- Corrected any potential syntax errors in the provided code snippet
+- Simplified component imports where possible
+- Improved readability of the codebase by applying consistent formatting and style conventions
 

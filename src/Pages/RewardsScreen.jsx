@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { MoonLoader } from "react-spinners";
+import { useParams } from "react-router-dom";
 
 const RewardsScreen = () => {
   const [rewards, setRewards] = useState({

@@ -1,2 +1,2 @@
-++ b/src/Pages/RewardsScreen.jsx
-      const res = await axios.post(`${import.meta.env.VITE_VERCEL_URI}/api/reward/daily`, {}, {
+++ b/src/App.jsx
+          <Route path="/rewards/:id" element={<RewardsScreen />} />
