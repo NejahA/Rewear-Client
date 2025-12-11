@@ -1,6 +1,6 @@
 // Updated ShowUser.jsx - DISPLAY BADGES + REWARDS SECTION
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { MoonLoader } from "react-spinners";
 
@@ -243,7 +243,11 @@ const ShowUser = ({ logged }) => {
           </div>
 
           {/* Name */}
-          <h4 className="text-center mb-2">{profile.fName} {profile.lName}</h4>
+          <h4 className="text-center mb-2">{profile.fName} {profile.lName}   {profile._id === loggedUser._id && (
+                <Link to="/edituser" className="text-decoration-none">
+                  <i className="bi bi-gear-fill fs-5" style={{ color: "#8356C0" }}></i>
+                </Link>
+              )}</h4>
 
           {/* Contact Info */}
           <div className="d-flex flex-column align-items-center text-center mb-3">
