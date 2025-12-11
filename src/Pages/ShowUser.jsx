@@ -402,7 +402,7 @@ const ShowUser = ({ logged }) => {
               <p>No badges earned yet</p>
             </div>
           )}
-<div className="text-center">
+{  loggedUser._id === profile._id && <div className="text-center">
               <button
                 onClick={() => navigate("/rewards/"+profile._id)}
                 className="btn btn-lg btn-warning fw-bold px-5 py-3 position-relative overflow-hidden"
@@ -430,7 +430,7 @@ const ShowUser = ({ logged }) => {
                 ></span>
               </button>
             </div>
-          {/* Recent Activity */}
+}          {/* Recent Activity */}
           <h5 className="mt-4 mb-3">Recent Activity</h5>
           {rewards.recent.length > 0 ? (
             <ul className="list-group">
