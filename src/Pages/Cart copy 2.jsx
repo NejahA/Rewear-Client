@@ -1,4 +1,4 @@
-// Cart.jsx - FINAL VERSION WITH POINTS REDEMPTION
+// Cart.jsx - FIXED QUANTITY BUTTONS
 import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import {
   Alert, AlertTitle, Button, Dialog, DialogActions, 
-  DialogContent, DialogTitle, Chip, IconButton, Slider, Box, Typography
+  DialogContent, DialogTitle, Chip, IconButton
 } from '@mui/material';
 import {
   Delete as DeleteIcon,
@@ -16,7 +16,6 @@ import {
   Warning as WarningIcon,
   Close as CloseIcon
 } from '@mui/icons-material';
-import { useAuth } from '../context/AuthContex';
 
 const Cart = () => {
   const { cartItems, setCartItems, removeFromCart } = useContext(CartContext);
@@ -30,17 +29,10 @@ const Cart = () => {
   const [iframeUrl, setIframeUrl] = useState(null);
   const navigate = useNavigate();
 
-  // POINTS REDEMPTION
-  const [rewards, setRewards] = useState({ points: 0 });
-  const [usePoints, setUsePoints] = useState(0);
-  const [finalTotal, setFinalTotal] = useState(0);
-   const  { isLoggedIn, loggedId } = useAuth();
-
   useEffect(() => {
-
     const fetchCartItems = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_LOCAL_URI}/api/cart`, {
+        const response = await axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/cart`, {
           withCredentials: true,
         });
         
@@ -60,49 +52,45 @@ const Cart = () => {
     };
 
     fetchCartItems();
-loggedId &&
-    // Fetch user rewards (points)
-    axios.get(`${import.meta.env.VITE_LOCAL_URI}/api/reward/${loggedId}`, { withCredentials: true })
-      .then((res) => {
-        setRewards(res.data);
-      })
-      .catch((err) => console.error("Error fetching rewards:", err));
 
     return () => {
       if (pollingInterval) clearInterval(pollingInterval);
     };
-  }, [setCartItems, loggedId]);
+  }, [setCartItems]);
 
-  // REAL-TIME FINAL PRICE CALCULATION
-  useEffect(() => {
-    const maxPoints = Math.min(rewards.points, totalAmount * 10); // 10 points = 1 TND
-    const effectivePoints = Math.min(usePoints, maxPoints);
-    const discount = Math.floor(effectivePoints / 10);
-    setFinalTotal(Math.max(1, totalAmount - discount)); // Minimum 1 TND
-    if (usePoints > maxPoints) setUsePoints(maxPoints);
-  }, [totalAmount, usePoints, rewards.points]);
-
-  // QUANTITY UPDATE
+  // ✅ FIXED QUANTITY UPDATE - NOW WORKS LIKE CartScreen.tsx
   const updateQuantity = async (itemId, newQuantity) => {
     try {
+      // Get current item stock
       const currentItem = cartItems.find(item => item.item._id === itemId);
       const maxQuantity = currentItem?.item?.stock || 0;
       
+      // ✅ CLAMP QUANTITY BETWEEN 1 AND STOCK
       const validQuantity = Math.min(Math.max(1, newQuantity), maxQuantity);
       
+      // ✅ SHOW ALERT IF EXCEEDING STOCK
       if (newQuantity > maxQuantity) {
         alert(`Maximum ${maxQuantity} available in stock!`);
       }
 
-      if (validQuantity === currentItem.quantity) return;
+      // ✅ ONLY UPDATE IF QUANTITY CHANGED
+      if (validQuantity === currentItem.quantity) {
+        return;
+      }
 
+      // ✅ UPDATE CART VIA API
       await axios.put(
-        `${import.meta.env.VITE_LOCAL_URI}/api/cart/update/${itemId}`, 
+        `${import.meta.env.VITE_VERCEL_URI}/api/cart/update/${itemId}`, 
         { itemId, quantity: validQuantity }, 
         { withCredentials: true }
       );
 
-      const response = await axios.get(`${import.meta.env.VITE_LOCAL_URI}/api/cart`, { withCredentials: true });
+      // ✅ REFRESH CART DATA IMMEDIATELY
+      const response = await axios.get(
+        `${import.meta.env.VITE_VERCEL_URI}/api/cart`, 
+        { withCredentials: true }
+      );
+      
       if (response.data && response.data.items) {
         setCartItems(response.data.items);
         setTotalAmount(response.data.totalAmount || 0);
@@ -116,7 +104,9 @@ loggedId &&
   const handleRemoveItem = async (itemId) => {
     try {
       await removeFromCart(itemId);
-      const response = await axios.get(`${import.meta.env.VITE_LOCAL_URI}/api/cart`, { withCredentials: true });
+      const response = await axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/cart`, {
+        withCredentials: true,
+      });
       if (response.data && response.data.items) {
         setCartItems(response.data.items);
         setTotalAmount(response.data.totalAmount || 0);
@@ -130,6 +120,7 @@ loggedId &&
     try {
       setPaymentLoading(true);
 
+      // ✅ STOCK VALIDATION BEFORE PAYMENT
       const outOfStockItems = cartItems.filter(item => item.item.stock === 0);
       if (outOfStockItems.length > 0) {
         alert('Some items are out of stock! Please remove them.');
@@ -143,8 +134,8 @@ loggedId &&
       }));
 
       const response = await axios.post(
-        `${import.meta.env.VITE_LOCAL_URI}/api/paymee/create-cart-payment`,
-        { items: cartItemsForPayment, usePoints }, // ← SEND usePoints
+        `${import.meta.env.VITE_VERCEL_URI}/api/paymee/create-cart-payment`,
+        { items: cartItemsForPayment },
         { withCredentials: true }
       );
 
@@ -184,7 +175,7 @@ loggedId &&
       attempts++;
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_LOCAL_URI}/api/paymee/check-status/${token}`,
+          `${import.meta.env.VITE_VERCEL_URI}/api/paymee/check-status/${token}`,
           { withCredentials: true, timeout: 10000 }
         );
 
@@ -194,7 +185,7 @@ loggedId &&
           setPaymentLoading(false);
           if (pollInterval) clearInterval(pollInterval);
 
-          await axios.post(`${import.meta.env.VITE_LOCAL_URI}/api/cart/checkout`, {}, { withCredentials: true });
+          await axios.post(`${import.meta.env.VITE_VERCEL_URI}/api/cart/checkout`, {}, { withCredentials: true });
           setCartItems([]);
           setTotalAmount(0);
         } else if (status.status === 'CANCELED' || status.status === 'FAILED') {
@@ -223,21 +214,28 @@ loggedId &&
     }
   };
 
-  // Message handler (optional Paymee callback)
+  // Message handler
   useEffect(() => {
     const handleMessage = (event) => {
       const { type } = event.data;
       if (type === 'PAYMENT_SUCCESS') {
-        if (pollingInterval) clearInterval(pollingInterval);
+        if (pollingInterval) {
+          clearInterval(pollingInterval);
+          setPollingInterval(null);
+        }
         setPaymentStatus('success');
         setPaymentLoading(false);
-        axios.post(`${import.meta.env.VITE_LOCAL_URI}/api/cart/checkout`, {}, { withCredentials: true })
+        axios.post(`${import.meta.env.VITE_VERCEL_URI}/api/cart/checkout`, {}, { withCredentials: true })
           .then(() => {
             setCartItems([]);
             setTotalAmount(0);
-          });
+          })
+          .catch(err => console.error('Error clearing cart:', err));
       } else if (type === 'PAYMENT_FAILURE') {
-        if (pollingInterval) clearInterval(pollingInterval);
+        if (pollingInterval) {
+          clearInterval(pollingInterval);
+          setPollingInterval(null);
+        }
         setPaymentStatus('failed');
         setPaymentLoading(false);
       }
@@ -265,6 +263,7 @@ loggedId &&
         <Button 
           variant="outlined" 
           onClick={() => navigate('/')}
+          startIcon={<i className="fas fa-plus"></i>}
           style={{ borderColor: '#713CC5', color: '#713CC5' }}
         >
           Continue Shopping
@@ -281,7 +280,6 @@ loggedId &&
         </div>
       ) : (
         <>
-          {/* Cart Items */}
           <div className="row g-4 mb-4">
             {cartItems.map((cartItem) => {
               const item = cartItem.item;
@@ -294,6 +292,7 @@ loggedId &&
                   <div className="card h-100 shadow-sm border-0" style={{ borderRadius: '16px' }}>
                     <div className="card-body p-4">
                       <div className="row align-items-center">
+                        {/* IMAGE */}
                         <div className="col-md-2 col-3">
                           <img 
                             src={item.itemPics?.[0]?.url || '/placeholder.jpg'} 
@@ -303,6 +302,7 @@ loggedId &&
                           />
                         </div>
 
+                        {/* DETAILS */}
                         <div className="col-md-5 col-6">
                           <h6 className="mb-2 fw-bold">{item.title}</h6>
                           <div className="d-flex align-items-center mb-2">
@@ -319,36 +319,57 @@ loggedId &&
                             />
                           </div>
                           <p className="mb-0 text-success fw-bold fs-5">
-                            {item.price} DT × {cartItem.quantity}
+                            {item.price} DT x {cartItem.quantity}
                           </p>
                         </div>
 
+                        {/* ✅ FIXED QUANTITY CONTROLLER */}
                         <div className="col-md-3 col-2">
                           <div className="d-flex align-items-center justify-content-center">
                             <IconButton 
                               size="small"
                               onClick={() => updateQuantity(item._id, cartItem.quantity - 1)}
                               disabled={cartItem.quantity <= 1 || isOutOfStock}
-                              sx={{ bgcolor: (cartItem.quantity <= 1 || isOutOfStock) ? '#e9ecef' : '#713CC5', color: 'white', borderRadius: '50%' }}
+                              sx={{ 
+                                bgcolor: (cartItem.quantity <= 1 || isOutOfStock) ? '#e9ecef' : '#713CC5',
+                                color: (cartItem.quantity <= 1 || isOutOfStock) ? '#6c757d' : 'white',
+                                '&:hover': { 
+                                  bgcolor: (cartItem.quantity <= 1 || isOutOfStock) ? '#e9ecef' : '#5a2d9a' 
+                                },
+                                borderRadius: '50%'
+                              }}
                             >
                               <RemoveIcon fontSize="small" />
                             </IconButton>
+                            
                             <span className="mx-2 fw-bold fs-5">{cartItem.quantity}</span>
+                            
                             <IconButton 
                               size="small"
                               onClick={() => updateQuantity(item._id, cartItem.quantity + 1)}
                               disabled={!canAddMore || isOutOfStock}
-                              sx={{ bgcolor: (!canAddMore || isOutOfStock) ? '#e9ecef' : '#713CC5', color: 'white', borderRadius: '50%' }}
+                              sx={{ 
+                                bgcolor: (!canAddMore || isOutOfStock) ? '#e9ecef' : '#713CC5',
+                                color: (!canAddMore || isOutOfStock) ? '#6c757d' : 'white',
+                                '&:hover': { 
+                                  bgcolor: (!canAddMore || isOutOfStock) ? '#e9ecef' : '#5a2d9a' 
+                                },
+                                borderRadius: '50%'
+                              }}
                             >
                               <AddIcon fontSize="small" />
                             </IconButton>
                           </div>
                         </div>
 
+                        {/* REMOVE */}
                         <div className="col-md-2 col-1 text-end">
                           <IconButton 
                             onClick={() => handleRemoveItem(item._id)}
-                            sx={{ color: '#dc3545', '&:hover': { bgcolor: '#ffebee' } }}
+                            sx={{ 
+                              color: '#dc3545',
+                              '&:hover': { bgcolor: '#ffebee' }
+                            }}
                           >
                             <DeleteIcon />
                           </IconButton>
@@ -361,59 +382,23 @@ loggedId &&
             })}
           </div>
 
-          {/* CHECKOUT SUMMARY + POINTS */}
+          {/* CHECKOUT FOOTER */}
           <div className="card shadow-sm border-0" style={{ borderRadius: '16px' }}>
             <div className="card-body p-4">
-              <Typography variant="h5" className="mb-3">Order Summary</Typography>
-
-              <div className="d-flex justify-content-between mb-2">
-                <span>Subtotal</span>
-                <span>{totalAmount.toFixed(2)} DT</span>
-              </div>
-
-              {/* POINTS REDEMPTION SLIDER */}
-              {rewards.points > 0 && totalAmount > 0 && (
-                <Box sx={{ mt: 3, mb: 2 }}>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Use Points (10 pts = 1 TND)
-                  </Typography>
-                  <Slider
-                    value={usePoints}
-                    onChange={(e, val) => setUsePoints(val)}
-                    step={10}
-                    marks
-                    min={0}
-                    max={Math.min(rewards.points, totalAmount * 10)}
-                    valueLabelDisplay="auto"
-                    valueLabelFormat={(val) => `${val} pts = ${(val / 10).toFixed(2)} TND off`}
-                  />
-                  <Typography color="text.secondary">
-                    Available: {rewards.points} points
-                  </Typography>
-                </Box>
-              )}
-
-              {usePoints > 0 && (
-                <div className="d-flex justify-content-between text-success fw-bold mb-2">
-                  <span>Points Discount</span>
-                  <span>-{(usePoints / 10).toFixed(2)} DT</span>
-                </div>
-              )}
-
-              <div className="d-flex justify-content-between align-items-center mt-4">
+              <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <h4 className="mb-1 text-success fw-bold">Final Total: {finalTotal.toFixed(2)} DT</h4>
+                  <h4 className="mb-1 text-success fw-bold">Total: {totalAmount} DT</h4>
                   <small className="text-muted">
-                    {cartItems.length} item{cartItems.length !== 1 ? 's' : ''}
+                    {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}
                   </small>
                   {cartItems.some(item => item.item.stock === 0) && (
-                    <Alert severity="warning" sx={{ mt: 2 }}>
+                    <Alert severity="warning" sx={{ mt: 1 }}>
                       <AlertTitle>Stock Issue</AlertTitle>
-                      Remove out-of-stock items before checkout.
+                      Some items are out of stock!
                     </Alert>
                   )}
                 </div>
-
+                
                 <Button 
                   variant="contained" 
                   size="large"
@@ -421,10 +406,10 @@ loggedId &&
                   disabled={paymentLoading || cartItems.some(item => item.item.stock === 0)}
                   sx={{ 
                     bgcolor: '#713CC5',
-                    px: 5,
-                    py: 2,
+                    px: 4,
+                    py: 1.5,
                     borderRadius: '12px',
-                    fontSize: '1.2rem',
+                    fontSize: '1.1rem',
                     fontWeight: 'bold',
                     '&:hover': { bgcolor: '#5a2d9a' },
                     '&:disabled': { bgcolor: '#6c757d' }
@@ -435,8 +420,10 @@ loggedId &&
                       <MoonLoader size={20} color="#fff" className="me-2" />
                       Processing...
                     </>
+                  ) : cartItems.some(item => item.item.stock === 0) ? (
+                    'Out of Stock'
                   ) : (
-                    `Checkout - ${finalTotal.toFixed(2)} DT`
+                    `Checkout - ${totalAmount} DT`
                   )}
                 </Button>
               </div>
@@ -444,7 +431,7 @@ loggedId &&
           </div>
         </>
       )}
-
+      
       {/* PAYMENT DIALOG */}
       <Dialog open={paymentDialog} onClose={closePaymentDialog} maxWidth="md" fullWidth>
         <DialogTitle>
@@ -466,19 +453,19 @@ loggedId &&
           )}
           {paymentStatus === 'success' && (
             <Alert severity="success" sx={{ mt: 2 }}>
-              <AlertTitle>Payment Successful!</AlertTitle>
+              <AlertTitle>🎉 Payment Successful!</AlertTitle>
               Your order has been placed. Cart cleared successfully.
             </Alert>
           )}
           {paymentStatus === 'failed' && (
             <Alert severity="error" sx={{ mt: 2 }}>
-              <AlertTitle>Payment Failed</AlertTitle>
+              <AlertTitle>❌ Payment Failed</AlertTitle>
               Please try again or contact support.
             </Alert>
           )}
           {paymentStatus === 'timeout' && (
             <Alert severity="warning" sx={{ mt: 2 }}>
-              <AlertTitle>Payment Timeout</AlertTitle>
+              <AlertTitle>⏰ Payment Timeout</AlertTitle>
               Check if payment was processed or try again.
             </Alert>
           )}
@@ -488,7 +475,9 @@ loggedId &&
             Close
           </Button>
           {paymentStatus === 'failed' && (
-            <Button onClick={() => { closePaymentDialog(); handleCheckout(); }}>
+            <Button onClick={() => { closePaymentDialog(); handleCheckout(); }}
+              variant="outlined" sx={{ borderColor: '#713CC5', color: '#713CC5' }}
+            >
               Try Again
             </Button>
           )}

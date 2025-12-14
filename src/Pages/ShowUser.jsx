@@ -369,7 +369,8 @@ const ShowUser = ({ logged }) => {
             {/* Streak */}
             <div className="text-center">
               <h5 className="mb-1">Streak</h5>
-              <div className="badge bg-primary fs-4">{rewards.streak} days</div>
+              <div className="badge  fs-4"    
+               style={{ backgroundColor: "#8356C0" }}>{rewards.streak} days</div>
             </div>
             
             {/* Referrals */}
