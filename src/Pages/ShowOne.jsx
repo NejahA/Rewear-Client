@@ -2,15 +2,37 @@
 import axios from "axios";
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Chip, Alert, AlertTitle, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
+// import {
+//   Alert,
+//   AlertTitle,
+//   Button,
+//   Dialog,
+//   DialogActions,
+//   DialogContent,
+//   DialogTitle,
+// } from "@mui/material";
 import { MoonLoader } from "react-spinners";
 import { CartContext } from "../context/CartContext";
+import { useAuth } from "../context/AuthContex";
+import { Chip, Alert, AlertTitle, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography, Slider, Box } from "@mui/material";
 
-const ShowOne = () => {
+const ShowOne =  () => {
   const [item, setItem] = useState({
-    title: "", category: "", brand: "", size: "", description: "", price: "",
-    previousOwners: "", gender: "", condition: "", age: "", status: "", stock: 1,
-    tags: [], itemPics: [], user: { fName: "loading", profilePic: { url: "/logo/load-violet.gif" } }
+    title: "",
+    category: "",
+    brand: "",
+    size: "",
+    description: "",
+    price: "",
+    previousOwners: "",
+    gender: "",
+    condition: "",
+    age: "",
+    status: "",
+    stock: 1,
+    tags: [],
+    itemPics: [],
+    user: { fName: "loading", profilePic: { url: "/logo/load-violet.gif" } },
   });
   const [activeImage, setActiveImage] = useState("");
   const [loggedUser, setLoggedUser] = useState(null);
@@ -26,19 +48,31 @@ const ShowOne = () => {
   const { id } = useParams();
   const { addToCart } = useContext(CartContext);
 
-  // Fetch item function (extracted for reuse)
+  // NEW: Points state
+  const [rewards, setRewards] = useState({ points: 0 });
+  const [usePoints, setUsePoints] = useState(0);
+  const [finalPrice, setFinalPrice] = useState(0);
+
+   const  { isLoggedIn, loggedId } = useAuth();
+    // Fetch item function (extracted for reuse)
   const fetchItem = useCallback(async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/items/${id}`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_VERCEL_URI}/api/items/${id}`
+      );
       const fetchedItem = res.data;
       console.log("🔄 Stock refresh:", fetchedItem.stock);
       setItem(fetchedItem);
-      
+
       // Update active image if needed
-      if (fetchedItem.itemPics && fetchedItem.itemPics.length > 0 && !activeImage) {
+      if (
+        fetchedItem.itemPics &&
+        fetchedItem.itemPics.length > 0 &&
+        !activeImage
+      ) {
         setActiveImage(fetchedItem.itemPics[0].url || fetchedItem.itemPics[0]);
       }
-      
+
       // Reset quantity if stock changed
       if (quantity > fetchedItem.stock) {
         setQuantity(fetchedItem.stock || 1);
@@ -50,11 +84,26 @@ const ShowOne = () => {
 
   // Fetch user
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/users/logged`, { withCredentials: true })
-      .then((res) => setLoggedUser(res.data))
-      .catch((err) => console.error("Error fetching logged user:", err));
-  }, []);
+    axios
+      .get(`${import.meta.env.VITE_VERCEL_URI}/api/users/logged`, {
+        withCredentials: true,
+      })
+      .then(async (res) => {
+        await setLoggedUser(res.data);
+      })
+      .catch(async(err) => console.error("Error fetching logged user:", err));
+   
+  }, [JSON.stringify(loggedUser), loggedId]);
+ useEffect( () => {  
 
+    loggedId && axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/reward/${loggedId}`, { withCredentials: true })
+      .then(async (res) => {
+        const rewardsdata = res.data;
+        setRewards(rewardsdata);
+        console.log("rewards",rewardsdata)
+      })
+      .catch((err) => console.error("Error fetching rewards:", err));
+    }, [loggedId]);
   // Initial load + Stock Polling
   useEffect(() => {
     fetchItem(); // Initial load
@@ -70,10 +119,22 @@ const ShowOne = () => {
   }, [fetchItem, pollingInterval]);
 
   const deleteItem = (itemId) => {
-    axios.delete(`${import.meta.env.VITE_VERCEL_URI}/api/items/${itemId}`, { withCredentials: true })
+    axios
+      .delete(`${import.meta.env.VITE_VERCEL_URI}/api/items/${itemId}`, {
+        withCredentials: true,
+      })
       .then(() => navigate("/"))
       .catch((error) => console.error("Error deleting item:", error));
   };
+
+  useEffect(() => {
+    const originalPrice = item.price * quantity;
+    const maxPoints = Math.min(rewards.points, originalPrice * 10); // 10 pts = 1 TND
+    const effectivePoints = Math.min(usePoints, maxPoints);
+    const discount = Math.floor(effectivePoints / 10);
+    setFinalPrice(Math.max(1, originalPrice - discount)); // min 1 TND
+    if (usePoints > maxPoints) setUsePoints(maxPoints);
+  }, [quantity, usePoints, item.price, rewards.points]);
 
   const handleBuyItem = async () => {
     if (!loggedUser) {
@@ -89,12 +150,14 @@ const ShowOne = () => {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_VERCEL_URI}/api/paymee/create-payment`,
-        { itemId: item._id, quantity },
+        { itemId: item._id, quantity, usePoints },
         { withCredentials: true }
       );
 
       if (response.data.error) {
-        alert(`Payment error: ${response.data.error.message || 'Unknown error'}`);
+        alert(
+          `Payment error: ${response.data.error.message || "Unknown error"}`
+        );
         setPaymentLoading(false);
         return;
       }
@@ -103,12 +166,12 @@ const ShowOne = () => {
       setIframeUrl(paymentUrl);
       setPaymentToken(token);
       setPaymentDialog(true);
-      setPaymentStatus('pending');
+      setPaymentStatus("pending");
       startPaymentPolling(token);
     } catch (error) {
-      console.error('Payment initiation failed:', error);
-      alert('Failed to initiate payment. Please try again.');
-      setPaymentStatus('error');
+      console.error("Payment initiation failed:", error);
+      alert("Failed to initiate payment. Please try again.");
+      setPaymentStatus("error");
       setPaymentLoading(false);
     }
   };
@@ -119,7 +182,7 @@ const ShowOne = () => {
 
     const poll = async () => {
       if (attempts >= maxAttempts) {
-        setPaymentStatus('timeout');
+        setPaymentStatus("timeout");
         setPaymentLoading(false);
         clearInterval(pollingInterval);
         setPollingInterval(null);
@@ -134,22 +197,25 @@ const ShowOne = () => {
         );
 
         const status = response.data;
-        if (status.status === 'PAID') {
-          setPaymentStatus('success');
+        if (status.status === "PAID") {
+          setPaymentStatus("success");
           setPaymentLoading(false);
           clearInterval(pollingInterval);
           setPollingInterval(null);
           fetchItem();
-        } else if (status.status === 'FAILED' || status.status === 'CANCELLED') {
-          setPaymentStatus('failed');
+        } else if (
+          status.status === "FAILED" ||
+          status.status === "CANCELLED"
+        ) {
+          setPaymentStatus("failed");
           setPaymentLoading(false);
           clearInterval(pollingInterval);
           setPollingInterval(null);
         }
       } catch (error) {
-        console.error('Polling error:', error);
+        console.error("Polling error:", error);
         if (attempts >= maxAttempts) {
-          setPaymentStatus('timeout');
+          setPaymentStatus("timeout");
           setPaymentLoading(false);
           clearInterval(pollingInterval);
           setPollingInterval(null);
@@ -181,12 +247,15 @@ const ShowOne = () => {
   // Message handler
   useEffect(() => {
     const handleMessage = (event) => {
-      if (event.data === 'payment_success') {
-        setPaymentStatus('success');
+      if (event.data === "payment_success") {
+        setPaymentStatus("success");
         setPaymentLoading(false);
         fetchItem();
-      } else if (event.data === 'payment_failed' || event.data === 'payment_cancelled') {
-        setPaymentStatus('failed');
+      } else if (
+        event.data === "payment_failed" ||
+        event.data === "payment_cancelled"
+      ) {
+        setPaymentStatus("failed");
         setPaymentLoading(false);
       }
       if (pollingInterval) {
@@ -195,16 +264,16 @@ const ShowOne = () => {
       }
     };
 
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
   }, [pollingInterval]);
 
   // ---- NEW: Navigate to owner profile --------------------
-const goToOwnerProfile = () => {
-  if (item?.user?._id) {
-    navigate(`/user/${item.user._id}`);
-  }
-};
+  const goToOwnerProfile = () => {
+    if (item?.user?._id) {
+      navigate(`/user/${item.user._id}`);
+    }
+  };
   return (
     <div className="container my-5">
       <div className="row">
@@ -214,7 +283,7 @@ const goToOwnerProfile = () => {
               src={activeImage}
               className="card-img-top"
               alt={item.title}
-              style={{ maxHeight: '500px', objectFit: 'contain' }}
+              style={{ maxHeight: "500px", objectFit: "contain" }}
             />
             <div className="card-body">
               <div className="d-flex flex-wrap gap-2">
@@ -223,7 +292,7 @@ const goToOwnerProfile = () => {
                     key={index}
                     src={pic.url || pic}
                     className="img-thumbnail"
-                    style={{ width: '60px', height: '60px', cursor: 'pointer' }}
+                    style={{ width: "60px", height: "60px", cursor: "pointer" }}
                     onClick={() => setActiveImage(pic.url || pic)}
                   />
                 ))}
@@ -234,134 +303,223 @@ const goToOwnerProfile = () => {
 
         <div className="col-12 col-md-6">
           <h1 className="mb-3">{item.title}</h1>
-          
 
-{/* ----------- NEW: Owner profile link ----------- */}
-<div className="d-flex align-items-center gap-2 mb-3">
-  {/* <strong>Seller:</strong> */}
-  <div
-    className="d-flex align-items-center gap-2"
-    style={{ cursor: "pointer" }}
-    onClick={goToOwnerProfile}
-  >
-    {/* Profile picture */}
-    <img
-      src={item.user?.profilePic?.url || "/logo/load-violet.gif"}
-      alt={`${item.user?.fName || ""} ${item.user?.lName || ""}`}
-      style={{
-        width: "40px",
-        height: "40px",
-        borderRadius: "50%",
-        objectFit: "cover",
-      }}
-    />
-    {/* Full name */}
-    <Typography variant="body1" sx={{ fontWeight: 500 }}>
-      {item.user?.fName || ""} {item.user?.lName || ""}
-    </Typography>
-  </div>
-</div>
+          {/* ----------- NEW: Owner profile link ----------- */}
+          <div className="d-flex align-items-center gap-2 mb-3">
+            {/* <strong>Seller:</strong> */}
+            <div
+              className="d-flex align-items-center gap-2"
+              style={{ cursor: "pointer" }}
+              onClick={goToOwnerProfile}
+            >
+              {/* Profile picture */}
+              <img
+                src={item.user?.profilePic?.url || "/logo/load-violet.gif"}
+                alt={`${item.user?.fName || ""} ${item.user?.lName || ""}`}
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                }}
+              />
+              {/* Full name */}
+              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                {item.user?.fName || ""} {item.user?.lName || ""}
+              </Typography>
+            </div>
+          </div>
 
           <div className="mb-3">
             <small className="text-muted">
               <strong>Price:</strong> {item.price} DT
               <br />
               <strong>Stock:</strong> {item.stock}
-              {item.stock <= 2 && item.stock > 0 && <span className="text-warning"> (Low Stock!)</span>}
-              {item.stock === 0 && <span className="text-danger"> (Out of Stock)</span>}
+              {item.stock <= 2 && item.stock > 0 && (
+                <span className="text-warning"> (Low Stock!)</span>
+              )}
+              {item.stock === 0 && (
+                <span className="text-danger"> (Out of Stock)</span>
+              )}
               <br />
               {/* <small className="text-muted">Updates every 30s ↻</small> */}
             </small>
           </div>
-          
-          {item.status === "1" && loggedUser && item.user?._id !== loggedUser._id && (
-            <div className="d-flex align-items-center gap-2 mt-3">
-              <div className="d-flex align-items-center">
-                <button
-                  onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
-                  disabled={quantity <= 1 || item.stock <= 0}
-                  className="btn btn-sm btn-outline-secondary"
-                >
-                  -
-                </button>
-                <span className="mx-2">{quantity}</span>
-                <button
-                  onClick={() => setQuantity(prev => Math.min(item.stock, prev + 1))}
-                  disabled={quantity >= item.stock || item.stock <= 0}
-                  className="btn btn-sm btn-outline-secondary"
-                >
-                  +
-                </button>
-              </div>
-              
-              {/* 🔥 BUTTON READY AFTER DIALOG CLOSE */}
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                onClick={handleBuyItem}
-                disabled={paymentLoading || item.stock <= 0}
-                style={{ backgroundColor: "#713CC5", padding: "12px 24px" }}
-              >
-                {paymentLoading ? (
-                  <div className="d-flex align-items-center justify-content-center">
-                    <MoonLoader size={20} color="#fff" />
-                    <span className="ms-2">Processing...</span>
-                  </div>
-                ) : (
-                  `Buy Now - ${item.price * quantity} DT`
+  {rewards && rewards.points > 0 && item.stock > 0 && (
+                  <Box
+                    sx={{
+                      mt: 3,
+                      p: 3,
+                      bgcolor: "background.paper",
+                      borderRadius: 2,
+                      boxShadow: 1,
+                    }}
+                  >
+                    <Typography variant="h6" gutterBottom>
+                      Use Points for Discount (10 points = 1 TND)
+                    </Typography>
+                    <Slider
+                      value={usePoints}
+                      onChange={(e, val) => setUsePoints(val)}
+                      step={10}
+                      marks
+                      min={0}
+                      max={Math.min(rewards.points, item.price * quantity * 10)}
+                      valueLabelDisplay="auto"
+                      valueLabelFormat={(val) =>
+                        `${val} pts (-${val / 10} TND)`
+                      }
+                    />
+                    <Typography color="primary" sx={{ mt: 1 }}>
+                      You have {rewards.points} points available
+                    </Typography>
+                  </Box>
                 )}
-              </Button>
+
+                {/* Price Display */}
+                {rewards && rewards.points > 0 && item.stock > 0 && (
+                  <>
+                    <Typography variant="h5" sx={{ mt: 2 }}>
+                      Original Price: {(item.price * quantity).toFixed(2)} TND
+                    </Typography>
+                    <Typography variant="h4" color="success.main">
+                      Final Price: {finalPrice.toFixed(2)} TND
+                    </Typography>
+                  </>
+                )}
+
+                {usePoints > 0 && (
+                  <Alert severity="success" sx={{ mt: 1 }}>
+                    Saving {(usePoints / 10).toFixed(2)} TND with {usePoints}{" "}
+                    points!
+                  </Alert>
+                )}
+          {item.status === "1" &&
+            loggedUser &&
+            item.user?._id !== loggedUser._id && (
+              <div className="d-flex align-items-center gap-2 mt-3">
+                <div className="d-flex align-items-center">
+                  <button
+                    onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                    disabled={quantity <= 1 || item.stock <= 0}
+                    className="btn btn-sm btn-outline-secondary"
+                  >
+                    -
+                  </button>
+                  <span className="mx-2">{quantity}</span>
+                  <button
+                    onClick={() =>
+                      setQuantity((prev) => Math.min(item.stock, prev + 1))
+                    }
+                    disabled={quantity >= item.stock || item.stock <= 0}
+                    className="btn btn-sm btn-outline-secondary"
+                  >
+                    +
+                  </button>
+                  
+                </div>
+                {/* NEW: Points Redemption Section */}
               
-              <Button
-                variant="outlined"
-                color="primary"
-                size="large"
-                onClick={() => addToCart(item._id, quantity)}
-                disabled={item.stock <= 0}
-                style={{ borderColor: "#713CC5", color: "#713CC5", padding: "12px 24px" }}
-              >
-                Add to Cart
-              </Button>
-            </div>
-          )}
-          
+                {/* 🔥 BUTTON READY AFTER DIALOG CLOSE */}
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  onClick={handleBuyItem}
+                  disabled={paymentLoading || item.stock <= 0}
+                  style={{ backgroundColor: "#713CC5", padding: "12px 24px" }}
+                >
+                  {paymentLoading ? (
+                    <div className="d-flex align-items-center justify-content-center">
+                      <MoonLoader size={20} color="#fff" />
+                      <span className="ms-2">Processing...</span>
+                    </div>
+                  ) : (
+                    `Buy Now - ${finalPrice.toFixed(2)} DT`
+                  )}
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  size="large"
+                  onClick={() => addToCart(item._id, quantity)}
+                  disabled={item.stock <= 0}
+                  style={{
+                    borderColor: "#713CC5",
+                    color: "#713CC5",
+                    padding: "12px 24px",
+                  }}
+                >
+                  Add to Cart
+                </Button>
+              </div>
+            )}
+
           {item.status === "4" && (
             <Alert severity="info" className="mt-3">
               <AlertTitle>Item Sold</AlertTitle>
               This item has already been sold.
             </Alert>
           )}
-          
+
           <div className="row mt-4">
             <div className="col-md-6">
-              <h5 className="text"><strong>Brand: </strong>{item.brand || "-"}</h5>
-              <h5 className="text"><strong>Category: </strong>{item.category || "-"}</h5>
-              <h5 className="text"><strong>Gender: </strong>{item.gender || "-"}</h5>
-              <h5 className="text"><strong>Condition: </strong>{item.condition || "-"}</h5>
+              <h5 className="text">
+                <strong>Brand: </strong>
+                {item.brand || "-"}
+              </h5>
+              <h5 className="text">
+                <strong>Category: </strong>
+                {item.category || "-"}
+              </h5>
+              <h5 className="text">
+                <strong>Gender: </strong>
+                {item.gender || "-"}
+              </h5>
+              <h5 className="text">
+                <strong>Condition: </strong>
+                {item.condition || "-"}
+              </h5>
             </div>
             <div className="col-md-6">
-              <h5 className="text"><strong>Age: </strong>{item.age || "-"}</h5>
-              <h5 className="text"><strong>Size: </strong>{item.size || "-"}</h5>
-              <h5 className="text"><strong>Previous Owners: </strong>{item.previousOwners || "-"}</h5>
+              <h5 className="text">
+                <strong>Age: </strong>
+                {item.age || "-"}
+              </h5>
+              <h5 className="text">
+                <strong>Size: </strong>
+                {item.size || "-"}
+              </h5>
+              <h5 className="text">
+                <strong>Previous Owners: </strong>
+                {item.previousOwners || "-"}
+              </h5>
             </div>
           </div>
-          
+
           {item.tags && item.tags.length > 0 && (
             <div className="d-flex flex-wrap mt-3">
               {item.tags.map((tag, index) => (
-                <Chip key={index} label={tag} color="default" sx={{ margin: 0.5 }} />
+                <Chip
+                  key={index}
+                  label={tag}
+                  color="default"
+                  sx={{ margin: 0.5 }}
+                />
               ))}
             </div>
           )}
-          
+
           {item.description && (
             <div className="mt-3">
-              <h5><strong>Description:</strong></h5>
+              <h5>
+                <strong>Description:</strong>
+              </h5>
               <p className="text">{item.description}</p>
             </div>
           )}
-          
+
           {item.adminComment && (
             <Alert severity="error" className="mt-3">
               <strong>Admin Comment:</strong> {item.adminComment}
@@ -369,64 +527,98 @@ const goToOwnerProfile = () => {
           )}
         </div>
       </div>
-      
+
       {loggedUser && item.user?._id === loggedUser._id && (
         <div className="d-flex justify-content-center gap-3 p-5">
-          <button className="btn btn-danger rounded" style={{ width: "120px" }}
+          <button
+            className="btn btn-danger rounded"
+            style={{ width: "120px" }}
             onClick={() => {
-              if (window.confirm("Are you sure you want to delete this item?")) {
+              if (
+                window.confirm("Are you sure you want to delete this item?")
+              ) {
                 deleteItem(item._id);
               }
             }}
           >
             Delete
           </button>
-          <button className="btn text-light rounded" style={{ backgroundColor: "#713CC5", width: "120px" }}
+          <button
+            className="btn text-light rounded"
+            style={{ backgroundColor: "#713CC5", width: "120px" }}
             onClick={() => navigate("/items/edit/" + item._id)}
           >
             Edit
           </button>
         </div>
       )}
-      
+
       {/* Payment Dialog */}
-      <Dialog open={paymentDialog} onClose={closePaymentDialog} maxWidth="md" fullWidth>
+      <Dialog
+        open={paymentDialog}
+        onClose={closePaymentDialog}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
-          {paymentStatus === 'pending' ? 'Processing Payment' :
-           paymentStatus === 'success' ? 'Payment Successful' :
-           paymentStatus === 'failed' ? 'Payment Failed' :
-           paymentStatus === 'timeout' ? 'Payment Timeout' : 'Payment'}
+          {paymentStatus === "pending"
+            ? "Processing Payment"
+            : paymentStatus === "success"
+            ? "Payment Successful"
+            : paymentStatus === "failed"
+            ? "Payment Failed"
+            : paymentStatus === "timeout"
+            ? "Payment Timeout"
+            : "Payment"}
         </DialogTitle>
         <DialogContent>
           {iframeUrl && (
-            <iframe src={iframeUrl} width="100%" height="600px" title="Payment Gateway" style={{ border: 'none' }} allow="payment" />
+            <iframe
+              src={iframeUrl}
+              width="100%"
+              height="600px"
+              title="Payment Gateway"
+              style={{ border: "none" }}
+              allow="payment"
+            />
           )}
-          {paymentStatus === 'success' && (
+          {paymentStatus === "success" && (
             <Alert severity="success" sx={{ mt: 2 }}>
               <AlertTitle>Payment Successful</AlertTitle>
               Your payment has been processed successfully.
             </Alert>
           )}
-          {paymentStatus === 'failed' && (
+          {paymentStatus === "failed" && (
             <Alert severity="error" sx={{ mt: 2 }}>
               <AlertTitle>Payment Failed</AlertTitle>
-              The payment was not completed. Please try again or contact support.
+              The payment was not completed. Please try again or contact
+              support.
             </Alert>
           )}
-          {paymentStatus === 'timeout' && (
+          {paymentStatus === "timeout" && (
             <Alert severity="warning" sx={{ mt: 2 }}>
               <AlertTitle>Payment Timeout</AlertTitle>
-              The payment confirmation took too long. Please check if your payment was processed or try again.
+              The payment confirmation took too long. Please check if your
+              payment was processed or try again.
             </Alert>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={closePaymentDialog} variant="contained" style={{ backgroundColor: '#713CC5' }}>
+          <Button
+            onClick={closePaymentDialog}
+            variant="contained"
+            style={{ backgroundColor: "#713CC5" }}
+          >
             Close
           </Button>
-          {paymentStatus === 'failed' && (
-            <Button onClick={() => { closePaymentDialog(); handleBuyItem(); }}
-              variant="outlined" style={{ borderColor: '#713CC5', color: '#713CC5' }}
+          {paymentStatus === "failed" && (
+            <Button
+              onClick={() => {
+                closePaymentDialog();
+                handleBuyItem();
+              }}
+              variant="outlined"
+              style={{ borderColor: "#713CC5", color: "#713CC5" }}
             >
               Try Again
             </Button>

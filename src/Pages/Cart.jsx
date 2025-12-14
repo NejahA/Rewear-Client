@@ -40,7 +40,7 @@ const Cart = () => {
 
     const fetchCartItems = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_LOCAL_URI}/api/cart`, {
+        const response = await axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/cart`, {
           withCredentials: true,
         });
         
@@ -62,7 +62,7 @@ const Cart = () => {
     fetchCartItems();
 loggedId &&
     // Fetch user rewards (points)
-    axios.get(`${import.meta.env.VITE_LOCAL_URI}/api/reward/${loggedId}`, { withCredentials: true })
+    axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/reward/${loggedId}`, { withCredentials: true })
       .then((res) => {
         setRewards(res.data);
       })
@@ -97,12 +97,12 @@ loggedId &&
       if (validQuantity === currentItem.quantity) return;
 
       await axios.put(
-        `${import.meta.env.VITE_LOCAL_URI}/api/cart/update/${itemId}`, 
+        `${import.meta.env.VITE_VERCEL_URI}/api/cart/update/${itemId}`, 
         { itemId, quantity: validQuantity }, 
         { withCredentials: true }
       );
 
-      const response = await axios.get(`${import.meta.env.VITE_LOCAL_URI}/api/cart`, { withCredentials: true });
+      const response = await axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/cart`, { withCredentials: true });
       if (response.data && response.data.items) {
         setCartItems(response.data.items);
         setTotalAmount(response.data.totalAmount || 0);
@@ -116,7 +116,7 @@ loggedId &&
   const handleRemoveItem = async (itemId) => {
     try {
       await removeFromCart(itemId);
-      const response = await axios.get(`${import.meta.env.VITE_LOCAL_URI}/api/cart`, { withCredentials: true });
+      const response = await axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/cart`, { withCredentials: true });
       if (response.data && response.data.items) {
         setCartItems(response.data.items);
         setTotalAmount(response.data.totalAmount || 0);
@@ -143,7 +143,7 @@ loggedId &&
       }));
 
       const response = await axios.post(
-        `${import.meta.env.VITE_LOCAL_URI}/api/paymee/create-cart-payment`,
+        `${import.meta.env.VITE_VERCEL_URI}/api/paymee/create-cart-payment`,
         { items: cartItemsForPayment, usePoints }, // ← SEND usePoints
         { withCredentials: true }
       );
@@ -184,7 +184,7 @@ loggedId &&
       attempts++;
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_LOCAL_URI}/api/paymee/check-status/${token}`,
+          `${import.meta.env.VITE_VERCEL_URI}/api/paymee/check-status/${token}`,
           { withCredentials: true, timeout: 10000 }
         );
 
@@ -194,7 +194,7 @@ loggedId &&
           setPaymentLoading(false);
           if (pollInterval) clearInterval(pollInterval);
 
-          await axios.post(`${import.meta.env.VITE_LOCAL_URI}/api/cart/checkout`, {}, { withCredentials: true });
+          await axios.post(`${import.meta.env.VITE_VERCEL_URI}/api/cart/checkout`, {}, { withCredentials: true });
           setCartItems([]);
           setTotalAmount(0);
         } else if (status.status === 'CANCELED' || status.status === 'FAILED') {
@@ -231,7 +231,7 @@ loggedId &&
         if (pollingInterval) clearInterval(pollingInterval);
         setPaymentStatus('success');
         setPaymentLoading(false);
-        axios.post(`${import.meta.env.VITE_LOCAL_URI}/api/cart/checkout`, {}, { withCredentials: true })
+        axios.post(`${import.meta.env.VITE_VERCEL_URI}/api/cart/checkout`, {}, { withCredentials: true })
           .then(() => {
             setCartItems([]);
             setTotalAmount(0);
