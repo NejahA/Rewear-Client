@@ -7,6 +7,7 @@ import { IconButton } from "@mui/material";
 // import Cookies from "universal-cookies";
 import { MdAddShoppingCart } from "react-icons/md";
 import { useAuth } from "../context/AuthContex";
+
 // A hook to detect screen width
 const useIsDesktop = () => {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 992);
@@ -20,9 +21,12 @@ const useIsDesktop = () => {
   return isDesktop;
 };
 
+// Helper function to detect if device is Android
+const isAndroid = () => {
+  return /Android/.test(navigator.userAgent);
+};
+
 const Navbar = ({
-  // logged,
-  // setLogged,
   setOpenModalReg,
   setOpenModalLog,
   openLog,
@@ -36,26 +40,16 @@ const Navbar = ({
   const [search, setSearch] = useState("");
   const [userNav, setUserNav] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSearchFocused, setIsSearchFocused] = useState(false); // New state for search focus
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const location = useLocation();
-  // const cookies = new Cookies();
-  const isDesktop = useIsDesktop(); // detect mode
+  const isDesktop = useIsDesktop();
+  const isAndroidDevice = isAndroid(); // Detect Android once
 
   // Check if there's an active search query
   const hasActiveSearch = search.trim().length > 0;
-
-  // useEffect(() => {
-  // axios
-  // .get(import.meta.env.VITE_VERCEL_URI + "/api/users/logged", {
-  //   withCredentials: true,
-  // })
-  // .then((res) => setUserNav(res.data))
-  // .catch(() => setUserNav(null));
-  // }, [
-  // JSON.stringify(cookies.get("userToken")),
-  //   location.pathname, isLoggedIn,
-  // ]);
+  
   useEffect(() => {}, [isLoggedIn]);
+  
   // Close menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
@@ -70,28 +64,26 @@ const Navbar = ({
     ? { width: "100%", transition: "width 0.3s ease-in-out" }
     : { width: "auto", transition: "width 0.3s ease-in-out" };
 
-  const [isAppInstalled, setIsAppInstalled] = useState(null); // null = checking, true/false = result
+  const [isAppInstalled, setIsAppInstalled] = useState(null);
+  
   useEffect(() => {
-    if (isDesktop) return;
+    // Only check for app on mobile Android devices
+    if (isDesktop || !isAndroidDevice) return;
 
     let detected = false;
-
     const startTime = Date.now();
 
-    // Hidden iframe trick for more reliable detection (works even if no blur)
     const iframe = document.createElement("iframe");
     iframe.style.display = "none";
-    iframe.src = "reweard://detect"; // any path works
+    iframe.src = "reweard://detect";
     document.body.appendChild(iframe);
 
-    // Cleanup iframe after a short delay
     const cleanup = () => {
       if (document.body.contains(iframe)) {
         document.body.removeChild(iframe);
       }
     };
 
-    // If app opens → page will pause/unload or blur
     const onBlur = () => {
       detected = true;
       setIsAppInstalled(true);
@@ -100,7 +92,6 @@ const Navbar = ({
 
     window.addEventListener("blur", onBlur);
 
-    // Fallback timeout
     const timeout = setTimeout(() => {
       window.removeEventListener("blur", onBlur);
       if (!detected && Date.now() - startTime < 3000) {
@@ -114,7 +105,8 @@ const Navbar = ({
       window.removeEventListener("blur", onBlur);
       cleanup();
     };
-  }, [isDesktop]);
+  }, [isDesktop, isAndroidDevice]);
+
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -201,8 +193,8 @@ const Navbar = ({
                       setSearch(e.target.value);
                     }}
                     value={search}
-                    onFocus={() => setIsSearchFocused(true)} // Set focus state
-                    onBlur={() => setIsSearchFocused(false)} // Clear focus state
+                    onFocus={() => setIsSearchFocused(true)}
+                    onBlur={() => setIsSearchFocused(false)}
                   />
                   <button className="btn bg-white border" type="submit">
                     <i className="bi bi-search"></i>
@@ -332,8 +324,8 @@ const Navbar = ({
                     </Button>
                   </div>
                 )}
-               {/* APK Button - ONLY on mobile, on its own centered line below */}
-                {!isDesktop && (
+                {/* APK Button - ONLY on mobile Android devices */}
+                {!isDesktop && isAndroidDevice && (
                   <div className="mt-4 w-100 d-flex justify-content-center">
                     <button
                       type="button"
@@ -372,7 +364,7 @@ const Navbar = ({
                       <span>
                         {isAppInstalled === null
                           ? "Checking..."
-                          : isAppInstalled 
+                          : isAppInstalled
                           ? "Open App"
                           : "Download App"}
                       </span>
@@ -380,11 +372,8 @@ const Navbar = ({
                   </div>
                 )}
               </div>
-              
             </div>
-            
           )}
-          
         </div>
       </nav>
     </>
