@@ -344,7 +344,7 @@ const Navbar = ({
                         if (isAppInstalled === true) {
                           window.location.href = "reweard://open";
                         } else {
-                          window.location.href = "/downloads/Reweard.apk";
+                          window.location.href = "https://github.com/NejahA/Rewear-Client/releases/download/v1.0.0/Reweard.apk";
                         }
                       }}
                       onMouseEnter={(e) => {
