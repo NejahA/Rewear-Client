@@ -372,7 +372,7 @@ const Navbar = ({
                       <span>
                         {isAppInstalled === null
                           ? "Checking..."
-                          : isAppInstalled
+                          : isAppInstalled 
                           ? "Open App"
                           : "Download App"}
                       </span>
