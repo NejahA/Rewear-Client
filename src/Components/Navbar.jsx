@@ -75,7 +75,7 @@ const Navbar = ({
 
     const iframe = document.createElement("iframe");
     iframe.style.display = "none";
-    iframe.src = "reweard://open";
+    iframe.src = "reweard://home";
     document.body.appendChild(iframe);
 
     const cleanup = () => {
