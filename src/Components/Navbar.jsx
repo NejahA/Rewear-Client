@@ -68,7 +68,11 @@ const Navbar = ({
   
   useEffect(() => {
     // Only check for app on mobile Android devices
-    if (isDesktop ) return;
+    if (isDesktop) return;
+    if (!isAndroidDevice) {
+      setIsAppInstalled(false);
+      return;
+    }
 
     let detected = false;
     const startTime = Date.now();
