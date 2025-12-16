@@ -75,39 +75,58 @@ const Navbar = ({
     }
 
     let detected = false;
-    const startTime = Date.now();
 
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = "reweard://home";
-    document.body.appendChild(iframe);
-
-    const cleanup = () => {
-      if (document.body.contains(iframe)) {
-        document.body.removeChild(iframe);
-      }
+    // Method 1: Try to open the app directly
+    const attemptOpen = () => {
+      const start = Date.now();
+      
+      // Try to open the app
+      window.location.href = "reweard://home";
+      
+      // If the page is still active after a short delay, app didn't open
+      setTimeout(() => {
+        const elapsed = Date.now() - start;
+        // If less than 1 second passed and page didn't blur, app probably isn't installed
+        if (elapsed < 1000 && !detected) {
+          setIsAppInstalled(false);
+        }
+      }, 500);
     };
 
     const onBlur = () => {
       detected = true;
       setIsAppInstalled(true);
-      cleanup();
+    };
+
+    const onFocus = () => {
+      // If we return to the page quickly, app might not be installed
+      if (!detected) {
+        setTimeout(() => {
+          if (!detected) {
+            setIsAppInstalled(false);
+          }
+        }, 300);
+      }
     };
 
     window.addEventListener("blur", onBlur);
+    window.addEventListener("focus", onFocus);
 
-    const timeout = setTimeout(() => {
-      window.removeEventListener("blur", onBlur);
-      if (!detected && Date.now() - startTime < 3000) {
+    // Start detection after a brief delay
+    const initTimeout = setTimeout(attemptOpen, 100);
+
+    // Final fallback - assume not installed after 3 seconds
+    const fallbackTimeout = setTimeout(() => {
+      if (!detected) {
         setIsAppInstalled(false);
       }
-      cleanup();
-    }, 2000);
+    }, 3000);
 
     return () => {
-      clearTimeout(timeout);
+      clearTimeout(initTimeout);
+      clearTimeout(fallbackTimeout);
       window.removeEventListener("blur", onBlur);
-      cleanup();
+      window.removeEventListener("focus", onFocus);
     };
   }, [isDesktop, isAndroidDevice]);
 
