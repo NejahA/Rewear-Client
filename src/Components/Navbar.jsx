@@ -5,7 +5,7 @@ import axios from "axios";
 import Button from "@mui/material/Button";
 import { IconButton } from "@mui/material";
 // import Cookies from "universal-cookies";
-import {MdAddShoppingCart}  from "react-icons/md"
+import { MdAddShoppingCart } from "react-icons/md";
 import { useAuth } from "../context/AuthContex";
 // A hook to detect screen width
 const useIsDesktop = () => {
@@ -30,8 +30,8 @@ const Navbar = ({
   setSort,
   sort,
 }) => {
-    const { isLoggedIn, user } = useAuth();
-  
+  const { isLoggedIn, user } = useAuth();
+
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [userNav, setUserNav] = useState(null);
@@ -45,19 +45,17 @@ const Navbar = ({
   const hasActiveSearch = search.trim().length > 0;
 
   // useEffect(() => {
-    // axios
-      // .get(import.meta.env.VITE_VERCEL_URI + "/api/users/logged", {
-      //   withCredentials: true,
-      // })
-      // .then((res) => setUserNav(res.data))
-      // .catch(() => setUserNav(null));
+  // axios
+  // .get(import.meta.env.VITE_VERCEL_URI + "/api/users/logged", {
+  //   withCredentials: true,
+  // })
+  // .then((res) => setUserNav(res.data))
+  // .catch(() => setUserNav(null));
   // }, [
-    // JSON.stringify(cookies.get("userToken")),
+  // JSON.stringify(cookies.get("userToken")),
   //   location.pathname, isLoggedIn,
   // ]);
- useEffect(() => {
-  
-  }, [isLoggedIn]);
+  useEffect(() => {}, [isLoggedIn]);
   // Close menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
@@ -72,6 +70,51 @@ const Navbar = ({
     ? { width: "100%", transition: "width 0.3s ease-in-out" }
     : { width: "auto", transition: "width 0.3s ease-in-out" };
 
+  const [isAppInstalled, setIsAppInstalled] = useState(null); // null = checking, true/false = result
+  useEffect(() => {
+    if (isDesktop) return;
+
+    let detected = false;
+
+    const startTime = Date.now();
+
+    // Hidden iframe trick for more reliable detection (works even if no blur)
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = "reweard://detect"; // any path works
+    document.body.appendChild(iframe);
+
+    // Cleanup iframe after a short delay
+    const cleanup = () => {
+      if (document.body.contains(iframe)) {
+        document.body.removeChild(iframe);
+      }
+    };
+
+    // If app opens → page will pause/unload or blur
+    const onBlur = () => {
+      detected = true;
+      setIsAppInstalled(true);
+      cleanup();
+    };
+
+    window.addEventListener("blur", onBlur);
+
+    // Fallback timeout
+    const timeout = setTimeout(() => {
+      window.removeEventListener("blur", onBlur);
+      if (!detected && Date.now() - startTime < 3000) {
+        setIsAppInstalled(false);
+      }
+      cleanup();
+    }, 2000);
+
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener("blur", onBlur);
+      cleanup();
+    };
+  }, [isDesktop]);
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -95,7 +138,7 @@ const Navbar = ({
                 />
               </div>
             )}
-{/* Back button when searching on mobile */}
+            {/* Back button when searching on mobile */}
             {!isDesktop && isSearchFocused && (
               <button
                 className="btn btn-link p-0 me-2"
@@ -136,9 +179,7 @@ const Navbar = ({
             {/* Search Bar - Expanded on mobile when searching */}
             <div
               className={`search-bar my-2 my-lg-0 ${
-                isDesktop 
-                  ? "flex-grow-1 mx-4" 
-                  : "flex-grow-1 mx-3"
+                isDesktop ? "flex-grow-1 mx-4" : "flex-grow-1 mx-3"
               }`}
               style={!isDesktop ? mobileSearchStyle : {}}
             >
@@ -188,7 +229,9 @@ const Navbar = ({
           {(isDesktop || (!hasActiveSearch && !isSearchFocused)) && (
             <div
               className={`${
-                isDesktop ? "d-flex align-items-center ms-auto" : `collapse navbar-collapse ${isMenuOpen ? "show" : ""}`
+                isDesktop
+                  ? "d-flex align-items-center ms-auto"
+                  : `collapse navbar-collapse ${isMenuOpen ? "show" : ""}`
               }`}
               id="navbarContent"
             >
@@ -230,14 +273,13 @@ const Navbar = ({
                         style={{ width: "24px", height: "24px" }}
                       />
                     </Link>
-                      <Link
+                    <Link
                       className="nav-link d-flex align-items-center"
                       to={"/cart"}
                     >
-                      
-                    <MdAddShoppingCart fontSize="large"  color="#8356C0"/>
+                      <MdAddShoppingCart fontSize="large" color="#8356C0" />
                     </Link>
-                    <Logout  />
+                    <Logout />
                   </>
                 ) : (
                   <div className="d-flex  gap-4">
@@ -290,9 +332,59 @@ const Navbar = ({
                     </Button>
                   </div>
                 )}
+               {/* APK Button - ONLY on mobile, on its own centered line below */}
+                {!isDesktop && (
+                  <div className="mt-4 w-100 d-flex justify-content-center">
+                    <button
+                      type="button"
+                      className="btn d-flex align-items-center justify-content-center gap-2 py-2 px-4 rounded-4 text-decoration-none shadow-sm"
+                      style={{
+                        backgroundColor: "transparent",
+                        border: "2px solid #8356C0",
+                        color: "#8356C0",
+                        fontWeight: "600",
+                        fontSize: "0.95rem",
+                        minWidth: "200px",
+                        transition: "all 0.3s ease",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        if (isAppInstalled === true) {
+                          window.location.href = "reweard://open";
+                        } else {
+                          window.location.href = "/downloads/Reweard.apk";
+                        }
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#8356C0";
+                        e.currentTarget.style.color = "white";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#8356C0";
+                      }}
+                      disabled={isAppInstalled === null}
+                    >
+                      <i
+                        className="bi bi-android2"
+                        style={{ fontSize: "1.6rem", color: "inherit" }}
+                      ></i>
+                      <span>
+                        {isAppInstalled === null
+                          ? "Checking..."
+                          : isAppInstalled
+                          ? "Open App"
+                          : "Download App"}
+                      </span>
+                    </button>
+                  </div>
+                )}
               </div>
+              
             </div>
+            
           )}
+          
         </div>
       </nav>
     </>
