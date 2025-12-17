@@ -81,7 +81,7 @@ const Navbar = ({
       const start = Date.now();
       
       // Try to open the app
-      window.location.href = "reweard://home";
+      window.location.href = "reweard://detect";
       
       // If the page is still active after a short delay, app didn't open
       setTimeout(() => {
