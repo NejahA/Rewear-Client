@@ -432,7 +432,7 @@ const ShowUser = ({ logged }) => {
               </button>
             </div>
 }          {/* Recent Activity */}
-          <h5 className="mt-4 mb-3">Recent Activity</h5>
+          {/* <h5 className="mt-4 mb-3">Recent Activity</h5>
           {rewards.recent.length > 0 ? (
             <ul className="list-group">
               {rewards.recent.map((log, idx) => (
@@ -447,7 +447,7 @@ const ShowUser = ({ logged }) => {
             </ul>
           ) : (
             <p className="text-center text-muted">No recent activity</p>
-          )}
+          )} */}
         </div>
       </div>
 
