@@ -4,7 +4,6 @@ import Logout from "./Logout";
 import axios from "axios";
 import Button from "@mui/material/Button";
 import { IconButton } from "@mui/material";
-// import Cookies from "universal-cookies";
 import { MdAddShoppingCart } from "react-icons/md";
 import { useAuth } from "../context/AuthContex";
 
@@ -43,13 +42,13 @@ const Navbar = ({
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const location = useLocation();
   const isDesktop = useIsDesktop();
-  const isAndroidDevice = isAndroid(); // Detect Android once
+  const isAndroidDevice = isAndroid();
 
   // Check if there's an active search query
   const hasActiveSearch = search.trim().length > 0;
-  
+
   useEffect(() => {}, [isLoggedIn]);
-  
+
   // Close menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
@@ -64,71 +63,50 @@ const Navbar = ({
     ? { width: "100%", transition: "width 0.3s ease-in-out" }
     : { width: "auto", transition: "width 0.3s ease-in-out" };
 
-  const [isAppInstalled, setIsAppInstalled] = useState(null);
-  
+  // === Android App States ===
+  const [isAppInstalled, setIsAppInstalled] = useState(null); // null = unknown, true/false = known
+  const [isAttempting, setIsAttempting] = useState(false);
+
+  // Restore known status from localStorage on mount
   useEffect(() => {
-    // Only check for app on mobile Android devices
-    if (isDesktop) return;
-    if (!isAndroidDevice) {
+    if (isDesktop || !isAndroidDevice) {
       setIsAppInstalled(false);
       return;
     }
 
-    let detected = false;
-
-    // Method 1: Try to open the app directly
-    const attemptOpen = () => {
-      const start = Date.now();
-      
-      // Try to open the app
-      window.location.href = "reweard://detect";
-      
-      // If the page is still active after a short delay, app didn't open
-      setTimeout(() => {
-        const elapsed = Date.now() - start;
-        // If less than 1 second passed and page didn't blur, app probably isn't installed
-        if (elapsed < 1000 && !detected) {
-          setIsAppInstalled(false);
-        }
-      }, 500);
-    };
-
-    const onBlur = () => {
-      detected = true;
-      setIsAppInstalled(true);
-    };
-
-    const onFocus = () => {
-      // If we return to the page quickly, app might not be installed
-      if (!detected) {
-        setTimeout(() => {
-          if (!detected) {
-            setIsAppInstalled(false);
-          }
-        }, 300);
-      }
-    };
-
-    window.addEventListener("blur", onBlur);
-    window.addEventListener("focus", onFocus);
-
-    // Start detection after a brief delay
-    const initTimeout = setTimeout(attemptOpen, 100);
-
-    // Final fallback - assume not installed after 3 seconds
-    const fallbackTimeout = setTimeout(() => {
-      if (!detected) {
-        setIsAppInstalled(false);
-      }
-    }, 3000);
-
-    return () => {
-      clearTimeout(initTimeout);
-      clearTimeout(fallbackTimeout);
-      window.removeEventListener("blur", onBlur);
-      window.removeEventListener("focus", onFocus);
-    };
+    const stored = localStorage.getItem("reweardAppInstalled");
+    if (stored !== null) {
+      setIsAppInstalled(stored === "true");
+    }
+    // Else leave as null → will be determined on first button click
   }, [isDesktop, isAndroidDevice]);
+
+  // Handle button click: try to open app → fallback to download
+  const handleAppButtonClick = () => {
+    if (isDesktop || !isAndroidDevice) return;
+
+    setIsAttempting(true);
+
+    // Optimistically assume success
+    localStorage.setItem("reweardAppInstalled", "true");
+    setIsAppInstalled(true);
+
+    const startTime = Date.now();
+
+    // Attempt to open the app
+    window.location.href = "reweard://open";
+
+    // Fallback: if still here after 1.5s, download APK
+    setTimeout(() => {
+      if (Date.now() - startTime < 2000 && document.hasFocus()) {
+        localStorage.setItem("reweardAppInstalled", "false");
+        setIsAppInstalled(false);
+        window.location.href =
+          "https://github.com/NejahA/Rewear-Client/releases/download/v1.0.0/Reweard.apk";
+      }
+      setIsAttempting(false);
+    }, 1500);
+  };
 
   return (
     <>
@@ -191,7 +169,7 @@ const Navbar = ({
               </div>
             )}
 
-            {/* Search Bar - Expanded on mobile when searching */}
+            {/* Search Bar */}
             <div
               className={`search-bar my-2 my-lg-0 ${
                 isDesktop ? "flex-grow-1 mx-4" : "flex-grow-1 mx-3"
@@ -226,7 +204,7 @@ const Navbar = ({
               </form>
             </div>
 
-            {/* Mobile menu toggle - Hidden when searching */}
+            {/* Mobile menu toggle */}
             {!isDesktop && !isSearchFocused && (
               <button
                 className="navbar-toggler"
@@ -240,7 +218,7 @@ const Navbar = ({
             )}
           </div>
 
-          {/* Collapsible / Desktop Menu - Hidden on mobile when searching */}
+          {/* Collapsible / Desktop Menu */}
           {(isDesktop || (!hasActiveSearch && !isSearchFocused)) && (
             <div
               className={`${
@@ -297,7 +275,7 @@ const Navbar = ({
                     <Logout />
                   </>
                 ) : (
-                  <div className="d-flex  gap-4">
+                  <div className="d-flex gap-4">
                     <Button
                       variant="outlined"
                       sx={{
@@ -347,6 +325,7 @@ const Navbar = ({
                     </Button>
                   </div>
                 )}
+
                 {/* APK Button - ONLY on mobile Android devices */}
                 {!isDesktop && isAndroidDevice && (
                   <div className="mt-4 w-100 d-flex justify-content-center">
@@ -363,30 +342,30 @@ const Navbar = ({
                         transition: "all 0.3s ease",
                         cursor: "pointer",
                       }}
-                      onClick={() => {
-                        if (isAppInstalled === true) {
-                          window.location.href = "reweard://open";
-                        } else {
-                          window.location.href = "https://github.com/NejahA/Rewear-Client/releases/download/v1.0.0/Reweard.apk";
+                      onClick={handleAppButtonClick}
+                      onMouseEnter={(e) => {
+                        if (!isAttempting) {
+                          e.currentTarget.style.backgroundColor = "#8356C0";
+                          e.currentTarget.style.color = "white";
                         }
                       }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "#8356C0";
-                        e.currentTarget.style.color = "white";
-                      }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#8356C0";
+                        if (!isAttempting) {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                          e.currentTarget.style.color = "#8356C0";
+                        }
                       }}
-                      disabled={isAppInstalled === null}
+                      disabled={isAttempting}
                     >
                       <i
                         className="bi bi-android2"
                         style={{ fontSize: "1.6rem", color: "inherit" }}
                       ></i>
                       <span>
-                        {isAppInstalled === null
-                          ? "Checking..."
+                        {isAttempting
+                          ? "Opening..."
+                          : isAppInstalled === null
+                          ? "Open in App"
                           : isAppInstalled
                           ? "Open App"
                           : "Download App"}
