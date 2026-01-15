@@ -3,13 +3,6 @@ import axios from "axios";
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 // import {
-//   Alert,
-//   AlertTitle,
-//   Button,
-//   Dialog,
-//   DialogActions,
-//   DialogContent,
-//   DialogTitle,
 // } from "@mui/material";
 import { MoonLoader } from "react-spinners";
 import { CartContext } from "../context/CartContext";
@@ -92,9 +85,9 @@ const ShowOne =  () => {
         await setLoggedUser(res.data);
       })
       .catch(async(err) => console.error("Error fetching logged user:", err));
-   
+  
   }, [JSON.stringify(loggedUser), loggedId]);
- useEffect( () => {  
+  useEffect( () => {  
 
     loggedId && axios.get(`${import.meta.env.VITE_VERCEL_URI}/api/reward/${loggedId}`, { withCredentials: true })
       .then(async (res) => {
@@ -300,10 +293,8 @@ const ShowOne =  () => {
             </div>
           </div>
         </div>
-
         <div className="col-12 col-md-6">
           <h1 className="mb-3">{item.title}</h1>
-
           {/* ----------- NEW: Owner profile link ----------- */}
           <div className="d-flex align-items-center gap-2 mb-3">
             {/* <strong>Seller:</strong> */}
@@ -329,7 +320,6 @@ const ShowOne =  () => {
               </Typography>
             </div>
           </div>
-
           <div className="mb-3">
             <small className="text-muted">
               <strong>Price:</strong> {item.price} DT
@@ -375,7 +365,6 @@ const ShowOne =  () => {
                     </Typography>
                   </Box>
                 )}
-
                 {/* Price Display */}
                 {rewards && rewards.points > 0 && item.stock > 0 && (
                   <>
@@ -387,7 +376,6 @@ const ShowOne =  () => {
                     </Typography>
                   </>
                 )}
-
                 {usePoints > 0 && (
                   <Alert severity="success" sx={{ mt: 1 }}>
                     Saving {(usePoints / 10).toFixed(2)} TND with {usePoints}{" "}
@@ -438,7 +426,6 @@ const ShowOne =  () => {
                     `Buy Now - ${finalPrice.toFixed(2)} DT`
                   )}
                 </Button>
-
                 <Button
                   variant="outlined"
                   color="primary"
@@ -455,14 +442,12 @@ const ShowOne =  () => {
                 </Button>
               </div>
             )}
-
           {item.status === "4" && (
             <Alert severity="info" className="mt-3">
               <AlertTitle>Item Sold</AlertTitle>
               This item has already been sold.
             </Alert>
           )}
-
           <div className="row mt-4">
             <div className="col-md-6">
               <h5 className="text">
@@ -497,7 +482,6 @@ const ShowOne =  () => {
               </h5>
             </div>
           </div>
-
           {item.tags && item.tags.length > 0 && (
             <div className="d-flex flex-wrap mt-3">
               {item.tags.map((tag, index) => (
@@ -510,7 +494,6 @@ const ShowOne =  () => {
               ))}
             </div>
           )}
-
           {item.description && (
             <div className="mt-3">
               <h5>
@@ -519,7 +502,6 @@ const ShowOne =  () => {
               <p className="text">{item.description}</p>
             </div>
           )}
-
           {item.adminComment && (
             <Alert severity="error" className="mt-3">
               <strong>Admin Comment:</strong> {item.adminComment}
@@ -527,7 +509,6 @@ const ShowOne =  () => {
           )}
         </div>
       </div>
-
       {loggedUser && item.user?._id === loggedUser._id && (
         <div className="d-flex justify-content-center gap-3 p-5">
           <button
@@ -552,7 +533,6 @@ const ShowOne =  () => {
           </button>
         </div>
       )}
-
       {/* Payment Dialog */}
       <Dialog
         open={paymentDialog}
@@ -627,6 +607,5 @@ const ShowOne =  () => {
       </Dialog>
     </div>
   );
-};
-
+};  
 export default ShowOne;

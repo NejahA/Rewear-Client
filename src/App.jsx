@@ -52,6 +52,7 @@ import Cart from "./Pages/Cart";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContex";
 import RewardsScreen from "./Pages/RewardsScreen";
+import Chat from "./Pages/Chat";
 const violetBase = "#7745B9";
 const violetMain = alpha(violetBase, 0.7);
 
@@ -107,7 +108,8 @@ function App() {
 
         {/* <Navbar /> */}
         {/* {hideNavbarOnRoutes.filter(element => element.includes("/admin/")) && <Navbar />} */}
-        {!location.pathname.includes("/admin/") && !location.pathname.includes("/payment-return") && (
+        {!location.pathname.includes("/admin/") && !location.pathname.includes("/payment-return") && 
+          (
           <Navbar
             logged={logged}
             setLogged={setLogged}
@@ -172,7 +174,7 @@ function App() {
             element={<ResetPassword />}
           />
         <Route path="/payment-return" element={<PaymentReturn />} />
-
+            <Route path="/chat"  element={<Chat />} />
           <Route
             path="/"
             element={
