@@ -54,7 +54,7 @@ const authProvider = {
       },
     
       logout: async () => {
-        await fetch(`${import.meta.env.VITE_VERCEL_URI}/api/logout`, {
+        await fetch(`${import.meta.env.VITE_VERCEL_URI }/api/logout`, {
           method: "POST",
           credentials: "include",
         });

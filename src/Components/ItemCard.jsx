@@ -197,7 +197,7 @@ const ItemCard = ({
           onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
           onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
         >
-          Voir l'article&
+          Voir l'article
         </button>
       </div>
     </div>

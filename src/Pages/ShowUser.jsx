@@ -3,9 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { MoonLoader } from "react-spinners";
-
 import { useRef } from "react";
-
 const StaticLocationMap = ({ lat, lng }) => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);

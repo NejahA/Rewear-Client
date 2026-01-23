@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import { Send, Trash2 } from 'lucide-react';
-
 const socket = io('http://localhost:8001');
-
 export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -13,11 +11,9 @@ export default function Chat() {
   const [typing, setTyping] = useState('');
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
-
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-
   useEffect(() => {
     socket.on('message_history', (history) => setMessages(history));
     socket.on('receive_message', (msg) => setMessages((prev) => [...prev, msg]));
@@ -52,7 +48,6 @@ export default function Chat() {
       setJoined(true);
     }
   };
-
   const sendMessage = () => {
     if (!input.trim() || !joined) return;
     socket.emit('send_message', { room, username, message: input, messageType: 'text' });
@@ -60,7 +55,6 @@ export default function Chat() {
     socket.emit('stop_typing', { room, username });
     clearTimeout(typingTimeoutRef.current);
   };
-
   const handleTyping = (e) => {
     setInput(e.target.value);
     if (!joined) return;
@@ -71,11 +65,9 @@ export default function Chat() {
       socket.emit('stop_typing', { room, username });
     }, 1500);
   };
-
   const deleteMessage = (messageId) => {
     socket.emit('delete_message', { messageId, room });
   };
-
   if (!joined) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-violet-100 via-purple-50 to-fuchsia-100 flex items-center justify-center p-4">
@@ -105,7 +97,6 @@ export default function Chat() {
       </div>
     );
   }
-
   return (
     <div className="flex flex-col h-screen bg-gradient-to-b from-slate-50 to-purple-50 dark:from-gray-950 dark:to-purple-950">
       {/* Header */}
@@ -115,7 +106,6 @@ export default function Chat() {
           <p className="text-sm opacity-90">You → {username}</p>
         </div>
       </header>
-
       {/* Messages */}
       <main className="flex-1 overflow-y-auto p-6 space-y-6 bg-[url('https://images.unsplash.com/photo-1557683311-973673bafdeb?auto=format&fit=crop&q=80')] bg-cover bg-fixed opacity-40 dark:opacity-20">
         <div className="max-w-4xl mx-auto space-y-5">
@@ -127,7 +117,6 @@ export default function Chat() {
               {msg.username !== username && (
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex-shrink-0 shadow-md" />
               )}
-
               <div
                 className={`group relative max-w-[70%] px-5 py-3 rounded-3xl shadow-md transition-all hover:shadow-xl ${
                   msg.username === username
@@ -148,27 +137,21 @@ export default function Chat() {
                     </button>
                   )}
                 </div>
-
                 <p className={msg.isDeleted ? 'italic opacity-70' : ''}>{msg.message}</p>
-
                 <div className="text-xs mt-2 opacity-70 flex items-center gap-2">
                   {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   {msg.isEdited && <span className="italic">(edited)</span>}
                 </div>
               </div>
-
               {msg.username === username && (
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex-shrink-0 shadow-md" />
               )}
             </div>
           ))}
-
           {typing && <div className="text-purple-600 dark:text-purple-400 italic pl-14 animate-pulse">{typing}</div>}
-
           <div ref={messagesEndRef} />
         </div>
       </main>
-
       {/* Input */}
       <footer className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-t border-purple-200 dark:border-purple-800 p-4 shadow-lg">
         <div className="max-w-4xl mx-auto flex items-center gap-3">
@@ -191,3 +174,4 @@ export default function Chat() {
     </div>
   );
 }
+
