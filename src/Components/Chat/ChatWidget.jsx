@@ -137,7 +137,7 @@ export default function ChatWidget() {
     setLoadingMessages(true);
     const socket = io(SOCKET, {
       withCredentials: true,
-      transports: ['websocket', 'polling']
+      transports: ['polling']
     });
     socketRef.current = socket;
 
