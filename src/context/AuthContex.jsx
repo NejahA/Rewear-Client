@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
       setLoggedId(res.data._id);
     } catch (err) {
       setUser(null);
-      loggedId(null);
+      setLoggedId(null);
     } finally {
       setLoading(false);
     }

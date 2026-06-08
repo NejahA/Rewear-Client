@@ -26,7 +26,6 @@ const ItemCard = ({
     }
     addToCart(item._id);
   };
-
   const handleShowProduct = () => {
     if (!isLoggedIn) {
       setOpenModalLog(true);
@@ -34,9 +33,7 @@ const ItemCard = ({
     }
     navigate(`/items/${item._id}`);
   };
-
   const firstImage = item?.itemPics?.[0]?.url || '/placeholder-clothing.jpg';
-
   return (
     <div
       className="card-modern h-100"
@@ -107,7 +104,6 @@ const ItemCard = ({
             />
           </button>
         )}
-
         {/* Heart (wishlist) – top right */}
         {/* <button
           onClick={(e) => {
@@ -138,7 +134,6 @@ const ItemCard = ({
           />
         </button> */}
       </div>
-
       {/* ─── Content ─────────────────────────────────────────── */}
       <div className="card-body d-flex flex-column p-4">
         <h6

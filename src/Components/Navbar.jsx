@@ -217,7 +217,6 @@ const Navbar = ({
               </button>
             )}
           </div>
-
           {/* Collapsible / Desktop Menu */}
           {(isDesktop || (!hasActiveSearch && !isSearchFocused)) && (
             <div
@@ -254,7 +253,6 @@ const Navbar = ({
                         alt="Profile"
                       />
                     </Link>
-
                     <Link
                       className="nav-link d-flex align-items-center"
                       to={"/items/new"}
@@ -301,7 +299,6 @@ const Navbar = ({
                       <i className="bi bi-box-arrow-in-right"></i>
                       Sign Up
                     </Button>
-
                     <Button
                       variant="contained"
                       sx={{

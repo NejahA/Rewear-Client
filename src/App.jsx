@@ -53,6 +53,7 @@ import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContex";
 import RewardsScreen from "./Pages/RewardsScreen";
 import Chat from "./Pages/Chat";
+import ChatWidget from "./Components/Chat/ChatWidget";
 const violetBase = "#7745B9";
 const violetMain = alpha(violetBase, 0.7);
 
@@ -199,6 +200,12 @@ function App() {
           <Route path="/admin/*" element={<AdminDash logged={logged}
             setLogged={setLogged} />} />
         </Routes>
+
+        {/* Facebook‑style floating chat widget for logged‑in users */}
+        {!location.pathname.includes("/chat") && !location.pathname.includes("/admin/") && (
+          <ChatWidget />
+        )}
+
         {/* <Footer
           userNav={userNav}
           setUserNav={setUserNav}
