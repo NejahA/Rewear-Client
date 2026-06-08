@@ -12,7 +12,7 @@ const API = import.meta.env.VITE_VERCEL_URI;
 // const SOCKET = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
 //   ? import.meta.env.VITE_SOCKET_URI
 //   : import.meta.env.VITE_PROD_SOCKET_URI;
-const SOCKET = VITE_PROD_SOCKET_URI
+const SOCKET = import.meta.env.VITE_PROD_SOCKET_URI
 /**
  * ChatWidget – Modern floating chat popup with channel rooms,
  * user search, DM conversations, and message editing.
