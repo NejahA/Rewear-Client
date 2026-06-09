@@ -137,11 +137,21 @@ export default function ChatWidget() {
     setLoadingMessages(true);
     const socket = io(SOCKET, {
       withCredentials: true,
-      transports: ['websocket', 'polling']
+      transports: ['websocket', 'polling'],
+      reconnectionDelay: 1000,
+      reconnection: true,
+      reconnectionAttempts: 5
     });
     socketRef.current = socket;
 
-    socket.emit('join_room', { room: currentRoom, username });
+    socket.on('connect', () => {
+      console.log('Socket connected in ChatWidget');
+      socket.emit('join_room', { room: currentRoom, username });
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+    });
 
     socket.on('message_history', (history) => {
       setMessages(history);
@@ -177,6 +187,8 @@ export default function ChatWidget() {
     socket.on('message_error', (err) => console.error(err.error));
 
     return () => {
+      socket.off('connect');
+      socket.off('connect_error');
       socket.off('message_history');
       socket.off('receive_message');
       socket.off('message_edited');
@@ -907,6 +919,14 @@ export default function ChatWidget() {
           0% { opacity: 0; transform: translateY(4px); }
           100% { opacity: 1; transform: translateY(0); }
         }
+        /* Cross-browser scrollbar styling */
+        .scrollbar-thin {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(168, 85, 247, 0.25) transparent;
+        }
+        .dark .scrollbar-thin {
+          scrollbar-color: rgba(126, 34, 206, 0.3) transparent;
+        }
         .scrollbar-thin::-webkit-scrollbar {
           width: 4px;
           height: 4px;
@@ -926,6 +946,15 @@ export default function ChatWidget() {
         }
         .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
           background: rgba(126, 34, 206, 0.5);
+        }
+        /* Cross-browser select styling */
+        select {
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+        }
+        select::-ms-expand {
+          display: none;
         }
       `}</style>
     </>
